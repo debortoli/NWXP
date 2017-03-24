@@ -15,11 +15,12 @@ if __name__ == '__main__':
     done = False
     board.clock.tick()
     while done == False:
-        print int(pygame.time.get_ticks()/1000.)
+        # print int(pygame.time.get_ticks()/1000.)
         if(int(pygame.time.get_ticks()/1000.)%10==0 and 
             (pygame.time.get_ticks()/1000.)>1):
             board.year+=1
-            print "here"
+
+            # print "here"
         # write event handlers here
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -29,11 +30,13 @@ if __name__ == '__main__':
                 # print event.pos
                 for icon in board.dnd:
                     if icon.rect.collidepoint(event.pos):
-
                         board.update_text+="item is being dragged"+'\n'
-                        # print "clicked on icon"
-                        
                         icon.click = True
+                for option in board.menu_options:
+                    if option.rect.collidepoint(event.pos) :
+                        board.update_text+="You have allowed the transmission line to"+ '\n'+ "continue aging."+'\n'
+                        board.update_text+="No money was spent!"+'\n'
+                        board.displayMenu=False
             elif event.type == pygame.MOUSEBUTTONUP:
                 for icon in board.dnd:
                     icon.click = False

@@ -33,20 +33,25 @@ class Board:
 		self.year=0
 		self.createCities()
 		self.createTransmissionLines()
-		self.displayMenu=True
+		self.displayMenu=False
+		self.menu_options=[]
 
 	def createCities(self):
 		self.cities=[]
-		c=City('../images/city_small.jpg',[110,180])
-		self.cities.append(c)
-		c=City('../images/city_small.jpg',[93,240])
-		self.cities.append(c)
+		locations=  [[88, 131], [67, 253], [70, 310], [63, 411], [305, 151], [300, 232], 
+					[386, 261], [387, 358], [384, 430], [390, 539], [149, 4], [146, 60], [105, 116],[110,180],[93,240], 
+					[184, 287], [177, 373], [532, 269], [492, 335], [494, 405], [458,620],[81, 267],[143, 526],[245, 579],[352, 633]]
+		for location in locations:
+			c=City('../images/city_small.jpg',location)
+			self.cities.append(c)
 
 	def createTransmissionLines(self):
 		self.transmissionLines=[]
-		t=Transmission('../images/transmission_small.png',[90,205],
+		t=Transmission('../images/transmission_small_vertical.png',[90,205],
 			"PortlandCorvallis",0)
 		self.transmissionLines.append(t)
+		
+
 
 	def textUpdate(self):
 		#format text
@@ -74,6 +79,18 @@ class Board:
 		for line in self.transmissionLines:
 			line.update(self)
 			self.screen.blit(line.image,line.rect)
+
+		#the below is a placeholder until I redefine transmission lines
+		end_points=[[121, 126], [313, 160], [115, 189], [309, 242], [309, 242], [551, 275], 
+		 [73, 268], [192, 290], [77, 323], [79, 317], [185, 380], [390, 437], [399, 448], [510, 411], [314, 246], [394, 269], 
+		 [394, 269], [398, 368], [398, 368], [495, 343], [399, 366], [398, 439], [498, 344], [506, 418], [506, 418], [403, 549], 
+		 [396, 441], [403, 546], [403, 546], [465, 624], [80, 265], [81, 324], [81, 317], [79, 425], [98, 147], [121, 185], [156, 71], 
+		 [124, 126], [167, 12], [152, 76], [195, 294], [186, 383], [105, 253], [81, 267], [78, 421], [143, 526], [143, 526], 
+		 [245, 579], [245, 579], [352, 633], [352, 633], [470, 635]]
+		i=0
+		while i <len(end_points):
+			pygame.draw.lines(self.screen, (0,0,0), False, [end_points[i],end_points[i+1]], 3)
+			i+=2
 
 	def draggablesUpdate(self):
 		for i,icon  in enumerate(self.dnd):

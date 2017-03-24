@@ -27,16 +27,16 @@ if __name__ == '__main__':
                 done = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print "button clicked"
-                # print event.pos
+                print event.pos
                 for icon in board.dnd:
                     if icon.rect.collidepoint(event.pos):
                         board.update_text+="item is being dragged"+'\n'
                         icon.click = True
-                for option in board.menu_options:
-                    if option.rect.collidepoint(event.pos) :
-                        board.update_text+="You have allowed the transmission line to"+ '\n'+ "continue aging."+'\n'
-                        board.update_text+="No money was spent!"+'\n'
-                        board.displayMenu=False
+                # for option in board.menu_options:
+                    # if option.rect.collidepoint(event.pos) :
+                    #     board.update_text+="You have allowed the transmission line to"+ '\n'+ "continue aging."+'\n'
+                    #     board.update_text+="No money was spent!"+'\n'
+                    #     board.displayMenu=False
             elif event.type == pygame.MOUSEBUTTONUP:
                 for icon in board.dnd:
                     icon.click = False

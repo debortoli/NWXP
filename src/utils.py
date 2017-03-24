@@ -33,7 +33,7 @@ class Board:
 		self.year=0
 		self.createCities()
 		self.createTransmissionLines()
-		self.displayMenu=False
+		self.displayMenu=True
 		self.menu_options=[]
 
 	def createCities(self):
@@ -113,6 +113,13 @@ class Board:
 					
 
 					#display the menu options
+					t=pygame.font.SysFont('Courier New', 22,bold=True).render("The transmission line from", False, (0, 0, 0))
+					optionScreen.blit(t,(oS_corner_x+10, oS_corner_y+10))
+					t=pygame.font.SysFont('Courier New', 22,bold=True).render("Corvallis to Portland is aging!", False, (0, 0, 0))
+					optionScreen.blit(t,(oS_corner_x+10, oS_corner_y+30))
+					
+					t=pygame.font.SysFont('Courier New', 22,bold=True).render("What would you like to do?", False, (0, 0, 0))
+					optionScreen.blit(t,(oS_corner_x+10, oS_corner_y+50))
 					self.menu_options=[]
 					options = [Option("Replace line with taxpayer money", (oS_corner_x+10, oS_corner_y+150)), 
 					Option("Replace line with utility money", (oS_corner_x+10, oS_corner_y+250)),	
@@ -183,7 +190,7 @@ class Option:
 		screen.blit(self.rend, self.rect)
 		
 	def set_rend(self):
-		self.rend = pygame.font.SysFont('Courier New', 20,bold=True).render(self.text, True, self.get_color())
+		self.rend = pygame.font.SysFont('Courier New', 18,bold=True).render(self.text, True, self.get_color())
 		
 	def get_color(self):
 		if self.hovered:

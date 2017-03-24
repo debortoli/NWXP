@@ -1,23 +1,34 @@
 import pygame
 import planes
+from pygame.locals import *
+import pdb
 class Board:
 	def __init__(self):
 		# initialize game engine
 		pygame.init()
-		self.size = [1000,1000]#width then height
+		self.size = [1000,700]#width then height
 		self.screen = pygame.display.set_mode(self.size)
 		pygame.display.set_caption('Grid Simulator')
 		self.clock = pygame.time.Clock()
 
 		#init the background stuff
-		self.BackGround = Background('../images/wecc_background.jpg', [0,0])
+		self.BackGround = Background('../images/wecc_background2.jpg', [0,0])
 		#init the text stuff
 		pygame.font.init()
 		self.myfont = pygame.font.SysFont('Courier New', 15)
 		#add the dragNdrop options
 		self.dnd=[]
-		d=DragNDrop((0,900,50,50),'../images/city.jpg')
-		self.dnd.append(d)
+		d1=DragNDrop((10,650,50,50),'../images/city.jpg')
+		self.dnd.append(d1)
+		d2=DragNDrop((130,650,50,50),'../images/transmission.png')
+		self.dnd.append(d2)
+		d3=DragNDrop((250,650,50,50),'../images/hydro.png')
+		self.dnd.append(d3)
+		d4=DragNDrop((370,650,50,50),'../images/solar.png')
+		self.dnd.append(d4)
+		d5=DragNDrop((490,650,50,50),'../images/wind.jpg')
+		self.dnd.append(d5)
+
 		self.update_text="Game has begun!\n"
 		self.year=0
 		self.createCities()

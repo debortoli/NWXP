@@ -4,6 +4,7 @@ import numpy as np
 import math
 from utils import Board
 import time
+from pygame.locals import *
 
 
 
@@ -36,6 +37,11 @@ if __name__ == '__main__':
             elif event.type == pygame.MOUSEBUTTONUP:
                 for icon in board.dnd:
                     icon.click = False
+
+            elif event.type==VIDEORESIZE:
+                screen=pygame.display.set_mode(event.dict['size'],FULLSCREEN)
+                # screen.blit(pygame.transform.scale(pic,event.dict['size']),(0,0))
+                pygame.display.flip()
         # write game logic here
         # if(board.year%10==0 and board.year>0):
         #     board.update_text+="Another 10 years have passed.\n"

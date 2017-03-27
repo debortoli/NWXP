@@ -19,6 +19,7 @@ if __name__ == '__main__':
         if(int(pygame.time.get_ticks()/1000.)%10==0 and 
             (pygame.time.get_ticks()/1000.)>1):
             board.year+=1
+            # board.progress+=0.1
 
         # write event handlers here
         for event in pygame.event.get():

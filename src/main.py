@@ -27,9 +27,14 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 done = True
 
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     if(board.updateQueue[0].buttonClicked=True)
-            #         board.updateQueue[0].buttonClicked=True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                buttonRect=pygame.Rect(board.UpdateMessageSurface_x+board.updateQueue[0].buttonx,
+                                       board.UpdateMessageSurface_y+board.updateQueue[0].buttony,
+                                        board.updateQueue[0].buttonw,
+                                        board.updateQueue[0].buttonh)
+                if(buttonRect.collidepoint(event.pos)):
+                    print board.updateQueue[0]
+                    board.updateQueue[0].buttonClicked=True
 
             elif event.type==VIDEORESIZE:
                 board.screen=pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)

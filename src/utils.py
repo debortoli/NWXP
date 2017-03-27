@@ -58,6 +58,9 @@ class Board:
 		self.year=0
 
 		self.updateQueue=[]
+		self.UpdateMessageSurface_x=100
+		self.UpdateMessageSurface_y=450
+
 		# self.poppinsFont=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',25)
 		# # self.createCities()
 		# # self.createTransmissionLines()
@@ -80,6 +83,8 @@ class Board:
 		self.screen.blit(self.levelCompleteSurface, (levelx,levely))
 		self.screen.blit(self.totalPointsSurface,   (pointsx,pointsy))
 		self.screen.blit(self.dragablesSurface,     (iconsx,pointsy*2))
+		if(len(self.updateQueue)>0):
+			self.screen.blit(self.updateQueue[0].messageSurface,(self.UpdateMessageSurface_x,self.UpdateMessageSurface_y))
 
 		#draw borders around surfaces
 		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(levelx,levely,self.screen.get_width()-levelx,pointsy),2)
@@ -231,6 +236,7 @@ class Board:
 		self.levelCompleteSurface=pygame.transform.scale(self.levelCompleteSurface,(screenSize[0]/3,screenSize[1]/5))
 		self.totalPointsSurface=pygame.transform.scale(self.totalPointsSurface,(screenSize[0]/3,screenSize[1]/5))
 		self.dragablesSurface=pygame.transform.scale(self.dragablesSurface,(screenSize[0]/3,screenSize[1]/5*3))
+		self.resizeUpdateMessages()
 		#update icons
 		self.dnd=[]
 		d1=DragNDrop((8/30.*self.dragablesSurface.get_width(),1/5.*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
@@ -244,12 +250,27 @@ class Board:
 		d5=DragNDrop((8/30.*self.dragablesSurface.get_width(),38/50.*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
 		self.dnd.append(d5)
 
+	def resizeUpdateMessages(self):
+		self.UpdateMessageSurface_y=0.65*self.screen.get_height()
+		self.UpdateMessageSurface_x=0.1*self.screen.get_width()
+		if(len(self.updateQueue)>0):
+			for message in self.updateQueue:
+				#surface resizing
+				message.messageSurface.fill([224,224,224])
+				message.messageSurface=pygame.transform.scale(message.messageSurface,(int(0.5*self.screen.get_width()),int(0.25*self.screen.get_height())))
+				#button resizing
+				message.buttonx=message.messageSurface.get_width()-message.messageSurface.get_width()*0.2+1
+				message.buttonw=message.messageSurface.get_width()-message.buttonx
+				message.buttonh=message.messageSurface.get_height()*0.15
+		
+
 			
 	
 class UpdateMessageSurface():
-	def __init__(self,message):
+	def __init__(self,board,message):
 		#make the semi-transparent surface
-		self.messageSurface=pygame.Surface((450,200), pygame.SRCALPHA)
+		# self.messageSurface_width=
+		self.messageSurface=pygame.Surface((0.5*board.screen.get_width(),0.25*board.screen.get_height()), pygame.SRCALPHA)
 		self.messageSurface.fill((255,255,255,200))
 
 		#display the message
@@ -257,20 +278,32 @@ class UpdateMessageSurface():
 
 		#make the button
 		self.buttonColor=(0,200,0)
-		pygame.draw.rect(self.messageSurface, self.buttonColor,(350,0,100,30))
+		self.buttonx=self.messageSurface.get_width()-self.messageSurface.get_width()*0.2+1
+		self.buttony=0
+		self.buttonw=self.messageSurface.get_width()-self.buttonx
+		self.buttonh=self.messageSurface.get_height()*0.15
+		pygame.draw.rect(self.messageSurface, self.buttonColor,(self.buttonx,self.buttony,self.buttonw,self.buttonh))
 		t=pygame.font.SysFont('comicsansms', 25).render("Continue", False, (0, 0, 0))
-		self.messageSurface.blit(t,(360,5))
-		self.buttonClick = False
+		self.messageSurface.blit(t,(self.buttonx+10,self.buttony))
+		self.buttonClicked = False
 
-	def update(self):
+	def update(self,board):
+		#dim the color as the mouse goes over it
+		buttonRect=pygame.Rect(board.UpdateMessageSurface_x+board.updateQueue[0].buttonx,
+									   board.UpdateMessageSurface_y+board.updateQueue[0].buttony,
+										board.updateQueue[0].buttonw,
+										board.updateQueue[0].buttonh)
+		if(buttonRect.collidepoint(pygame.mouse.get_pos())):
+			self.buttonColor=(0,150,0)
+		else:
+			self.buttonColor=(0,200,0)
+			
 
 		#display button
-		pygame.draw.rect(self.messageSurface, self.buttonColor,(350,0,100,30))
+		pygame.draw.rect(self.messageSurface, self.buttonColor,(self.buttonx,self.buttony,self.buttonw,self.buttonh))
 		t=pygame.font.SysFont('comicsansms', 25).render("Continue", False, (0, 0, 0))
-		self.messageSurface.blit(t,(360,5))
-
-		if self.buttonClick:
-			self.rect.center = pygame.mouse.get_pos()
+		self.messageSurface.blit(t,(self.buttonx+10,self.buttony+5))
+		
 
 		#format the text
 		line_num=0
@@ -353,4 +386,3 @@ class Option:
 
 
 
-	

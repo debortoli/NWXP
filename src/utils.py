@@ -15,17 +15,17 @@ class Board:
 		# self.BackGround = Background('../images/wecc_background2.jpg', [0,0])
 
 		#init all apropriate surfaces
-		self.levelCompleteSurface = pygame.Surface((300,100))
-		self.levelCompleteSurface.fill([255,255,255])
+		self.levelCompleteSurface = pygame.Surface((300,100),1)
+		self.levelCompleteSurface.fill([224,224,224])
 		self.totalPointsSurface = pygame.Surface((300,100))
-		self.totalPointsSurface.fill([255,255,255])
+		self.totalPointsSurface.fill([224,224,224])
 		self.dragablesSurface = pygame.Surface((300,500))
-		self.dragablesSurface.fill([255,255,255])
-		self.blitSurfaces()
+		self.dragablesSurface.fill([224,224,224])
+		# self.blitSurfaces()
 
 
 
-		#init the text stuff
+		#init the text STUFF
 		# pygame.font.init()
 		# self.myfont = pygame.font.SysFont('Courier New', 15)
 
@@ -46,9 +46,11 @@ class Board:
 		self.draggablesUpdate()
 
 		self.progress=0.8
+		self.totalPoints=20
 
 		# self.update_text="Game has started!\n"
-		# self.year=0
+		self.year=0
+		# self.poppinsFont=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',25)
 		# # self.createCities()
 		# # self.createTransmissionLines()
 		# self.displayMenu=True
@@ -58,19 +60,39 @@ class Board:
 		levelx,levely=[700,0]
 		pointsx,pointsy=[700,100]
 		iconsx,iconsy=[700,200]
+
+		#update surface info
+		self.updateLevelSurface(self.progress)
+		self.updatePointsSurface()
+
+		#
 		self.screen.blit(self.levelCompleteSurface, (levelx,levely))
 		self.screen.blit(self.totalPointsSurface,   (pointsx,pointsy))
 		self.screen.blit(self.dragablesSurface,     (iconsx,iconsy))
 
-	def updateLevelProgressBar(self,progress):
+		#draw borders around surfaces
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,0,300,100),2)
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,100,300,100),2)
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,200,300,500),2)
+
+	def updateLevelSurface(self,progress):
 		maxwidth=280
 		left=10
 		top=50
-		height=30
+		height=25
 		bar=pygame.draw.rect(self.levelCompleteSurface, (0,255,0), pygame.Rect(left,top,maxwidth*progress,height))
 		outline=pygame.draw.rect(self.levelCompleteSurface, (0,0,0), pygame.Rect(left,top,maxwidth,height),3)
-		# self.levelCompleteSurface.blit(bar,(left,top))
-		# self.levelCompleteSurface.blit(outline,(left,top))
+
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',30).render("Level Progress", False, (0, 0, 0))
+		self.levelCompleteSurface.blit(title,(80,10))
+
+	def updatePointsSurface(self):
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',30).render("Total Points", False, (0, 0, 0))
+		self.totalPointsSurface.blit(title,(100,10))
+
+		points=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',55).render(str(self.totalPoints), False, (0, 128, 0))
+		self.totalPointsSurface.blit(points,(140,45))
+
 
 	def createCities(self):
 		self.cities=[]

@@ -28,9 +28,9 @@ if __name__ == '__main__':
 
         
         # write draw code here
-        
+
         board.blitSurfaces()
-        board.updateLevelProgressBar(board.progress)
+        # board.updateLevelSurface(board.progress)
 
         # display what’s drawn. this might change.
         pygame.display.update()

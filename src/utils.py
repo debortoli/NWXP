@@ -12,29 +12,65 @@ class Board:
 		self.clock = pygame.time.Clock()
 
 		#init the background stuff
-		self.BackGround = Background('../images/wecc_background2.jpg', [0,0])
+		# self.BackGround = Background('../images/wecc_background2.jpg', [0,0])
+
+		#init all apropriate surfaces
+		self.levelCompleteSurface = pygame.Surface((300,100))
+		self.levelCompleteSurface.fill([255,255,255])
+		self.totalPointsSurface = pygame.Surface((300,100))
+		self.totalPointsSurface.fill([255,255,255])
+		self.dragablesSurface = pygame.Surface((300,500))
+		self.dragablesSurface.fill([255,255,255])
+		self.blitSurfaces()
+
+
+
 		#init the text stuff
-		pygame.font.init()
-		self.myfont = pygame.font.SysFont('Courier New', 15)
-		#add the dragNdrop options
+		# pygame.font.init()
+		# self.myfont = pygame.font.SysFont('Courier New', 15)
+
+
+		# #add the dragNdrop options
 		self.dnd=[]
-		d1=DragNDrop((10,650,50,50),'../images/city.jpg')
+		d1=DragNDrop((80,140,50,50),'../images/city.jpg')
 		self.dnd.append(d1)
-		d2=DragNDrop((130,650,50,50),'../images/transmission.png')
+		d2=DragNDrop((180,140,50,50),'../images/city.jpg')
 		self.dnd.append(d2)
-		d3=DragNDrop((250,650,50,50),'../images/hydro.png')
+		d3=DragNDrop((80,280,50,50),'../images/city.jpg')
 		self.dnd.append(d3)
-		d4=DragNDrop((370,650,50,50),'../images/solar.png')
+		d4=DragNDrop((180,280,50,50),'../images/city.jpg')
 		self.dnd.append(d4)
-		d5=DragNDrop((490,650,50,50),'../images/wind.jpg')
+		d5=DragNDrop((80,420,50,50),'../images/city.jpg')
 		self.dnd.append(d5)
 
-		self.update_text="Game has started!\n"
-		self.year=0
-		self.createCities()
-		self.createTransmissionLines()
-		self.displayMenu=True
-		self.menu_options=[]
+		self.draggablesUpdate()
+
+		self.progress=0.8
+
+		# self.update_text="Game has started!\n"
+		# self.year=0
+		# # self.createCities()
+		# # self.createTransmissionLines()
+		# self.displayMenu=True
+		# self.menu_options=[]
+
+	def blitSurfaces(self):
+		levelx,levely=[700,0]
+		pointsx,pointsy=[700,100]
+		iconsx,iconsy=[700,200]
+		self.screen.blit(self.levelCompleteSurface, (levelx,levely))
+		self.screen.blit(self.totalPointsSurface,   (pointsx,pointsy))
+		self.screen.blit(self.dragablesSurface,     (iconsx,iconsy))
+
+	def updateLevelProgressBar(self,progress):
+		maxwidth=280
+		left=10
+		top=50
+		height=30
+		bar=pygame.draw.rect(self.levelCompleteSurface, (0,255,0), pygame.Rect(left,top,maxwidth*progress,height))
+		outline=pygame.draw.rect(self.levelCompleteSurface, (0,0,0), pygame.Rect(left,top,maxwidth,height),3)
+		# self.levelCompleteSurface.blit(bar,(left,top))
+		# self.levelCompleteSurface.blit(outline,(left,top))
 
 	def createCities(self):
 		self.cities=[]
@@ -67,6 +103,7 @@ class Board:
 				line+=char
 
 	def staticItemsUpdate(self):
+		#BELOW IS OLD STUFF RELATING TO CITIES, ETC.
 		#background image
 		self.screen.fill([255, 255,255])
 		self.screen.blit(self.BackGround.image, self.BackGround.rect)
@@ -94,7 +131,7 @@ class Board:
 
 	def draggablesUpdate(self):
 		for i,icon  in enumerate(self.dnd):
-			icon.update(self.screen)
+			icon.update(self.dragablesSurface)
 			# board.screen.blit(icon,(i*100,700))
 
 	def checkPowerLineAge(self):

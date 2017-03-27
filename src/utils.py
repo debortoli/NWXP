@@ -2,23 +2,27 @@ import pygame
 import planes
 from pygame.locals import *
 import pdb
+import time
+
 class Board:
 	def __init__(self):
 		# initialize game engine
 		pygame.init()
 		self.size = [1000,700]#width then height
-		self.screen = pygame.display.set_mode(self.size)
+		self.screen = pygame.display.set_mode(self.size,RESIZABLE)
 		pygame.display.set_caption('Grid Simulator')
 		self.clock = pygame.time.Clock()
 
 		#init the background stuff
-		# self.BackGround = Background('../images/wecc_background2.jpg', [0,0])
+		self.BackGround = Background('../images/dam.jpg', [0,0])
 
 		#init all apropriate surfaces
 		self.levelCompleteSurface = pygame.Surface((300,100),1)
 		self.levelCompleteSurface.fill([224,224,224])
+
 		self.totalPointsSurface = pygame.Surface((300,100))
 		self.totalPointsSurface.fill([224,224,224])
+
 		self.dragablesSurface = pygame.Surface((300,500))
 		self.dragablesSurface.fill([224,224,224])
 		# self.blitSurfaces()
@@ -32,24 +36,28 @@ class Board:
 
 		# #add the dragNdrop options
 		self.dnd=[]
-		d1=DragNDrop((80,140,50,50),'../images/city.jpg')
+		d1=DragNDrop((80,100,50,50),'../images/city.jpg')
 		self.dnd.append(d1)
-		d2=DragNDrop((180,140,50,50),'../images/city.jpg')
+		d2=DragNDrop((180,100,50,50),'../images/city.jpg')
 		self.dnd.append(d2)
-		d3=DragNDrop((80,280,50,50),'../images/city.jpg')
+		d3=DragNDrop((80,240,50,50),'../images/city.jpg')
 		self.dnd.append(d3)
-		d4=DragNDrop((180,280,50,50),'../images/city.jpg')
+		d4=DragNDrop((180,240,50,50),'../images/city.jpg')
 		self.dnd.append(d4)
-		d5=DragNDrop((80,420,50,50),'../images/city.jpg')
+		d5=DragNDrop((80,380,50,50),'../images/city.jpg')
 		self.dnd.append(d5)
 
 		self.draggablesUpdate()
 
 		self.progress=0.8
 		self.totalPoints=20
+		#level 0=tutorial
+		self.level=0
 
 		# self.update_text="Game has started!\n"
 		self.year=0
+
+		self.updateQueue=[]
 		# self.poppinsFont=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',25)
 		# # self.createCities()
 		# # self.createTransmissionLines()
@@ -57,7 +65,9 @@ class Board:
 		# self.menu_options=[]
 
 	def blitSurfaces(self):
-		levelx,levely=[700,0]
+		self.screen.blit(self.BackGround.image, self.BackGround.rect)
+
+		levelx,levely=[0.7*self.screen.get_width(),0]
 		pointsx,pointsy=[700,100]
 		iconsx,iconsy=[700,200]
 
@@ -76,18 +86,22 @@ class Board:
 		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,200,300,500),2)
 
 	def updateLevelSurface(self,progress):
-		maxwidth=280
-		left=10
-		top=50
-		height=25
+		#clear the surface
+		self.levelCompleteSurface.fill((255,255,255))
+
+		maxwidth=0.8*self.levelCompleteSurface.get_width()
+		left=0.03*self.levelCompleteSurface.get_width()
+		top=0.5*self.levelCompleteSurface.get_height()
+		height=0.25*self.levelCompleteSurface.get_height()
 		bar=pygame.draw.rect(self.levelCompleteSurface, (0,255,0), pygame.Rect(left,top,maxwidth*progress,height))
 		outline=pygame.draw.rect(self.levelCompleteSurface, (0,0,0), pygame.Rect(left,top,maxwidth,height),3)
 
-		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',30).render("Level Progress", False, (0, 0, 0))
+		self.fontsize=int(0.1*self.levelCompleteSurface.get_width())
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',self.fontsize).render("Level Progress", False, (0, 0, 0))
 		self.levelCompleteSurface.blit(title,(80,10))
 
 	def updatePointsSurface(self):
-		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',30).render("Total Points", False, (0, 0, 0))
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',self.fontsize).render("Total Points", False, (0, 0, 0))
 		self.totalPointsSurface.blit(title,(100,10))
 
 		points=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',55).render(str(self.totalPoints), False, (0, 128, 0))
@@ -193,10 +207,51 @@ class Board:
 
 					self.screen.blit(optionScreen, (oS_corner_x,oS_corner_y))
 
+	def resizeSurfaces(self,screenSize):
+		self.levelCompleteSurface=pygame.transform.scale(self.levelCompleteSurface,(screenSize[0]/3,screenSize[1]/5))
+
 			
 	
+class UpdateMessageSurface():
+	def __init__(self,message):
+		#make the semi-transparent surface
+		self.messageSurface=pygame.Surface((450,200), pygame.SRCALPHA)
+		self.messageSurface.fill((255,255,255,200))
+
+		#display the message
+		self.text=message
+
+		#make the button
+		self.buttonColor=(0,200,0)
+		pygame.draw.rect(self.messageSurface, self.buttonColor,(350,0,100,30))
+		t=pygame.font.SysFont('comicsansms', 25).render("Continue", False, (0, 0, 0))
+		self.messageSurface.blit(t,(360,5))
+		self.buttonClick = False
+
+	def update(self):
+
+		#display button
+		pygame.draw.rect(self.messageSurface, self.buttonColor,(350,0,100,30))
+		t=pygame.font.SysFont('comicsansms', 25).render("Continue", False, (0, 0, 0))
+		self.messageSurface.blit(t,(360,5))
+
+		if self.buttonClick:
+			self.rect.center = pygame.mouse.get_pos()
+
+		#format the text
+		line_num=0
+		line=""
+		for char in self.text:
+			if char=='\n':
+				t=pygame.font.SysFont('comicsansms', 25).render(line, False, (0, 0, 0))
+				self.messageSurface.blit(t,(10,20*line_num+5))
+				line=""
+				line_num+=1
+			else:
+				line+=char
 
 
+		
 
 class DragNDrop:
 	def __init__(self,rect,filename):

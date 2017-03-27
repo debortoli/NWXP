@@ -68,44 +68,64 @@ class Board:
 		self.screen.blit(self.BackGround.image, self.BackGround.rect)
 
 		levelx,levely=[0.7*self.screen.get_width(),0]
-		pointsx,pointsy=[700,100]
-		iconsx,iconsy=[700,200]
+		pointsx,pointsy=[0.7*self.screen.get_width(),self.screen.get_height()/7.]
+		iconsx,iconsy=[0.7*self.screen.get_width(),pointsy*2]
 
 		#update surface info
 		self.updateLevelSurface(self.progress)
 		self.updatePointsSurface()
+		self.updateDraggablesSurface()
 
 		#
 		self.screen.blit(self.levelCompleteSurface, (levelx,levely))
 		self.screen.blit(self.totalPointsSurface,   (pointsx,pointsy))
-		self.screen.blit(self.dragablesSurface,     (iconsx,iconsy))
+		self.screen.blit(self.dragablesSurface,     (iconsx,pointsy*2))
 
 		#draw borders around surfaces
-		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,0,300,100),2)
-		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,100,300,100),2)
-		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(700,200,300,500),2)
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(levelx,levely,self.screen.get_width()-levelx,pointsy),2)
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(pointsx,pointsy,self.screen.get_width()-pointsx,pointsy),2)
+		pygame.draw.rect(self.screen, (0,0,0), pygame.Rect(iconsx,pointsy*2,self.screen.get_width()-pointsx,pointsy*5),2)
 
 	def updateLevelSurface(self,progress):
 		#clear the surface
-		self.levelCompleteSurface.fill((255,255,255))
+		self.levelCompleteSurface.fill((224,224,224))
 
 		maxwidth=0.8*self.levelCompleteSurface.get_width()
 		left=0.03*self.levelCompleteSurface.get_width()
-		top=0.5*self.levelCompleteSurface.get_height()
+		top=0.4*self.levelCompleteSurface.get_height()
 		height=0.25*self.levelCompleteSurface.get_height()
 		bar=pygame.draw.rect(self.levelCompleteSurface, (0,255,0), pygame.Rect(left,top,maxwidth*progress,height))
 		outline=pygame.draw.rect(self.levelCompleteSurface, (0,0,0), pygame.Rect(left,top,maxwidth,height),3)
 
-		self.fontsize=int(0.1*self.levelCompleteSurface.get_width())
-		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',self.fontsize).render("Level Progress", False, (0, 0, 0))
-		self.levelCompleteSurface.blit(title,(80,10))
+		fontsizelevel=int(0.1*self.levelCompleteSurface.get_width())
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',fontsizelevel).render("Level Progress", False, (0, 0, 0))
+		title_rect = title.get_rect(center=(self.levelCompleteSurface.get_width()/2.2, self.levelCompleteSurface.get_height()*0.4/2))
+		self.levelCompleteSurface.blit(title,title_rect)
 
 	def updatePointsSurface(self):
-		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',self.fontsize).render("Total Points", False, (0, 0, 0))
-		self.totalPointsSurface.blit(title,(100,10))
+		#clear the surface
+		self.totalPointsSurface.fill((224,224,224))
+
+		fontsizepoint=int(0.1*self.totalPointsSurface.get_width())
+		title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',fontsizepoint).render("Total Points", False, (0, 0, 0))
+		title_rect = title.get_rect(center=(self.totalPointsSurface.get_width()/2.2, self.totalPointsSurface.get_height()*0.4/2))
+		self.totalPointsSurface.blit(title,title_rect)
 
 		points=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',55).render(str(self.totalPoints), False, (0, 128, 0))
-		self.totalPointsSurface.blit(points,(140,45))
+		self.totalPointsSurface.blit(points,(title_rect[0]+title_rect[0]/2.,title_rect[1]*4.))
+
+	def updateDraggablesSurface(self):
+		#clear the surface
+		self.dragablesSurface.fill((224,224,224))
+		self.draggablesUpdate()
+
+		fontsizepoint=int(0.1*self.dragablesSurface.get_width())
+		# title=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',fontsizepoint).render("Total Points", False, (0, 0, 0))
+		# title_rect = title.get_rect(center=(self.dragablesSurface.get_width()/2, self.dragablesSurface.get_height()*0.4/2))
+		# self.totalPointsSurface.blit(title,title_rect)
+
+		# points=pygame.font.SysFont('../fonts/Poppins-Regular.ttf',55).render(str(self.totalPoints), False, (0, 128, 0))
+		# self.totalPointsSurface.blit(points,(140,45))
 
 
 	def createCities(self):
@@ -209,6 +229,20 @@ class Board:
 
 	def resizeSurfaces(self,screenSize):
 		self.levelCompleteSurface=pygame.transform.scale(self.levelCompleteSurface,(screenSize[0]/3,screenSize[1]/5))
+		self.totalPointsSurface=pygame.transform.scale(self.totalPointsSurface,(screenSize[0]/3,screenSize[1]/5))
+		self.dragablesSurface=pygame.transform.scale(self.dragablesSurface,(screenSize[0]/3,screenSize[1]/5*3))
+		#update icons
+		self.dnd=[]
+		d1=DragNDrop((8/30.*self.dragablesSurface.get_width(),1/5.*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
+		self.dnd.append(d1)
+		d2=DragNDrop((18/30.*self.dragablesSurface.get_width(),1/5.*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
+		self.dnd.append(d2)
+		d3=DragNDrop((8/30.*self.dragablesSurface.get_width(),0.5*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
+		self.dnd.append(d3)
+		d4=DragNDrop((18/30.*self.dragablesSurface.get_width(),0.5*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
+		self.dnd.append(d4)
+		d5=DragNDrop((8/30.*self.dragablesSurface.get_width(),38/50.*self.dragablesSurface.get_height(),50,50),'../images/city.jpg')
+		self.dnd.append(d5)
 
 			
 	

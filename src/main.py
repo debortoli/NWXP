@@ -32,7 +32,6 @@ if __name__ == '__main__':
             #         board.updateQueue[0].buttonClicked=True
 
             elif event.type==VIDEORESIZE:
-                print "here"
                 board.screen=pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
                 # pdb.set_trace()
                 thing=pygame.transform.scale(board.screen,event.dict['size'])

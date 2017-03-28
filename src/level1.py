@@ -3,6 +3,7 @@ import planes
 from pygame.locals import *
 import pdb
 from utils import UpdateMessageSurface
+import Tkinter as tk
 
 def tutorialSequence(board):
 	#on the first iteration, add all of the messages
@@ -15,3 +16,13 @@ def tutorialSequence(board):
 
 	board.updateQueue[0].update(board)
 	board.screen.blit(board.updateQueue[0].messageSurface,(board.UpdateMessageSurface_x,board.UpdateMessageSurface_y))
+
+	root = tk.Tk()
+	explanation = """At present, only GIF and PPM/PGM
+	formats are supported, but an interface 
+	exists to allow additional image file
+	formats to be added easily."""
+	w2 = tk.Label(root, 
+	           padx = 10, 
+	           text=explanation).pack(side="left")
+	board.screen.blit(root,(100,100))

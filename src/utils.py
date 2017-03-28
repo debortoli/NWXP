@@ -11,7 +11,7 @@ class Board:
 		# self.size = [1000,700]#width then height
 		# self.screen = pygame.display.set_mode(self.size,RESIZABLE)
 		# pygame.display.set_caption('Grid Simulator')
-		# self.clock = pygame.time.Clock()
+		self.clock = pygame.time.Clock()
 
 		# #init the background stuff
 		# self.BackGround = Background('../images/dam.jpg', [0,0])

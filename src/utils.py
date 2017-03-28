@@ -8,46 +8,46 @@ class Board:
 	def __init__(self):
 		# initialize game engine
 		pygame.init()
-		self.size = [1000,700]#width then height
-		self.screen = pygame.display.set_mode(self.size,RESIZABLE)
-		pygame.display.set_caption('Grid Simulator')
-		self.clock = pygame.time.Clock()
+		# self.size = [1000,700]#width then height
+		# self.screen = pygame.display.set_mode(self.size,RESIZABLE)
+		# pygame.display.set_caption('Grid Simulator')
+		# self.clock = pygame.time.Clock()
 
-		#init the background stuff
-		self.BackGround = Background('../images/dam.jpg', [0,0])
+		# #init the background stuff
+		# self.BackGround = Background('../images/dam.jpg', [0,0])
 
-		#init all apropriate surfaces
-		self.levelCompleteSurface = pygame.Surface((300,100),1)
-		self.levelCompleteSurface.fill([224,224,224])
+		# #init all apropriate surfaces
+		# self.levelCompleteSurface = pygame.Surface((300,100),1)
+		# self.levelCompleteSurface.fill([224,224,224])
 
-		self.totalPointsSurface = pygame.Surface((300,100))
-		self.totalPointsSurface.fill([224,224,224])
+		# self.totalPointsSurface = pygame.Surface((300,100))
+		# self.totalPointsSurface.fill([224,224,224])
 
-		self.dragablesSurface = pygame.Surface((300,500))
-		self.dragablesSurface.fill([224,224,224])
-		# self.blitSurfaces()
-
-
-
-		#init the text STUFF
-		# pygame.font.init()
-		# self.myfont = pygame.font.SysFont('Courier New', 15)
+		# self.dragablesSurface = pygame.Surface((300,500))
+		# self.dragablesSurface.fill([224,224,224])
+		# # self.blitSurfaces()
 
 
-		# #add the dragNdrop options
-		self.dnd=[]
-		d1=DragNDrop((80,100,50,50),'../images/city.jpg')
-		self.dnd.append(d1)
-		d2=DragNDrop((180,100,50,50),'../images/city.jpg')
-		self.dnd.append(d2)
-		d3=DragNDrop((80,240,50,50),'../images/city.jpg')
-		self.dnd.append(d3)
-		d4=DragNDrop((180,240,50,50),'../images/city.jpg')
-		self.dnd.append(d4)
-		d5=DragNDrop((80,380,50,50),'../images/city.jpg')
-		self.dnd.append(d5)
 
-		self.draggablesUpdate()
+		# #init the text STUFF
+		# # pygame.font.init()
+		# # self.myfont = pygame.font.SysFont('Courier New', 15)
+
+
+		# # #add the dragNdrop options
+		# self.dnd=[]
+		# d1=DragNDrop((80,100,50,50),'../images/city.jpg')
+		# self.dnd.append(d1)
+		# d2=DragNDrop((180,100,50,50),'../images/city.jpg')
+		# self.dnd.append(d2)
+		# d3=DragNDrop((80,240,50,50),'../images/city.jpg')
+		# self.dnd.append(d3)
+		# d4=DragNDrop((180,240,50,50),'../images/city.jpg')
+		# self.dnd.append(d4)
+		# d5=DragNDrop((80,380,50,50),'../images/city.jpg')
+		# self.dnd.append(d5)
+
+		# self.draggablesUpdate()
 
 		self.progress=0.8
 		self.totalPoints=20

@@ -10,27 +10,27 @@ import pdb
 from tkinterutils import TKBoard
 import Tkinter as tk
 from ttk import *
+from logicmain import initGameLogic, gameLogic
 
 
 
 if __name__ == '__main__':
     
-    board=Board()
+    boardlogic=initGameLogic()
 
     root = tk.Tk()
-    my_gui = TKBoard(root,board)
+    my_gui = TKBoard(root,boardlogic)
     root.style=Style()
     root.configure(background='white')
     root.style.theme_use("default")
     root.style.configure("green.Horizontal.TProgressbar", foreground='green', background='green')
     root.rowconfigure(0,weight=1)
-    root.after(100,my_gui.updateDisplays)
+    root.after(0,my_gui.updateDisplays,root)
     root.mainloop()
 
 
     
         # run at 20 fps
-    board.clock.tick(20)
         # time.sleep(2)
      
     # close the window and quit

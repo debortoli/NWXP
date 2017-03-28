@@ -2,7 +2,6 @@ import pygame
 import planes
 from pygame.locals import *
 import pdb
-from utils import UpdateMessageSurface
 import Tkinter as tk
 
 def tutorialSequence(board):

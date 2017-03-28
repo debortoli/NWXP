@@ -49,7 +49,7 @@ class Board:
 
 		# self.draggablesUpdate()
 
-		self.progress=0.8
+		self.progress=10
 		self.totalPoints=20
 		#level 0=tutorial
 		self.level=0

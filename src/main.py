@@ -21,8 +21,10 @@ if __name__ == '__main__':
     my_gui = TKBoard(root,board)
     root.style=Style()
     root.configure(background='white')
-    root.style.theme_use("clam")
+    root.style.theme_use("default")
+    root.style.configure("green.Horizontal.TProgressbar", foreground='green', background='green')
     root.rowconfigure(0,weight=1)
+    root.after(100,my_gui.updateDisplays)
     root.mainloop()
 
 

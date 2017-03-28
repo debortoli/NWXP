@@ -68,6 +68,14 @@ class TKBoard:
                                                   self.damRectangle[3]-self.damRectangle[4]+self.damRectangle[4]/2,
                                                   fill="#0000aa",width=0)
 
+        #updateCanvas
+        self.updateMessageCanvas=tk.Canvas(master,bg="lightgray",highlightthickness=0)
+        self.updateMessageCanvas.pack()
+        self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 15))
+        self.updateMessageLabel.pack(side='top',pady=10)
+        self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
+        self.continueButton.pack()
+
         #for resizing
         self.updateFrame.rowconfigure(0,weight=5)
         self.updateFrame.rowconfigure(1,weight=5)
@@ -94,6 +102,18 @@ class TKBoard:
                                                   self.damRectangle[2]-self.damRectangle[4]+self.damRectangle[4]/2,
                                                   self.damRectangle[3]-self.damRectangle[4]+self.damRectangle[4]/2,
                                                   fill="#0000aa",width=0)
-        root.after(500,gameLogic,self,self.boardlogic,root)
+        root.after(400,gameLogic,self,self.boardlogic,root)
 
+    def updateMessage(self):
+        self.updateMessageCanvas.pack(side='left')
+        self.updateMessageLabel['text']=self.boardlogic.updateQueue[0]
+        self.updateMessageLabel.pack(side='top',pady=10)
 
+    def nextMessage(self):
+        del self.boardlogic.updateQueue[0]
+        if(len(self.boardlogic.updateQueue)==0):
+            #stop providing update messages
+            self.updateMessageCanvas.pack_forget()
+        else:
+            #display the next message
+            self.updateMessage()

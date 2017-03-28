@@ -15,10 +15,14 @@ def initGameLogic():
 	return board
 
 def gameLogic(disp,board,root):
-	if(int(pygame.time.get_ticks()/1000.)%2==0 and 
-		(pygame.time.get_ticks()/1000.)>1):
-		board.water_level+=1
-	root.after(500,disp.updateDisplays,root)
+	# if(int(pygame.time.get_ticks()/1000.)%2==0 and 
+	# 	(pygame.time.get_ticks()/1000.)>1):
+	# 	board.water_level+=1
+	# root.after(500,disp.updateDisplays,root)
+	
+	if(board.level==1):
+		tutorialSequence(board,disp,root)
+	
 
 	
 	# self.after(0,)

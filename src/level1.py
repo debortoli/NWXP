@@ -17,5 +17,5 @@ def tutorialSequence(board,disp,root):
 		   "goal is to manage these in response to load demand and resevoir level"+'\n'
 		board.updateQueue.append(m2)
 		#explain the responses with message and visuals
-		
-	root.after(200,disp.updateMessage)
+
+	root.after(100,disp.spinTurbine,root)

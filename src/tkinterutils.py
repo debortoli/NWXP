@@ -121,13 +121,12 @@ class TKBoard:
                                                         self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width,self.shaft_height,
                                                         fill="#808080",width=0)
         #draw the blade
-        self.blade_height=self.turbine_height-4
-        self.blade_width=8
-        bladePolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5,self.shaft_height+self.turbine_height-2,
-                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5+self.blade_width,self.shaft_height+self.turbine_height-2,
-                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5+self.blade_width,self.shaft_height+self.turbine_height-self.blade_height,
-                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5,self.shaft_height+self.turbine_height-self.blade_height,
-                                                        fill="#000000",width=0)
+        self.blade_height=self.turbine_height+4
+        self.blade_width=12
+        self.blade=self.gameCanvas.create_rectangle(self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5,self.shaft_height+self.turbine_height+2,
+                                                    self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+self.blade_width,self.shaft_height+self.turbine_height-self.turbine_height-2,
+                                                    fill="#000000")
+        [self.original_blade_x0,self.original_blade_y0,self.original_blade_x1,self.original_blade_y1]=self.gameCanvas.coords(self.blade)
 
         wall_width=4#width of wall on the right side
         # self.gameCanvas.create_line(self.damRectangle[2]+wall_width/2,self.damRectangle[3],self.damRectangle[2]+wall_width/2,self.damRectangle[1],width=wall_width)
@@ -207,3 +206,25 @@ class TKBoard:
         else:
             #display the next message
             self.updateMessage()
+
+
+    def spinTurbine(self,root):
+        #get position of blade
+        [x0,y0,x1,y1]=self.gameCanvas.coords(self.blade)
+        # print self.original_blade_x-x0
+        if((x0-self.original_blade_x0)>25):
+            x0=self.original_blade_x0
+            x1=self.original_blade_x1
+            y0=self.original_blade_y0
+            y1=self.original_blade_y1
+
+        #delete the old blade
+        self.gameCanvas.delete(self.blade)
+
+        #add a new blade
+        self.blade=self.gameCanvas.create_rectangle(x0+1,y0,
+                                                    x1+1,y1,
+                                                    fill="#000000")
+        root.after(10,self.updateDisplays,root)
+
+        #move it over a couple of pixels

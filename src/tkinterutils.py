@@ -62,17 +62,72 @@ class TKBoard:
 
         #draw thw actual dam
         self.dam_width=200
-        self.dam_triangle_h=100
-        self.tower_height=self.dam_height*0.4
+        self.dam_triangle_h=150
+        self.tower_height=self.dam_height*0.3
         self.tower_width=100
+        self.tower_elevation=50
         damPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1],
                                                   self.damRectangle[2],self.damRectangle[1]+self.tower_height,
                                                   self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h,
-                                                  self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height,
+                                                  self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.tower_elevation,
                                                   self.damRectangle[2]+self.tower_width,self.damRectangle[1]+self.tower_height,
                                                   self.damRectangle[2]+self.tower_width,self.damRectangle[1],
                                                   self.damRectangle[2],self.damRectangle[1],
                                                   fill="#c0c0c0",width=0)
+
+        #draw the bottom of the dam
+        self.penstock_diameter=50
+        self.turbine_elevation=30
+        damBottomPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1]+self.tower_height+self.penstock_diameter,
+                                                        self.damRectangle[2],self.damRectangle[3],
+                                                        self.damRectangle[2]+self.dam_width,self.damRectangle[3],
+                                                        self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h+self.penstock_diameter,
+                                                        fill="#c0c0c0",width=0)
+
+        #draw the powerhouse
+        self.powerhouse_width=150
+        self.powerhouse_height=150
+        powerhousePolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h,
+                                                         self.damRectangle[2]+self.dam_width+self.powerhouse_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h,
+                                                         self.damRectangle[2]+self.dam_width+self.powerhouse_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.powerhouse_height,
+                                                         self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.powerhouse_height,
+                                                        fill="#d0d0d0",width=0)
+
+        #draw the generator
+        self.generator_buffer_width=self.powerhouse_width*0.15
+        self.generator_buffer_height=self.powerhouse_height*0.35
+        generatorPolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width+self.generator_buffer_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height,
+                                                         self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height,
+                                                         self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.powerhouse_height+self.generator_buffer_height,
+                                                         self.damRectangle[2]+self.dam_width+self.generator_buffer_width,self.damRectangle[1]+self.tower_height-self.powerhouse_height+self.dam_triangle_h+self.generator_buffer_height,
+                                                        fill="#808080",width=0)
+
+        #draw the shaft
+        self.shaft_height=self.damRectangle[1]+self.tower_height+self.dam_triangle_h+30
+        self.shaft_buffer_width=(self.powerhouse_width-self.generator_buffer_width*2)/2.5
+        self.turbine_buffer_height=0.2*self.penstock_diameter
+        shaftPolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width,self.shaft_height,#damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height+self.shaft_height,
+                                                        self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width-self.shaft_buffer_width,self.shaft_height,#self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height+self.shaft_height,
+                                                        self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width-self.shaft_buffer_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height,
+                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.generator_buffer_height,
+                                                        fill="#808080",width=0)
+
+        #draw the turbine
+        self.turbine_height=20
+        self.turbine_buffer_width=20
+        turbinePolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width,self.shaft_height+self.turbine_height,
+                                                        self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width-self.shaft_buffer_width+self.turbine_buffer_width,self.shaft_height+self.turbine_height,   
+                                                        self.damRectangle[2]+self.dam_width+self.powerhouse_width-self.generator_buffer_width-self.shaft_buffer_width+self.turbine_buffer_width,self.shaft_height,
+                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width,self.shaft_height,
+                                                        fill="#808080",width=0)
+        #draw the blade
+        self.blade_height=self.turbine_height-4
+        self.blade_width=8
+        bladePolygon=self.gameCanvas.create_polygon(self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5,self.shaft_height+self.turbine_height-2,
+                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5+self.blade_width,self.shaft_height+self.turbine_height-2,
+                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5+self.blade_width,self.shaft_height+self.turbine_height-self.blade_height,
+                                                        self.damRectangle[2]+self.dam_width+self.generator_buffer_width+self.shaft_buffer_width-self.turbine_buffer_width+5,self.shaft_height+self.turbine_height-self.blade_height,
+                                                        fill="#000000",width=0)
 
         wall_width=4#width of wall on the right side
         # self.gameCanvas.create_line(self.damRectangle[2]+wall_width/2,self.damRectangle[3],self.damRectangle[2]+wall_width/2,self.damRectangle[1],width=wall_width)
@@ -94,7 +149,7 @@ class TKBoard:
                                                   self.damRectangle[3],
                                                   ground_width+self.damRectangle[0],
                                                   self.damRectangle[3]+100,
-                                                  fill="#8B4513",width=0)
+                                                  fill="#7B3523",width=0)
         self.gameCanvas.pack(fill='both',expand=True)
 
 

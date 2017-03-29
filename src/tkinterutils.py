@@ -9,6 +9,7 @@ class TKBoard:
     def __init__(self, master,boardlogic):
         self.master = master
         master.title("GRID SIMULATOR")
+        master.minsize(width=1400,height=700)
 
 
         self.boardlogic=boardlogic
@@ -47,32 +48,63 @@ class TKBoard:
         self.draggablesCanvas.pack()#grid(row=2,column=0,sticky='NS')
 
         #the game canvas
-        self.gameCanvas=tk.Canvas(master,bg="white",highlightthickness=0)
-        self.gameCanvas.pack(fill='both',expand=True)
+        self.gameFrame=tk.Frame(master,bg="white",highlightthickness=0)
+        self.gameFrame.pack(fill='both',expand=True)
 
-        #draw sides of the dam
-        self.damRectangle=[100,200,300,500,6]
-        self.gameCanvas.create_line(self.damRectangle[0],self.damRectangle[1],self.damRectangle[0],self.damRectangle[3],width=self.damRectangle[4])
-        self.gameCanvas.create_line(self.damRectangle[0],self.damRectangle[3],self.damRectangle[2],self.damRectangle[3],width=self.damRectangle[4])
-        self.gameCanvas.create_line(self.damRectangle[2],self.damRectangle[3],self.damRectangle[2],self.damRectangle[1],width=self.damRectangle[4])
+        self.gameCanvas=tk.Canvas(self.gameFrame,bg="white",highlightthickness=0)
+        
+
+        #draw constraints for water
+        self.damRectangle=[0,200,400,500]
+
+        #compute height of dam
+        self.dam_height=self.damRectangle[3]-self.damRectangle[1]
+
+        #draw thw actual dam
+        self.dam_width=200
+        self.dam_triangle_h=100
+        self.tower_height=self.dam_height*0.4
+        self.tower_width=100
+        damPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1],
+                                                  self.damRectangle[2],self.damRectangle[1]+self.tower_height,
+                                                  self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height+self.dam_triangle_h,
+                                                  self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.tower_height,
+                                                  self.damRectangle[2]+self.tower_width,self.damRectangle[1]+self.tower_height,
+                                                  self.damRectangle[2]+self.tower_width,self.damRectangle[1],
+                                                  self.damRectangle[2],self.damRectangle[1],
+                                                  fill="#c0c0c0",width=0)
+
+        wall_width=4#width of wall on the right side
+        # self.gameCanvas.create_line(self.damRectangle[2]+wall_width/2,self.damRectangle[3],self.damRectangle[2]+wall_width/2,self.damRectangle[1],width=wall_width)
         
 
         #one rectangle which shows the filling of water
-        #compute height of dam
-        self.dam_height=self.damRectangle[3]-self.damRectangle[1]
+        
         #compute how many pixels need to be filled
         self.fill_start=self.damRectangle[3]-boardlogic.water_level/100.*self.dam_height
-        fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0]+self.damRectangle[4]-self.damRectangle[4]/2,
+        fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
                                                   self.fill_start,
-                                                  self.damRectangle[2]-self.damRectangle[4]+self.damRectangle[4]/2,
-                                                  self.damRectangle[3]-self.damRectangle[4]+self.damRectangle[4]/2,
+                                                  self.damRectangle[2],
+                                                  self.damRectangle[3],
                                                   fill="#0000aa",width=0)
 
+        #one rectangle which is the ground
+        ground_width=800
+        groundRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
+                                                  self.damRectangle[3],
+                                                  ground_width+self.damRectangle[0],
+                                                  self.damRectangle[3]+100,
+                                                  fill="#8B4513",width=0)
+        self.gameCanvas.pack(fill='both',expand=True)
+
+
+        
+
         #updateCanvas
-        self.updateMessageCanvas=tk.Canvas(master,bg="lightgray",highlightthickness=0)
-        self.updateMessageCanvas.pack()
+        self.updateMessageCanvas=tk.Canvas(self.gameFrame,bg="lightgray",highlightthickness=0)
+        self.updateMessageCanvas.pack(fill='y')
         self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 15))
-        self.updateMessageLabel.pack(side='top',pady=10)
+        self.updateMessageLabel.pack(fill='y',pady=10)
         self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
         self.continueButton.pack()
 
@@ -95,14 +127,17 @@ class TKBoard:
         if(self.boardlogic.level==1):
             # self.gameCanvas.clear('fillRect')
             self.dam_height=self.damRectangle[3]-self.damRectangle[1]
+
             #compute how many pixels need to be filled
             self.fill_start=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
-            fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0]+self.damRectangle[4]-self.damRectangle[4]/2,
+            fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
                                                   self.fill_start,
-                                                  self.damRectangle[2]-self.damRectangle[4]+self.damRectangle[4]/2,
-                                                  self.damRectangle[3]-self.damRectangle[4]+self.damRectangle[4]/2,
+                                                  self.damRectangle[2],
+                                                  self.damRectangle[3],
                                                   fill="#0000aa",width=0)
-        root.after(400,gameLogic,self,self.boardlogic,root)
+
+            #
+        root.after(100,gameLogic,self,self.boardlogic,root)
 
     def updateMessage(self):
         self.updateMessageCanvas.pack(side='left')

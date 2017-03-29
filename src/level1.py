@@ -11,10 +11,11 @@ def tutorialSequence(board,disp,root):
 						"To start out, your role will be to manage the Bonneville Dam"+'\n'+\
 								 "right here in the PNW."+'\n'
 		board.updateQueue.append(m1)
-		
+
 		m2="Managing a damn involves controlling the dam bypass "+'\n'+\
 		   "and the turbine throttle (to control water flow. The"+'\n'+\
 		   "goal is to manage these in response to load demand and resevoir level"+'\n'
 		board.updateQueue.append(m2)
 		#explain the responses with message and visuals
+		
 	root.after(200,disp.updateMessage)

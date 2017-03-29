@@ -34,7 +34,7 @@ class Board:
 		self.updateQueue=[]
 		self.UpdateMessageSurface_x=100
 		self.UpdateMessageSurface_y=450
-		self.water_level=25
+		self.water_level=90
 	
 	def createCities(self):
 		self.cities=[]

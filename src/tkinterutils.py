@@ -55,7 +55,7 @@ class TKBoard:
         
 
         #draw constraints for water
-        self.damRectangle=[0,200,400,500]
+        self.damRectangle=[0,200,400,600]
 
         #compute height of dam
         self.dam_height=self.damRectangle[3]-self.damRectangle[1]
@@ -147,8 +147,27 @@ class TKBoard:
         groundRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
                                                   self.damRectangle[3],
                                                   ground_width+self.damRectangle[0],
-                                                  self.damRectangle[3]+100,
+                                                  self.damRectangle[3]+50,
                                                   fill="#7B3523",width=0)
+        
+
+        #add grass outside of powerhouse
+        grass_width=200
+        grassRect=self.gameCanvas.create_rectangle(self.damRectangle[2]+self.dam_width+self.powerhouse_width,
+                                                    self.damRectangle[1]+self.tower_height+self.dam_triangle_h,
+                                                    self.damRectangle[2]+self.dam_width+self.powerhouse_width+grass_width,
+                                                    self.damRectangle[1]+self.tower_height+self.dam_triangle_h-20,
+                                                  fill="#228B22",width=0)
+        #add power station
+        self.p_station_height=120
+        self.p_station_width=50
+        pstationRect=self.gameCanvas.create_rectangle(self.damRectangle[2]+self.dam_width+self.powerhouse_width+70,
+                                                    self.damRectangle[1]+self.tower_height+self.dam_triangle_h-20,
+                                                    self.damRectangle[2]+self.dam_width+self.powerhouse_width+self.p_station_width,
+                                                    self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.p_station_height ,
+                                                  fill="#808080",width=0)
+
+
         self.gameCanvas.pack(fill='both',expand=True)
 
 

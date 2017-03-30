@@ -85,12 +85,32 @@ class TKBoard:
 
 		#draw the bottom of the dam
 		self.penstock_diameter=50
-		damBottomPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1]+self.tower_height+self.penstock_diameter,
+		self.damBottomPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1]+self.tower_height+self.penstock_diameter,
 														self.damRectangle[2],self.damRectangle[3],
 														self.damRectangle[2]+self.dam_width,self.damRectangle[3],
 														self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.dam_triangle_h+self.penstock_diameter,
 														self.damRectangle[2]+self.dam_width-self.block_width,self.damRectangle[1]+self.dam_triangle_h+self.penstock_diameter,
 														fill="#c0c0c0",width=0)
+
+		#create the water down the penstock
+		self.penstockPolygon=self.gameCanvas.create_polygon(self.gameCanvas.coords(self.damBottomPolygon)[0],self.gameCanvas.coords(self.damBottomPolygon)[1],
+														self.gameCanvas.coords(self.damBottomPolygon)[8],self.gameCanvas.coords(self.damBottomPolygon)[9],
+														self.gameCanvas.coords(self.damBottomPolygon)[6],self.gameCanvas.coords(self.damBottomPolygon)[7],
+														self.gameCanvas.coords(self.damTopPolygon)[6],self.gameCanvas.coords(self.damTopPolygon)[7],
+														self.gameCanvas.coords(self.damTopPolygon)[4],self.gameCanvas.coords(self.damTopPolygon)[5],
+														self.gameCanvas.coords(self.damTopPolygon)[2],self.gameCanvas.coords(self.damTopPolygon)[3],
+														fill="#0000aa",width=0)
+		
+		#flowing of the water
+		[self.kneePointx,self.kneePointy]=[self.gameCanvas.coords(self.damTopPolygon)[4],self.gameCanvas.coords(self.damTopPolygon)[5]]
+		[self.startx,self.starty]=[self.gameCanvas.coords(self.damTopPolygon)[2],self.gameCanvas.coords(self.damTopPolygon)[3]]
+		[self.diffx,self.diffy]=[self.kneePointx-self.startx,self.kneePointy-self.starty]
+		self.wave_width=1/15.
+		self.wavePolygon=self.gameCanvas.create_polygon(self.startx,self.starty,
+														self.startx+self.diffx*self.wave_width,self.starty+self.diffy*self.wave_width,
+														self.gameCanvas.coords(self.damBottomPolygon)[0]+self.diffx*self.wave_width,self.gameCanvas.coords(self.damBottomPolygon)[1]+self.diffy*self.wave_width,
+														self.gameCanvas.coords(self.damBottomPolygon)[0],self.gameCanvas.coords(self.damBottomPolygon)[1],
+														fill="#0000cc",width=0)
 
 		#add generator
 		self.generator_buffer_x=10
@@ -124,6 +144,8 @@ class TKBoard:
 													self.gameCanvas.coords(self.turbine)[0]+self.blade_width,
 													self.gameCanvas.coords(self.turbine)[3]+5,
 													fill="#0000aa",width=0)
+
+
 		
 		[self.original_blade_x0,self.original_blade_y0,self.original_blade_x1,self.original_blade_y1]=self.gameCanvas.coords(self.blade)
 
@@ -131,8 +153,7 @@ class TKBoard:
 		# self.gameCanvas.create_line(self.damRectangle[2]+wall_width/2,self.damRectangle[3],self.damRectangle[2]+wall_width/2,self.damRectangle[1],width=wall_width)
 		
 
-		#one rectangle which shows the filling of water
-		
+		#one rectangle which shows the filling of water		
 		#compute how many pixels need to be filled
 		self.fill_start=self.damRectangle[3]-boardlogic.water_level/100.*self.dam_height
 		fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
@@ -237,6 +258,47 @@ class TKBoard:
 		self.blade=self.gameCanvas.create_rectangle(x0+1,y0,
 													x1+1,y1,
 													fill="#000000")
+
+		#get position of leading edge of wave
+		[x0,y0]=[self.gameCanvas.coords(self.wavePolygon)[2],self.gameCanvas.coords(self.wavePolygon)[3]]
+		wave_velocity=1/40.
+		if(x0>self.kneePointx or y0>self.kneePointy)and(x0<self.gameCanvas.coords(self.damTopPolygon)[6]-3):
+			if(self.gameCanvas.coords(self.wavePolygon)[0]<self.kneePointx):#we're just turning the corner
+				self.gameCanvas.delete(self.wavePolygon)
+				self.wavePolygon=self.gameCanvas.create_polygon(self.kneePointx,self.kneePointy,
+															self.kneePointx+self.diffx*self.wave_width,self.kneePointy,
+															self.kneePointx+self.diffx*self.wave_width,self.kneePointy+self.penstock_diameter,
+															self.kneePointx,self.kneePointy+self.penstock_diameter,
+															fill="#0000cc",width=0)
+
+			self.gameCanvas.move(self.wavePolygon,self.diffx*wave_velocity/2.,0)
+
+		elif(x0>self.gameCanvas.coords(self.damTopPolygon)[6]-3):
+			self.gameCanvas.delete(self.wavePolygon)
+			self.wavePolygon=self.gameCanvas.create_polygon(self.startx,self.starty,
+														self.startx+self.diffx*self.wave_width,self.starty+self.diffy*self.wave_width,
+														self.gameCanvas.coords(self.damBottomPolygon)[0]+self.diffx*self.wave_width,self.gameCanvas.coords(self.damBottomPolygon)[1]+self.diffy*self.wave_width,
+														self.gameCanvas.coords(self.damBottomPolygon)[0],self.gameCanvas.coords(self.damBottomPolygon)[1],
+														fill="#0000cc",width=0)
+
+		else:#its moving down the chute
+			self.gameCanvas.move(self.wavePolygon,self.diffx*wave_velocity,self.diffy*wave_velocity)
+
+		
+
+		#delete the old wave
+		# self.gameCanvas.delete(self.wavePolygon)
+
+		#add a new wave
+		# wave_velocity=1/10.
+		# [start_wavex,start_wavey]=[x0+self.diffx*wave_velocity,y0+diffy*self.wave_velocity]
+		# [bottom_wavex,bottom_wavey]=[x1+self.diffx*wave_velocity,y1+diffy*self.wave_velocity]
+		# self.blade=self.gameCanvas.create_polygon(start_wavex,start_wavey,
+		# 										  start_wavex+diffx*self.wave_width,start_wavey+diffy*self.wave_width,
+		# 										  bottom_wavex+diffx*self.wave_width,bottom_wavey+diffy*self.wave_width,
+		# 										  bottom_wavex,bottom_wavey,
+		# 											fill="#0000cc",width=0)
+
+
 		root.after(10,self.updateDisplays,root)
 
-		#move it over a couple of pixels

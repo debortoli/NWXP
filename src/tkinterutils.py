@@ -55,7 +55,7 @@ class TKBoard:
 		
 
 		#draw constraints for water
-		self.damRectangle=[0,200,400,600]
+		self.damRectangle=[0,150,400,500]
 
 		#compute height of dam
 		self.dam_height=self.damRectangle[3]-self.damRectangle[1]
@@ -189,7 +189,7 @@ class TKBoard:
 
 		#updateCanvas
 		self.updateMessageCanvas=tk.Canvas(self.gameFrame,bg="lightgray",highlightthickness=0)
-		self.updateMessageCanvas.pack(fill='y')
+		self.updateMessageCanvas.pack(fill='y',side='bottom')
 		self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 15))
 		self.updateMessageLabel.pack(fill='y',pady=10)
 		self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
@@ -199,6 +199,7 @@ class TKBoard:
 		self.updateFrame.rowconfigure(0,weight=5)
 		self.updateFrame.rowconfigure(1,weight=5)
 		self.updateFrame.rowconfigure(2,weight=1)
+
 
 		# self.butt=tk.Button(master,command=lambda: self.greet(boardlogic))
 		# self.butt.pack()
@@ -223,11 +224,11 @@ class TKBoard:
 												  self.damRectangle[3],
 												  fill="#0000aa",width=0)
 
-			#
+		
 		root.after(10,gameLogic,self,self.boardlogic,root)
 
 	def updateMessage(self):
-		self.updateMessageCanvas.pack(side='left')
+		self.updateMessageCanvas.pack()
 		self.updateMessageLabel['text']=self.boardlogic.updateQueue[0]
 		self.updateMessageLabel.pack(side='top',pady=10)
 

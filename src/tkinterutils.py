@@ -55,13 +55,13 @@ class TKBoard:
 		
 
 		#draw constraints for water
-		self.damRectangle=[0,150,400,500]
+		self.damRectangle=[0,150,300,500]
 
 		#compute height of dam
 		self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 		#draw the top of the dam
-		self.dam_width=450
+		self.dam_width=400
 		self.dam_triangle_h=self.dam_height*0.6
 		self.tower_height=self.dam_height*0.3
 		self.block_width=100
@@ -83,6 +83,7 @@ class TKBoard:
 													  self.damRectangle[2]+self.tower_width,self.damRectangle[1],
 												  fill="#c0c0c0",width=0)
 
+		
 		#draw the bottom of the dam
 		self.penstock_diameter=50
 		self.damBottomPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1]+self.tower_height+self.penstock_diameter,
@@ -100,6 +101,14 @@ class TKBoard:
 														self.gameCanvas.coords(self.damTopPolygon)[4],self.gameCanvas.coords(self.damTopPolygon)[5],
 														self.gameCanvas.coords(self.damTopPolygon)[2],self.gameCanvas.coords(self.damTopPolygon)[3],
 														fill="#0000aa",width=0)
+
+		#create the water after the penstock
+		self.river_width=200
+		self.riverAfterDam=self.gameCanvas.create_rectangle(self.damRectangle[2]+self.dam_width,
+															self.damRectangle[1]+self.dam_triangle_h,
+															self.damRectangle[2]+self.dam_width+150,
+															self.damRectangle[3],
+															fill="#0000aa",width=0)
 		
 		#flowing of the water
 		[self.kneePointx,self.kneePointy]=[self.gameCanvas.coords(self.damTopPolygon)[4],self.gameCanvas.coords(self.damTopPolygon)[5]]
@@ -118,8 +127,66 @@ class TKBoard:
 		self.generator=self.gameCanvas.create_rectangle(self.gameCanvas.coords(self.damTopPolygon)[16]+self.generator_buffer_x,self.gameCanvas.coords(self.damTopPolygon)[17]-self.generator_buffer_y,
 														self.gameCanvas.coords(self.damTopPolygon)[12]-self.generator_buffer_x,self.gameCanvas.coords(self.damTopPolygon)[13]+self.generator_buffer_y,
 														fill="#808080",width=0)
-		
 
+		#add power station
+		self.p_station_height=80
+		self.p_station_width=50
+		self.power_line_length=40
+		pstationRect=self.gameCanvas.create_rectangle(self.gameCanvas.coords(self.generator)[2]+self.power_line_length,
+													self.damRectangle[1]+self.dam_triangle_h-self.block_height-self.p_station_height,
+													self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width,
+													self.damRectangle[1]+self.dam_triangle_h-self.block_height,
+												  fill="#808080",width=0)
+
+		#add the power lines from the generator to the power station
+		self.line1=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2],
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   fill="#ffff00",width=4)
+
+		self.line2=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2],
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   fill="#ffff00",width=4)
+
+		self.line3=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2],
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   fill="#ffff00",width=4)
+
+		#add the power lines from the power station to the load
+		self.power_line_lengthb=60
+		self.line1b=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width+self.power_line_lengthb,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   fill="#ffff00",width=4)
+
+		self.line2b=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width+self.power_line_lengthb,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   fill="#ffff00",width=4)
+
+		self.line3b=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width+self.power_line_lengthb,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   fill="#ffff00",width=4)
+
+		#add the indicator of power produced
+		self.powerIndicator=tk.Label(self.gameCanvas,text="Hi",bg='#00aa00',font=("Helvetica", 17))
+		self.powerIndicator_x=self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width+self.power_line_lengthb
+		self.powerIndicator_y=(self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-15,
+		self.powerIndicator.place(x=self.powerIndicator_x,y=self.powerIndicator_y, width=80,height=30)
+
+		#add the load
+
+
+		
 		#add shaft
 		self.generator_width=self.gameCanvas.coords(self.generator)[2]-self.gameCanvas.coords(self.generator)[0]
 		self.shaft_width=self.generator_width/3.
@@ -166,14 +233,7 @@ class TKBoard:
 		
 
 	   
-		#add power station
-		self.p_station_height=120
-		self.p_station_width=50
-		pstationRect=self.gameCanvas.create_rectangle(self.damRectangle[2]+self.dam_width+self.powerhouse_width+70,
-													self.damRectangle[1]+self.tower_height+self.dam_triangle_h-20,
-													self.damRectangle[2]+self.dam_width+self.powerhouse_width+self.p_station_width,
-													self.damRectangle[1]+self.tower_height+self.dam_triangle_h-self.p_station_height ,
-												  fill="#808080",width=0)
+		
 
 		#one rectangle which is the ground
 		ground_width=self.dam_width+self.damRectangle[2]+200
@@ -224,6 +284,7 @@ class TKBoard:
 												  self.damRectangle[3],
 												  fill="#0000aa",width=0)
 
+		self.powerIndicator.text=str(self.boardlogic.powerProducedDam)
 		
 		root.after(10,gameLogic,self,self.boardlogic,root)
 

@@ -37,6 +37,7 @@ class Board:
 		self.water_level=90
 		self.powerProducedDam=100.
 		self.damLoad=110.
+		self.water_velocity=10.
 	
 	def createCities(self):
 		self.cities=[]

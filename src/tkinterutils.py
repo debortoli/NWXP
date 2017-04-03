@@ -157,7 +157,7 @@ class TKBoard:
 											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
 											   fill="#ffff00",width=4)
 
-		#add the power lines from the power station to the load
+		#add the power lines from the power station to the power indicator
 		self.power_line_lengthb=60
 		self.line1b=self.gameCanvas.create_line(self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width,
 											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
@@ -180,11 +180,44 @@ class TKBoard:
 		#add the indicator of power produced
 		self.powerIndicator=tk.Label(self.gameCanvas,text="Hi",bg='#00aa00',font=("Helvetica", 17))
 		self.powerIndicator_x=self.gameCanvas.coords(self.generator)[2]+self.power_line_length+self.p_station_width+self.power_line_lengthb
-		self.powerIndicator_y=(self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-15,
-		self.powerIndicator.place(x=self.powerIndicator_x,y=self.powerIndicator_y, width=80,height=30)
+		self.powerIndicator_y=(self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-15
+		self.powerIndicator_width=65
+		self.powerIndicator.place(x=self.powerIndicator_x,y=self.powerIndicator_y, width=self.powerIndicator_width,height=30)
 
+		#add the label for the powerIndicator
+		self.pILabel=tk.Label(self.gameCanvas,text="Power Produced",bg='white',font=("Helvetica", 10))
+		self.pILabel.place(x=self.powerIndicator_x-20,y=self.powerIndicator_y-30)
+
+		#add the power lines from the power indicator to the load
+		self.power_line_lengthc=40
+		self.line1c=self.gameCanvas.create_line(self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1+self.power_line_lengthc,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-10,
+											   fill="#ffff00",width=4)
+
+		self.power_line_lengthc=40
+		self.line2c=self.gameCanvas.create_line(self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1+self.power_line_lengthc,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2,
+											   fill="#ffff00",width=4)
+
+		self.power_line_lengthc=40
+		self.line3c=self.gameCanvas.create_line(self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   self.powerIndicator_x+self.powerIndicator.winfo_width()+self.powerIndicator_width-1+self.power_line_lengthc,
+											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
+											   fill="#ffff00",width=4)
 		#add the load
+		self.LoadIndicator=tk.Label(self.gameCanvas,text="Hi",bg='#00aa00',font=("Helvetica", 17))
+		self.Load_x=self.powerIndicator_x+self.powerIndicator.winfo_width()+64+self.power_line_lengthc
+		self.Load_y=(self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-15
+		self.LoadIndicator.place(x=self.Load_x,y=self.Load_y, width=65,height=30)
 
+		#add the label for the load
+		self.LoadLabel=tk.Label(self.gameCanvas,text="Load",bg='white',font=("Helvetica", 10))
+		self.LoadLabel.place(x=self.Load_x+10,y=self.Load_y-30)
 
 		
 		#add shaft
@@ -283,8 +316,8 @@ class TKBoard:
 												  self.damRectangle[2],
 												  self.damRectangle[3],
 												  fill="#0000aa",width=0)
-
-		self.powerIndicator.text=str(self.boardlogic.powerProducedDam)
+		self.powerIndicator['text']=str(self.boardlogic.powerProducedDam)
+		self.LoadIndicator['text']=str(self.boardlogic.damLoad)
 		
 		root.after(10,gameLogic,self,self.boardlogic,root)
 

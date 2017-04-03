@@ -36,6 +36,7 @@ class Board:
 		self.UpdateMessageSurface_y=450
 		self.water_level=90
 		self.powerProducedDam=100.
+		self.damLoad=110.
 	
 	def createCities(self):
 		self.cities=[]

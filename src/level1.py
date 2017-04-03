@@ -19,6 +19,11 @@ def tutorialSequence(board,disp,root):
 		board.updateQueue.append(m2)
 		#explain the responses with message and visuals
 
-	root.after(100,disp.spinTurbine,root)
-	board.progress+=0.1
-	# root.after(100,disp.updateMessage)
+	board.water_level+=0.1
+	if(board.progress<99.5):
+		board.progress+=0.1
+		if(board.water_level>99):
+			board.progress-=20.
+		root.after(100,disp.spinTurbine,root)
+	else:
+		root.after(100,disp.level1End,root)

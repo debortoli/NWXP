@@ -291,7 +291,7 @@ class TKBoard:
 		#one rectangle which shows the filling of water		
 		#compute how many pixels need to be filled
 		self.fill_start=self.damRectangle[3]-boardlogic.water_level/100.*self.dam_height
-		fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
+		self.fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
 												  self.fill_start,
 												  self.damRectangle[2],
 												  self.damRectangle[3],
@@ -318,6 +318,10 @@ class TKBoard:
 		self.water_slider_label.place(x=690,y=10)
 		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=100,orient='horizontal',command=self.updateWaterVelocity)
 		self.water_slider.place(x=700,y=40)
+
+		#put in the level end button
+		self.level1endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
+		self.level1endbutton.pack_forget()
 		
 
 		#updateCanvas
@@ -341,13 +345,14 @@ class TKBoard:
 
 		#fill level of dam
 		if(self.boardlogic.level==1):
-			# self.gameCanvas.clear('fillRect')
+			self.gameCanvas.delete(self.fillRect)
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
-			self.fill_start=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
-			fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
-												  self.fill_start,
+			self.boardlogic.water_level-=self.boardlogic.water_velocity/400#decrease the filling by the water velocity
+			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
+			self.fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
+												  self.fill_level,
 												  self.damRectangle[2],
 												  self.damRectangle[3],
 												  fill="#0000aa",width=0)
@@ -447,4 +452,6 @@ class TKBoard:
 			self.gameCanvas.move(self.wavePolygon2,self.diffx*wave_velocity,self.diffy*wave_velocity)
 
 
-
+	def level1End(self,root):
+		self.level1endbutton.place(x=850,y=40)
+		root.after(10,self.spinTurbine,root)

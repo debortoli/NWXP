@@ -321,8 +321,8 @@ class TKBoard:
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
-		self.level0endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
-		self.level0endbutton.pack_forget()
+		self.level1endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
+		self.level1endbutton.pack_forget()
 		
 
 		#updateCanvas
@@ -353,7 +353,7 @@ class TKBoard:
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
-			self.boardlogic.water_level-=self.boardlogic.water_velocity/400#decrease the filling by the water velocity
+			self.boardlogic.water_level-=self.boardlogic.water_velocity/500#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
 			#ensure that the water level does not go below the chute height
 			if self.fill_level>self.gameCanvas.coords(self.damTopPolygon)[3]:
@@ -412,7 +412,7 @@ class TKBoard:
 			self.updateMessage()
 
 	def updateWaterVelocity(self,value):
-		self.boardlogic.water_velocity=float(value)/2.
+		self.boardlogic.water_velocity=float(value)/4.
 
 
 	def spinTurbine(self,root):
@@ -487,6 +487,6 @@ class TKBoard:
 			self.gameCanvas.move(self.wavePolygon2,self.diffx*wave_velocity,self.diffy*wave_velocity)
 
 
-	def level0End(self,root):
-		self.level0endbutton.place(x=850,y=40)
+	def level1End(self,root):
+		self.levelendbutton.place(x=850,y=40)
 		root.after(10,self.spinTurbine,root)

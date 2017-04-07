@@ -19,6 +19,12 @@ def damLevel(board,disp,root):
 				del board.updateQueue[0]
 				root.after(100,disp.updateMessage)
 
+		#update the power produced
+		powerProduced(board)
+
 		root.after(100,disp.spinTurbine,root)
 	else:
-		root.after(100,disp.level0End,root)
+		root.after(100,disp.level1End,root)
+
+def powerProduced(board):
+	board.powerProducedDam=10*board.water_velocity

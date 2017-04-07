@@ -1,5 +1,4 @@
 import pygame
-import planes
 from pygame.locals import *
 import pdb
 import time
@@ -25,16 +24,16 @@ class Board:
 
 		# self.draggablesUpdate()
 
-		self.progress=10
+		self.progress=0
 		self.totalPoints=20
 		#level 0=tutorial
-		self.level=1
+		self.level=0
 		self.year=0
 
 		self.updateQueue=[]
 		self.UpdateMessageSurface_x=100
 		self.UpdateMessageSurface_y=450
-		self.water_level=90
+		self.water_level=85
 		self.powerProducedDam=100.
 		self.damLoad=110.
 		self.water_velocity=10.

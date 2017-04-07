@@ -9,8 +9,8 @@ class TKBoard:
 	def __init__(self, master,boardlogic):
 		self.master = master
 		master.title("GRID SIMULATOR")
-		master.minsize(width=1400,height=700)
-		master.maxsize(width=1400,height=700)
+		master.minsize(width=1300,height=700)
+		master.maxsize(width=1300,height=700)
 
 
 		self.boardlogic=boardlogic
@@ -316,12 +316,13 @@ class TKBoard:
 		#put in slider for user to set water velocity
 		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Velocity",font=("Helvetica",15))
 		self.water_slider_label.place(x=690,y=10)
+
 		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=100,orient='horizontal',command=self.updateWaterVelocity)
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
-		self.level1endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
-		self.level1endbutton.pack_forget()
+		self.level0endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
+		self.level0endbutton.pack_forget()
 		
 
 		#updateCanvas
@@ -337,6 +338,9 @@ class TKBoard:
 		self.updateFrame.rowconfigure(1,weight=5)
 		self.updateFrame.rowconfigure(2,weight=1)
 
+		#for making the star
+		
+
 
 	def updateDisplays(self,root):
 		#level progress and total points earned
@@ -344,13 +348,16 @@ class TKBoard:
 		self.points['text']=self.boardlogic.totalPoints
 
 		#fill level of dam
-		if(self.boardlogic.level==1):
+		if(self.boardlogic.level==0 or self.boardlogic.level==1):
 			self.gameCanvas.delete(self.fillRect)
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
 			self.boardlogic.water_level-=self.boardlogic.water_velocity/400#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
+			#ensure that the water level does not go below the chute height
+			if self.fill_level>self.gameCanvas.coords(self.damTopPolygon)[3]:
+				self.fill_level=self.gameCanvas.coords(self.damTopPolygon)[3]
 			self.fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
 												  self.fill_level,
 												  self.damRectangle[2],
@@ -358,12 +365,41 @@ class TKBoard:
 												  fill="#0000aa",width=0)
 		self.powerIndicator['text']=str(self.boardlogic.powerProducedDam)
 		self.LoadIndicator['text']=str(self.boardlogic.damLoad)
+
+		#logic for highlighting specific widgets
+		if (self.boardlogic.level==0 and len(self.boardlogic.updateQueue)>0):
+			
+
+			if(self.boardlogic.updateQueue[0][1]==2):#highlight the turbine
+				# print 
+				# self.gameCanvas.itemconfig("circle",fill="orange")
+				self.gameCanvas.create_oval(self.gameCanvas.coords(self.blade)[0]-40,
+											 self.gameCanvas.coords(self.blade)[1]-40,
+											 self.gameCanvas.coords(self.blade)[0],
+											 self.gameCanvas.coords(self.blade)[1],fill="#ff6600",width=0,tag="circle")
+				# self.gameCanvas.move("circle",10,20)
+
+			elif(self.boardlogic.updateQueue[0][1]==3):#highlight the water slider
+				if(self.gameCanvas.coords("circle")[0]<640):
+					self.gameCanvas.move("circle",10,-20)
+
+			elif(self.boardlogic.updateQueue[0][1]==4):#highlight the load label
+				if(self.gameCanvas.coords("circle")[0]<840):
+					self.gameCanvas.move("circle",25,20)
+
+			elif(self.boardlogic.updateQueue[0][1]==5):#highlight the load label
+				self.gameCanvas.delete("circle") 
+				
+
+				# if(self.gameCanvas.coords("arrow_turbine")[0]<850):
+				# 	self.gameCanvas.itemconfig("arrow_turbine",arrow=tk.LAST)
+				# 	self.gameCanvas.move("arrow_turbine",10,20)
 		
 		root.after(10,gameLogic,self,self.boardlogic,root)
 
 	def updateMessage(self):
 		self.updateMessageCanvas.pack()
-		self.updateMessageLabel['text']=self.boardlogic.updateQueue[0]
+		self.updateMessageLabel['text']=self.boardlogic.updateQueue[0][0]
 		self.updateMessageLabel.pack(side='top',pady=10)
 
 	def nextMessage(self):
@@ -376,7 +412,7 @@ class TKBoard:
 			self.updateMessage()
 
 	def updateWaterVelocity(self,value):
-		self.boardlogic.water_velocity=float(value)
+		self.boardlogic.water_velocity=float(value)/2.
 
 
 	def spinTurbine(self,root):
@@ -398,7 +434,6 @@ class TKBoard:
 													fill="#000000")
 
 		self.moveWaves()
-
 		root.after(10,self.updateDisplays,root)
 	def moveWaves(self):
 		#get position of leading edge of wave
@@ -452,6 +487,6 @@ class TKBoard:
 			self.gameCanvas.move(self.wavePolygon2,self.diffx*wave_velocity,self.diffy*wave_velocity)
 
 
-	def level1End(self,root):
-		self.level1endbutton.place(x=850,y=40)
+	def level0End(self,root):
+		self.level0endbutton.place(x=850,y=40)
 		root.after(10,self.spinTurbine,root)

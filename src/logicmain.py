@@ -6,7 +6,8 @@ from utils import Board
 import time
 from pygame.locals import *
 import pdb
-from level1 import tutorialSequence
+from level0 import tutorialSequence
+from level1 import damLevel
 
 
 def initGameLogic():
@@ -20,8 +21,10 @@ def gameLogic(disp,board,root):
 	# 	board.water_level+=1
 	# root.after(500,disp.updateDisplays,root)
 	
-	if(board.level==1):
+	if(board.level==0):
 		tutorialSequence(board,disp,root)
+	if(board.level==1):
+		damLevel(board,disp,root)
 	
 
 	

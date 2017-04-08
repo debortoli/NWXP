@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import pdb
 import Tkinter as tk
-from level1 import damLevel
+from level1 import damLevel,initLevel1,powerProduced
 
 def tutorialSequence(board,disp,root):
 	#on the first iteration, add all of the messages
@@ -45,6 +45,7 @@ def tutorialSequence(board,disp,root):
 	
 	board.progress+=0.05
 	root.after(100,disp.spinTurbine,root)
+	powerProduced(board)
 	#if we have gone through all of the messages
 	if(len(board.updateQueue)<1):
 		board.level=1

@@ -236,7 +236,7 @@ class TKBoard:
 											   (self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2+10,
 											   fill="#ffff00",width=4)
 		#add the load
-		self.LoadIndicator=tk.Label(self.gameCanvas,text="Hi",bg='#00aa00',font=("Helvetica", 17))
+		self.LoadIndicator=tk.Label(self.gameCanvas,text="Hi",bg='#00e600',font=("Helvetica", 17))
 		self.Load_x=self.powerIndicator_x+self.powerIndicator.winfo_width()+64+self.power_line_lengthc
 		self.Load_y=(self.gameCanvas.coords(self.generator)[1]+self.gameCanvas.coords(self.generator)[3])/2-15
 		self.LoadIndicator.place(x=self.Load_x,y=self.Load_y, width=65,height=30)
@@ -317,7 +317,7 @@ class TKBoard:
 		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Velocity",font=("Helvetica",15))
 		self.water_slider_label.place(x=690,y=10)
 
-		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=100,orient='horizontal',command=self.updateWaterVelocity)
+		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity)
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
@@ -338,8 +338,8 @@ class TKBoard:
 		self.updateFrame.rowconfigure(1,weight=5)
 		self.updateFrame.rowconfigure(2,weight=1)
 
-		#for making the star
-		
+		#for water flowing in the animation
+		self.waterAnimationSpeed=0.
 
 
 	def updateDisplays(self,root):
@@ -353,7 +353,7 @@ class TKBoard:
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
-			self.boardlogic.water_level-=self.boardlogic.water_velocity/500#decrease the filling by the water velocity
+			self.boardlogic.water_level-=self.waterAnimationSpeed#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
 			#ensure that the water level does not go below the chute height
 			if self.fill_level>self.gameCanvas.coords(self.damTopPolygon)[3]:
@@ -363,6 +363,7 @@ class TKBoard:
 												  self.damRectangle[2],
 												  self.damRectangle[3],
 												  fill="#0000aa",width=0)
+
 		self.powerIndicator['text']=str(self.boardlogic.powerProducedDam)
 		self.LoadIndicator['text']=str(self.boardlogic.damLoad)
 
@@ -391,9 +392,16 @@ class TKBoard:
 				self.gameCanvas.delete("circle") 
 				
 
-				# if(self.gameCanvas.coords("arrow_turbine")[0]<850):
-				# 	self.gameCanvas.itemconfig("arrow_turbine",arrow=tk.LAST)
-				# 	self.gameCanvas.move("arrow_turbine",10,20)
+		#handle the coloring of the power produced indicator
+		if(self.boardlogic.powerProducedDam<(self.boardlogic.damLoad-20)):
+			self.powerIndicator.configure(bg='#ed0000')
+		elif (self.boardlogic.powerProducedDam<self.boardlogic.damLoad-5):
+			self.powerIndicator.configure(bg='#ff9933')
+		elif (self.boardlogic.powerProducedDam<self.boardlogic.damLoad+5):
+			self.powerIndicator.configure(bg='#00e600')
+		else:
+			self.powerIndicator.configure(bg='#ff9933')
+
 		
 		root.after(10,gameLogic,self,self.boardlogic,root)
 
@@ -412,7 +420,8 @@ class TKBoard:
 			self.updateMessage()
 
 	def updateWaterVelocity(self,value):
-		self.boardlogic.water_velocity=float(value)/4.
+		self.boardlogic.water_velocity=float(value)
+		self.waterAnimationSpeed=float(value)/12000
 
 
 	def spinTurbine(self,root):
@@ -429,8 +438,8 @@ class TKBoard:
 		self.gameCanvas.delete(self.blade)
 
 		#add a new blade
-		self.blade=self.gameCanvas.create_rectangle(x0+self.boardlogic.water_velocity/40.,y0,
-													x1+self.boardlogic.water_velocity/40.,y1,
+		self.blade=self.gameCanvas.create_rectangle(x0+self.waterAnimationSpeed*70.,y0,
+													x1+self.waterAnimationSpeed*70.,y1,
 													fill="#000000")
 
 		self.moveWaves()
@@ -438,7 +447,7 @@ class TKBoard:
 	def moveWaves(self):
 		#get position of leading edge of wave
 		[x0,y0]=[self.gameCanvas.coords(self.wavePolygon)[2],self.gameCanvas.coords(self.wavePolygon)[3]]
-		wave_velocity=self.boardlogic.water_velocity/4000.
+		wave_velocity= self.waterAnimationSpeed 
 		if(x0>self.kneePointx or y0>self.kneePointy)and(x0<self.gameCanvas.coords(self.damTopPolygon)[6]-3):
 			if(self.gameCanvas.coords(self.wavePolygon)[0]<self.kneePointx):#we're just turning the corner
 				self.gameCanvas.delete(self.wavePolygon)
@@ -463,7 +472,7 @@ class TKBoard:
 
 		#get position of leading edge of wave
 		[x0,y0]=[self.gameCanvas.coords(self.wavePolygon2)[2],self.gameCanvas.coords(self.wavePolygon2)[3]]
-		wave_velocity=self.boardlogic.water_velocity/4000.
+		wave_velocity=self.waterAnimationSpeed
 		if(x0>self.kneePointx or y0>self.kneePointy)and(x0<self.gameCanvas.coords(self.damTopPolygon)[6]-3):
 			if(self.gameCanvas.coords(self.wavePolygon2)[0]<self.kneePointx):#we're just turning the corner
 				self.gameCanvas.delete(self.wavePolygon2)
@@ -488,5 +497,5 @@ class TKBoard:
 
 
 	def level1End(self,root):
-		self.levelendbutton.place(x=850,y=40)
+		self.level1endbutton.place(x=650,y=40)
 		root.after(10,self.spinTurbine,root)

@@ -418,7 +418,7 @@ class TKBoard:
 		self.updateMessageLabel.pack(side='top',pady=10)
 
 	def nextMessage(self):
-		print self.boardlogic.updateQueue[0][1],"\n"
+		
 		del self.boardlogic.updateQueue[0]
 		if(len(self.boardlogic.updateQueue)==0):
 			#stop providing update messages
@@ -428,9 +428,9 @@ class TKBoard:
 				if(self.waterAnimationSpeed==0.):
 					self.boardlogic.updateQueue = [["Move the water by moving the slider!",3]] + self.boardlogic.updateQueue
 
-				if(self.boardlogic.updateQueue[0][1]==5):#highlight the load label
-					if(self.boardlogic.powerProducedDam!=self.boardlogic.damLoad):
-						self.boardlogic.updateQueue = [["Match the load exactly!",4]]+self.boardlogic.updateQueue
+			if(self.boardlogic.updateQueue[0][1]==5):#highlight the load label
+				if(self.boardlogic.powerProducedDam!=self.boardlogic.damLoad):
+					self.boardlogic.updateQueue = [["Match the load exactly!",4]]+self.boardlogic.updateQueue
 			#display the next message
 			self.updateMessage()
 

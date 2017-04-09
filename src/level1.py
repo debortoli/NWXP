@@ -18,14 +18,13 @@ def damLevel(board,disp,root):
 		if(board.water_level>99):
 			board.progress-=20.
 		if(board.water_level>90):
-			board.updateQueue.append(["The water level is getting too high!",8])
+			board.updateQueue.append(["The water level is getting too high. +\n Increase the water water velocity!",8])
 			root.after(1,disp.updateMessage)
 		else:
 			#remove the message
-			print "removing water level message"
-			if(len(board.updateQueue)>0 and board.updateQueue[0][0]==8):
+			if(len(board.updateQueue)>0 and board.updateQueue[0][1]==8):
 				del board.updateQueue[0]
-				root.after(1,disp.updateMessage)
+				root.after(1,disp.nextMessage)
 
 		#update the power produced
 		powerProduced(board)

@@ -4,6 +4,7 @@ import pdb
 import time
 import ttk
 from logicmain import gameLogic
+from level1 import initLevel1
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -41,7 +42,7 @@ class TKBoard:
 		self.pointsTitle=   tk.Label(self.pointsCanvas,bg='lightgray',text="TOTAL POINTS",font=("Helvetica", 16))
 		self.pointsTitle.pack(side='top',pady=10)
 
-		self.points = tk.Label(self.pointsCanvas,bg='lightgray',text=str(boardlogic.totalPoints),font=("Helvetica", 25),fg="green")
+		self.points = tk.Label(self.pointsCanvas,bg='lightgray',text=str(boardlogic.totalPoints),font=("Helvetica", 25),fg="#309933")
 		self.points.pack(side='top',pady=10)
 
 		#draggables canvas
@@ -314,8 +315,8 @@ class TKBoard:
 
 
 		#put in slider for user to set water velocity
-		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Velocity",font=("Helvetica",15))
-		self.water_slider_label.place(x=690,y=10)
+		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate",font=("Helvetica",15))
+		self.water_slider_label.place(x=680,y=10)
 
 		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity)
 		self.water_slider.place(x=700,y=40)
@@ -358,9 +359,29 @@ class TKBoard:
 			#compute how many pixels need to be filled
 			self.boardlogic.water_level-=self.waterAnimationSpeed#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
+
 			#ensure that the water level does not go below the chute height
 			if self.fill_level>self.gameCanvas.coords(self.damTopPolygon)[3]:
 				self.fill_level=self.gameCanvas.coords(self.damTopPolygon)[3]
+
+			#ensure the water level does not go over the side of the dam
+			if self.boardlogic.water_level>99.:
+				self.boardlogic.water_level=80
+				self.boardlogic.updateQueue=[]
+
+				#in order for the message to stay up fo a while, we add a bunch of them
+				for i in range(50):
+					self.boardlogic.updateQueue.append(["Water level got too high! Level restarted.",99])
+				self.updateMessage()
+				initLevel1(self.boardlogic)
+
+			else:
+				if(len(self.boardlogic.updateQueue)>0 and self.boardlogic.updateQueue[0][1]==99):
+					# self.updateRate=100
+					self.nextMessage()
+				
+
+
 			self.fillRect=self.gameCanvas.create_rectangle(self.damRectangle[0],
 												  self.fill_level,
 												  self.damRectangle[2],

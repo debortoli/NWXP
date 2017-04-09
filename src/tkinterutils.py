@@ -321,7 +321,7 @@ class TKBoard:
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
-		self.level1endbutton=tk.Button(self.gameCanvas,bg='green',text="Move on!")
+		self.level1endbutton=tk.Button(self.gameFrame,bg='#00ff00',text="     Move     \n     on!     \n")
 		self.level1endbutton.pack_forget()
 		
 
@@ -341,11 +341,14 @@ class TKBoard:
 		#for water flowing in the animation
 		self.waterAnimationSpeed=0.
 
+		#to set how long cycles should go for
+		self.updateRate=100#its in ms
+
 
 	def updateDisplays(self,root):
 		#level progress and total points earned
 		self.progress["value"]=self.boardlogic.progress
-		self.points['text']=self.boardlogic.totalPoints
+		self.points["text"]=str(int(self.boardlogic.totalPoints))
 
 		#fill level of dam
 		if(self.boardlogic.level==0 or self.boardlogic.level==1):
@@ -374,13 +377,17 @@ class TKBoard:
 			if(self.boardlogic.updateQueue[0][1]==2):#highlight the turbine
 				# print 
 				# self.gameCanvas.itemconfig("circle",fill="orange")
-				self.gameCanvas.create_oval(self.gameCanvas.coords(self.blade)[0]-40,
-											 self.gameCanvas.coords(self.blade)[1]-40,
-											 self.gameCanvas.coords(self.blade)[0],
-											 self.gameCanvas.coords(self.blade)[1],fill="#ff6600",width=0,tag="circle")
+				self.gameCanvas.create_oval(self.gameCanvas.coords(self.turbine)[0]+2-40,
+											 self.gameCanvas.coords(self.turbine)[1]-5-40,
+											 self.gameCanvas.coords(self.turbine)[0]+2,
+											 self.gameCanvas.coords(self.turbine)[1]-5,fill="#ff6600",width=0,tag="circle")
+				self.waterAnimationSpeed=50./12000.
 				# self.gameCanvas.move("circle",10,20)
 
 			elif(self.boardlogic.updateQueue[0][1]==3):#highlight the water slider
+				if(self.gameCanvas.coords("circle")[0]==self.gameCanvas.coords(self.turbine)[0]+2-40):#if this message has just been chosen
+					self.waterAnimationSpeed=0.
+
 				if(self.gameCanvas.coords("circle")[0]<640):
 					self.gameCanvas.move("circle",10,-20)
 
@@ -393,17 +400,17 @@ class TKBoard:
 				
 
 		#handle the coloring of the power produced indicator
-		if(self.boardlogic.powerProducedDam<(self.boardlogic.damLoad-20)):
+		if(abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)>10):
 			self.powerIndicator.configure(bg='#ed0000')
-		elif (self.boardlogic.powerProducedDam<self.boardlogic.damLoad-5):
-			self.powerIndicator.configure(bg='#ff9933')
-		elif (self.boardlogic.powerProducedDam<self.boardlogic.damLoad+5):
-			self.powerIndicator.configure(bg='#00e600')
-		else:
-			self.powerIndicator.configure(bg='#ff9933')
+		elif(abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)<10)and (abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)>5):
+			self.powerIndicator.configure(bg='#ff0000')
+		elif (abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)<=5) and (abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)>1):
+			self.powerIndicator.configure(bg='#ff8000')
+		elif(abs(self.boardlogic.powerProducedDam-self.boardlogic.damLoad)<=1):
+			self.powerIndicator.configure(bg='#00ee00')
 
 		
-		root.after(10,gameLogic,self,self.boardlogic,root)
+		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
 
 	def updateMessage(self):
 		self.updateMessageCanvas.pack()
@@ -411,11 +418,19 @@ class TKBoard:
 		self.updateMessageLabel.pack(side='top',pady=10)
 
 	def nextMessage(self):
+		print self.boardlogic.updateQueue[0][1],"\n"
 		del self.boardlogic.updateQueue[0]
 		if(len(self.boardlogic.updateQueue)==0):
 			#stop providing update messages
 			self.updateMessageCanvas.pack_forget()
 		else:
+			if(self.boardlogic.updateQueue[0][1]==4):#highlighting the water slider
+				if(self.waterAnimationSpeed==0.):
+					self.boardlogic.updateQueue = [["Move the water by moving the slider!",3]] + self.boardlogic.updateQueue
+
+				if(self.boardlogic.updateQueue[0][1]==5):#highlight the load label
+					if(self.boardlogic.powerProducedDam!=self.boardlogic.damLoad):
+						self.boardlogic.updateQueue = [["Match the load exactly!",4]]+self.boardlogic.updateQueue
 			#display the next message
 			self.updateMessage()
 
@@ -443,7 +458,7 @@ class TKBoard:
 													fill="#000000")
 
 		self.moveWaves()
-		root.after(10,self.updateDisplays,root)
+		root.after(1,self.updateDisplays,root)
 	def moveWaves(self):
 		#get position of leading edge of wave
 		[x0,y0]=[self.gameCanvas.coords(self.wavePolygon)[2],self.gameCanvas.coords(self.wavePolygon)[3]]
@@ -497,5 +512,5 @@ class TKBoard:
 
 
 	def level1End(self,root):
-		self.level1endbutton.place(x=650,y=40)
-		root.after(10,self.spinTurbine,root)
+		self.level1endbutton.place(x=500,y=40)
+		root.after(1,self.spinTurbine,root)

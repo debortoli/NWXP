@@ -25,7 +25,7 @@ class Board:
 		# self.draggablesUpdate()
 
 		self.progress=0
-		self.totalPoints=20
+		self.totalPoints=0.
 		#level 0=tutorial
 		self.level=0
 		self.year=0

@@ -6,12 +6,12 @@ from level1 import damLevel,initLevel1,powerProduced
 
 def tutorialSequence(board,disp,root):
 	#on the first iteration, add all of the messages
-	if(len(board.updateQueue)<1 and board.progress<1):
+	if(len(board.updateQueue)<1 and board.progress==0.):
 		m1="Welcome to the Grid Simulator Game!"+'\n'+\
 			"To start out, your role will be to manage the Bonneville Dam"+'\n'+\
 			"right here in the PNW."+'\n'
 		board.updateQueue.append([m1,1])
-		root.after(100,disp.updateMessage)
+		root.after(1,disp.updateMessage)
 
 		m2="A dam works by using the energy in flowing water to spin a turbine. "+'\n'
 		board.updateQueue.append([m2,2])
@@ -43,10 +43,11 @@ def tutorialSequence(board,disp,root):
 
 	
 	
-	board.progress+=0.05
-	root.after(100,disp.spinTurbine,root)
+	board.progress+=0.01
+	root.after(1,disp.spinTurbine,root)
 	powerProduced(board)
 	#if we have gone through all of the messages
 	if(len(board.updateQueue)<1):
 		board.level=1
-		root.after(10,damLevel,board,disp,root)
+		initLevel1(board)
+		root.after(1,damLevel,board,disp,root)

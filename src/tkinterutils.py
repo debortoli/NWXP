@@ -345,11 +345,22 @@ class TKBoard:
 		#to set how long cycles should go for
 		self.updateRate=100#its in ms
 
+		#spill button
+		self.spillRepeatInterval=100
+		self.spillbutton=tk.Button(self.gameCanvas,bg='#c0c0c0',text="Spill Water!",command=self.spill,repeatdelay=10,repeatinterval=self.spillRepeatInterval,relief='groove')
+		self.spillbutton.place(x=self.gameCanvas.coords(self.damTopPolygon)[0],y=self.gameCanvas.coords(self.damTopPolygon)[1]-27)
+
+		#time indicator
+		self.timeIndicator=tk.Label(self.gameCanvas,bg='white',text="time",font=("Helvetica", 15),fg="#bb0000")
+		self.timeIndicator.place(x=15,y=15)
+
+
 
 	def updateDisplays(self,root):
 		#level progress and total points earned
 		self.progress["value"]=self.boardlogic.progress
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
+		self.timeIndicator["text"]=str(self.boardlogic.time)
 
 		#fill level of dam
 		if(self.boardlogic.level==0 or self.boardlogic.level==1):
@@ -377,7 +388,10 @@ class TKBoard:
 
 			else:
 				if(len(self.boardlogic.updateQueue)>0 and self.boardlogic.updateQueue[0][1]==99):
-					# self.updateRate=100
+					self.nextMessage()
+
+				#delete the "you've spilled too much" message
+				if(len(self.boardlogic.updateQueue)>0 and self.boardlogic.updateQueue[0][1]==199):
 					self.nextMessage()
 				
 
@@ -535,3 +549,15 @@ class TKBoard:
 	def level1End(self,root):
 		self.level1endbutton.place(x=500,y=40)
 		root.after(1,self.spinTurbine,root)
+
+	def spill(self):
+		self.boardlogic.spilledSeconds+=self.spillRepeatInterval/1000.
+		if(self.boardlogic.spilledSeconds>10.):
+			self.boardlogic.updateQueue.append(["Cannot spill for more than 20 seconds!",199])
+			self.boardlogic.updateQueue.append(["Cannot spill for more than 20 seconds!",199])
+			self.updateMessage()
+
+		else:
+			self.boardlogic.water_level-=0.05
+		
+		

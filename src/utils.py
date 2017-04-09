@@ -38,8 +38,13 @@ class Board:
 		self.damLoad=110.
 		self.water_velocity=10.
 		self.loadChangeTime=pygame.time.get_ticks()
+		self.spilledSeconds=0.
+		self.time="09:00 AM"
 
-		self.possibleLoadLevels=[105.,115.,110.,100.,103.,108.,112.]
+		self.possibleLoadLevels=[110.,112.,110.,111.,110.,110.,
+								 112.,120.,121.,124.,124.,120.,
+								 121.,124.,125.,124.,128.,135.,
+								 140.,135.,134.,125.,120.,115.,]
 	
 	def createCities(self):
 		self.cities=[]

@@ -14,12 +14,12 @@ def initLevel1(board):
 
 def damLevel(board,disp,root):
 
-	board.water_level+=0.01
+	board.water_level+=0.022
 	if(board.progress<99.5):
 		if(board.water_level>99):
 			board.progress-=20.
-		if(board.water_level>90):
-			board.updateQueue.append(["The water level is getting too high. \n Increase the water flow rate!",8])
+		if(board.water_level>95):
+			board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
 			root.after(1,disp.updateMessage)
 		else:
 			#remove the message

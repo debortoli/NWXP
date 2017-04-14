@@ -34,6 +34,7 @@ def tutorialSequence(board,disp,root):
 
 		m5="The load will vary every 'hour'. An hour (as indicated by the clock in the upper left) is "+"\n"+\
 		   "about 20 seconds of real time. The load amount is determined by the energy consumers!"+"\n"+\
+		   "The typical unitused while observing generation and loas values is Megawatts. "+"\n"+\
 		   "During the night energy consumption is low, and during the late afternoon when everyone "+"\n"+\
 		   "comes home energy consumption is the highest."
 		board.updateQueue.append([m5,5])

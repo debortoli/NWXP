@@ -368,7 +368,7 @@ class TKBoard:
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
-			self.boardlogic.water_level-=self.waterAnimationSpeed*2#decrease the filling by the water velocity
+			self.boardlogic.water_level-=self.waterAnimationSpeed*1.2#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
 
 			#ensure that the water level does not go below the chute height

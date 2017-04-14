@@ -14,7 +14,7 @@ def initLevel1(board):
 
 def damLevel(board,disp,root):
 
-	board.water_level+=0.022
+	board.water_level+=0.018
 	if(board.progress<99.5):
 		if(board.water_level>99):
 			board.progress-=20.
@@ -46,9 +46,22 @@ def damLevel(board,disp,root):
 			elif(int(board.time[:2])==12):
 				board.time="01:00 "+str(board.time[-2:])
 			else:
-				board.time=str(int(board.time[:2])+1)+":00 "+str(board.time[-2:])
+				if(int(board.time[:2])+1<10):
+					board.time="0"+str(int(board.time[:2])+1)+":00 "+str(board.time[-2:])
+				else:
+					board.time=str(int(board.time[:2])+1)+":00 "+str(board.time[-2:])
 			#choose the load level based on the time
-			board.damLoad=board.possibleLoadLevels[int(board.time[:2])-1]
+			if(str(board.time[-2:])=='AM'):
+				if(int(board.time[:2])==12):
+					board.damLoad=board.possibleLoadLevels[0]
+				else:
+					board.damLoad=board.possibleLoadLevels[int(board.time[:2])]
+
+			else:
+				if(int(board.time[:2])==12):
+					board.damLoad=board.possibleLoadLevels[12]
+				else:
+					board.damLoad=board.possibleLoadLevels[int(board.time[:2])+12]
 		else:
 			#increment the seconds
 			#to make the single digit seconds include a 0
@@ -86,7 +99,7 @@ def powerProduced(board):
 
 def addPoints(board,disp):
 	if abs(board.powerProducedDam-board.damLoad)<5:
-		board.progress+=(disp.updateRate/2)/1000./1.2 #amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
+		board.progress+=(disp.updateRate/2)/1000./3 #/1.2  amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
 		board.totalPoints+=0.01
 	if abs(board.powerProducedDam-board.damLoad)<1:
 		board.totalPoints+=0.01

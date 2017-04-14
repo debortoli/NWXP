@@ -35,16 +35,16 @@ class Board:
 		self.UpdateMessageSurface_y=450
 		self.water_level=87
 		self.powerProducedDam=0.
-		self.damLoad=110.
+		self.damLoad=1010.
 		self.water_velocity=10.
 		self.loadChangeTime=pygame.time.get_ticks()
 		self.spilledSeconds=0.
 		self.time="09:00 AM"
 
-		self.possibleLoadLevels=[110.,112.,110.,111.,110.,110.,
-								 112.,120.,121.,124.,124.,120.,
-								 121.,124.,125.,124.,128.,135.,
-								 140.,135.,134.,125.,120.,115.,]
+		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
+								 1012.,1020.,1021.,1024.,1024.,1020.,
+								 1025.,1030.,1032.,1033.,1039.,1047.,
+								 1055.,1050.,1040.,1030.,1025.,1017.,]
 	
 	def createCities(self):
 		self.cities=[]

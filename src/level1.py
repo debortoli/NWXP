@@ -78,7 +78,7 @@ def damLevel(board,disp,root):
 		root.after(disp.updateRate,disp.level1End,root)
 
 def powerProduced(board):
-	board.powerProducedDam=int(0.3*board.water_velocity)+70
+	board.powerProducedDam=int(board.water_velocity)+900
 	if(board.powerProducedDam<0):
 		board.powerProducedDam=0
 	elif(board.water_velocity==0):

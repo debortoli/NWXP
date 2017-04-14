@@ -318,7 +318,7 @@ class TKBoard:
 		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate",font=("Helvetica",15))
 		self.water_slider_label.place(x=680,y=10)
 
-		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity)
+		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity,showvalue=0)
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
@@ -403,7 +403,7 @@ class TKBoard:
 												  fill="#0000aa",width=0)
 
 		self.powerIndicator['text']=str(self.boardlogic.powerProducedDam)
-		self.LoadIndicator['text']=str(self.boardlogic.damLoad)
+		self.LoadIndicator['text']=str(int(self.boardlogic.damLoad))
 
 		#logic for highlighting specific widgets
 		if (self.boardlogic.level==0 and len(self.boardlogic.updateQueue)>0):
@@ -423,16 +423,16 @@ class TKBoard:
 				if(self.gameCanvas.coords("circle")[0]==self.gameCanvas.coords(self.turbine)[0]+2-40):#if this message has just been chosen
 					self.waterAnimationSpeed=0.
 
-				if(self.gameCanvas.coords("circle")[0]<640):
+				if(self.gameCanvas.coords("circle")[0]<630):
 					self.gameCanvas.move("circle",10,-20)
 
 			elif(self.boardlogic.updateQueue[0][1]==4):#highlight the load label
-				if(self.gameCanvas.coords("circle")[0]<840):
-					self.gameCanvas.move("circle",25,20)
+				if(self.gameCanvas.coords("circle")[0]<830):
+					self.gameCanvas.move("circle",30,20)
 
-			elif(self.boardlogic.updateQueue[0][1]==6):#highlight the load label
-				if(self.gameCanvas.coords("circle")[0]>440):
-					self.gameCanvas.move("circle",-25,-3)
+			elif(self.boardlogic.updateQueue[0][1]==6):#highlight the spill button
+				if(self.gameCanvas.coords("circle")[0]>420):
+					self.gameCanvas.move("circle",-25,-3.5)
 
 			elif(self.boardlogic.updateQueue[0][1]==8):
 				self.gameCanvas.delete("circle")

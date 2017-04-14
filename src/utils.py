@@ -33,7 +33,7 @@ class Board:
 		self.updateQueue=[]
 		self.UpdateMessageSurface_x=100
 		self.UpdateMessageSurface_y=450
-		self.water_level=85
+		self.water_level=87
 		self.powerProducedDam=0.
 		self.damLoad=110.
 		self.water_velocity=10.

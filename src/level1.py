@@ -10,6 +10,7 @@ def initLevel1(board):
 	board.loadChangeTime=pygame.time.get_ticks()
 	board.time="09:00 AM"
 	board.damLoad=board.possibleLoadLevels[int(board.time[:2])-1]
+	board.spilledSeconds=0
 
 def damLevel(board,disp,root):
 
@@ -77,7 +78,7 @@ def damLevel(board,disp,root):
 		root.after(disp.updateRate,disp.level1End,root)
 
 def powerProduced(board):
-	board.powerProducedDam=int(0.3*board.water_velocity)+50
+	board.powerProducedDam=int(0.3*board.water_velocity)+70
 	if(board.powerProducedDam<0):
 		board.powerProducedDam=0
 	elif(board.water_velocity==0):

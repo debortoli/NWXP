@@ -430,8 +430,13 @@ class TKBoard:
 				if(self.gameCanvas.coords("circle")[0]<840):
 					self.gameCanvas.move("circle",25,20)
 
-			elif(self.boardlogic.updateQueue[0][1]==5):#highlight the load label
-				self.gameCanvas.delete("circle") 
+			elif(self.boardlogic.updateQueue[0][1]==6):#highlight the load label
+				if(self.gameCanvas.coords("circle")[0]>440):
+					self.gameCanvas.move("circle",-25,-3)
+
+			elif(self.boardlogic.updateQueue[0][1]==8):
+				self.gameCanvas.delete("circle")
+
 				
 
 		#handle the coloring of the power produced indicator

@@ -5,6 +5,8 @@ import time
 import ttk
 from logicmain import gameLogic
 from level1 import initLevel1
+from level3 import initLevel3
+import ttk
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -15,6 +17,7 @@ class TKBoard:
 
 
 		self.boardlogic=boardlogic
+		self.root=self.master
 
 		#create update frame which contains 3 widgets
 		self.updateFrame= tk.Frame(master)
@@ -322,8 +325,8 @@ class TKBoard:
 		self.water_slider.place(x=700,y=40)
 
 		#put in the level end button
-		self.level1endbutton=tk.Button(self.gameFrame,bg='#00ff00',text="     Move     \n     on!     \n")
-		self.level1endbutton.pack_forget()
+		self.level1endbutton=tk.Button(self.gameFrame,bg='#00ff00',text="     Move     \n     on!     \n",command=self.nextLevel)
+		# self.level1endbutton.pack_forget()
 		
 
 		#updateCanvas
@@ -357,6 +360,13 @@ class TKBoard:
 
 
 	def updateDisplays(self,root):
+		if(self.boardlogic.level==0 or self.boardlogic.level == 1):
+			self.updateDisplaysLevel1(root)
+		elif(self.boardlogic.level==3):
+			self.updateDisplaysLevel3(root)
+
+	def updateDisplaysLevel1(self,root):
+
 		#level progress and total points earned
 		self.progress["value"]=self.boardlogic.progress
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
@@ -451,6 +461,11 @@ class TKBoard:
 
 		
 		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
+
+
+	def updateDisplaysLevel3(self,root):
+		p=0
+
 
 	def updateMessage(self):
 		self.updateMessageCanvas.pack()
@@ -564,5 +579,54 @@ class TKBoard:
 
 		else:
 			self.boardlogic.water_level-=0.1
+
+	def nextLevel(self):
+		if(self.boardlogic.level==1):
+			#clear the board
+			self.clearBoard()
+			self.boardlogic.level=3
+
+			#set the board
+			self.setBoard()
+			self.root.after(1,initLevel3,self.boardlogic,self.root)
+
+	def clearBoard(self):
+		#gameFrame and updateFrame
+		if(self.boardlogic.level==1):
+			self.gameFrame.destroy()
+			self.updateFrame.destroy()
+
+	def setBoard(self):
+		if(self.boardlogic.level==3):
+			self.generatorFrame= tk.Frame(self.master,bg="grey")
+			self.generatorFrame.pack(side="right",fill="y")
+
+			#level canvas
+			self.generatorCanvas = tk.Canvas(self.generatorFrame,bg="lightgray")
+			self.generatorCanvas.pack(fill='x')#grid(row=0,column=0,sticky='N')
+
+			tree = ttk.Treeview(self.generatorCanvas)
+			tree["columns"]=("type","name","cap","ramp","bid")
+			tree.column("type", width=50 ,anchor=tk.CENTER)
+			tree.column("name", width=150,anchor=tk.CENTER)
+			tree.column("cap", width=120 ,anchor=tk.CENTER)
+			tree.column("ramp", width=140,anchor=tk.CENTER)
+			tree.column("bid", width=100 ,anchor=tk.CENTER)
+
+			tree.heading("type", text="Type")
+			tree.heading("name", text="Name")
+			tree.heading("cap",  text="Capacity (MW)")
+			tree.heading("ramp", text="Ramp Rate (MW/s)")
+			tree.heading("bid",  text="Bid ($/MWhr)")
+
+			tree.insert("",0,values=("Hydro","Bonneville Dam",1080,2,50))
+			tree['show'] = 'headings'#get rid of the empty column on the left
+			tree.pack()
+
+			self.generatorFrame= tk.Frame(self.master,bg="grey")
+			self.generatorFrame.pack(side="right",fill="y")
+
+
+
 		
 		

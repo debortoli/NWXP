@@ -24,10 +24,10 @@ class Board:
 
 		# self.draggablesUpdate()
 
-		self.progress=0
+		self.progress=99
 		self.totalPoints=0.
 		#level 0=tutorial
-		self.level=0
+		self.level=1
 		self.year=0
 
 		self.updateQueue=[]
@@ -35,7 +35,7 @@ class Board:
 		self.UpdateMessageSurface_y=450
 		self.water_level=87
 		self.powerProducedDam=0.
-		self.damLoad=1010.
+		self.damLoad=0.
 		self.water_velocity=10.
 		self.loadChangeTime=pygame.time.get_ticks()
 		self.spilledSeconds=0.

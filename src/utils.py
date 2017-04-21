@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import pdb
 import time
+import csv
 
 class Board:
 	def __init__(self):
@@ -41,10 +42,21 @@ class Board:
 		self.spilledSeconds=0.
 		self.time="09:00 AM"
 
+		#for level 2
 		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
 								 1012.,1020.,1021.,1024.,1024.,1020.,
 								 1025.,1030.,1032.,1033.,1039.,1047.,
 								 1055.,1050.,1040.,1030.,1025.,1017.,]
+
+		#for level 3
+		self.generators=[]
+		with open('generators.csv', 'rb') as csvfile:
+		    generator_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+		    for row in generator_reader:
+		        self.generators.append([row[0],row[1],float(row[2]),
+		        	                    float(row[3]),float(row[4])])
+
+
 	
 	def createCities(self):
 		self.cities=[]

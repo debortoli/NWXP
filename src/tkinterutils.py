@@ -619,7 +619,16 @@ class TKBoard:
 			tree.heading("ramp", text="Ramp Rate (MW/s)")
 			tree.heading("bid",  text="Bid ($/MWhr)")
 
-			tree.insert("",0,values=("Hydro","Bonneville Dam",1080,2,50))
+			row_tag='oddrow'#for alternating colors
+			for gen in self.boardlogic.generators:
+				if(row_tag=='oddrow'):
+					row_tag='evenrow'
+					tree.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				else:
+					row_tag='oddrow'
+					tree.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+			tree.tag_configure('oddrow', background='#b8b894')
+
 			tree['show'] = 'headings'#get rid of the empty column on the left
 			tree.pack()
 

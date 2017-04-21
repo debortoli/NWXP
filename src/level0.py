@@ -14,27 +14,27 @@ def tutorialSequence(board,disp,root):
 		root.after(1,disp.updateMessage)
 
 		m2="A dam works by converting the energy in flowing water into electricity"+'\n'+\
-		"by spinning  a turbine. "+'\n'
+		"by spinning a turbine. "+'\n'
 		board.updateQueue.append([m2,2])
 		#highlight turbine
 
-		m3="Increasing the turbine speed increases the water flow rate through the dam"+"\n"+\
+		m3="Increasing the water flow rate through the dam increases the turbine speed"+"\n"+\
 			"and the amount of electricity produced. Try to increase the water velocity"+"\n"+\
-		   "to water water flow through the turbine!"
+		   "to water flow through the turbine!"
 		board.updateQueue.append([m3,3])
 		#highlight water velocity slider
 
 		m4="As an electricity generator, your goal is to produce exactly the correct"+"\n"+\
 		   "amount of energy that is needed. This amount is indicated by the load sign."+"\n"+\
-		    "The load is determined by anyone who uses electricity!"+"\n"+\
-		   "Try to increase the power produced until you reach the amount necessary!"+"\n"+\
-		   "Then press the continue button to move on."
+		    "The load is determined by anyone who uses electricity! Try to increase the"+"\n"+\
+		   "power produced until you reach the amount necessary! To get finer control you can click"+"\n"+\
+		   "the dark regions to the right and left of the slider. Then press the continue button to move on."
 		board.updateQueue.append([m4,4])
 		#highlight load indicator
 
 		m5="The load will vary every 'hour'. An hour (as indicated by the clock in the upper left) is "+"\n"+\
 		   "about 20 seconds of real time. The load amount is determined by the energy consumers!"+"\n"+\
-		   "The typical unitused while observing generation and loas values is Megawatts. "+"\n"+\
+		   "The typical unit used while observing generation and loads values is Megawatts. "+"\n"+\
 		   "During the night energy consumption is low, and during the late afternoon when everyone "+"\n"+\
 		   "comes home energy consumption is the highest."
 		board.updateQueue.append([m5,5])
@@ -63,7 +63,7 @@ def tutorialSequence(board,disp,root):
 		board.updateQueue.append([m9,9])
 
 		m10="You can beat this level of the game by successfully running the dam"+"\n"+\
-		   "for 2 minutes. When you are ready press the 'Continue' Button!"
+		   "until the progress bar fills up. When you are ready press the 'Continue' Button!"
 		board.updateQueue.append([m10,10])
 
 	

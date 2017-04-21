@@ -11,6 +11,7 @@ def initLevel1(board):
 	board.time="09:00 AM"
 	board.damLoad=board.possibleLoadLevels[int(board.time[:2])-1]
 	board.spilledSeconds=0
+	board.water_level=87
 
 def damLevel(board,disp,root):
 

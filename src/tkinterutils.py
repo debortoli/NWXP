@@ -315,8 +315,8 @@ class TKBoard:
 
 
 		#put in slider for user to set water velocity
-		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate",font=("Helvetica",15))
-		self.water_slider_label.place(x=680,y=10)
+		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate (m^3/s)",font=("Helvetica",15))
+		self.water_slider_label.place(x=670,y=10)
 
 		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity,showvalue=0)
 		self.water_slider.place(x=700,y=40)
@@ -368,7 +368,7 @@ class TKBoard:
 			self.dam_height=self.damRectangle[3]-self.damRectangle[1]
 
 			#compute how many pixels need to be filled
-			self.boardlogic.water_level-=self.waterAnimationSpeed*1.2#decrease the filling by the water velocity
+			self.boardlogic.water_level-=self.waterAnimationSpeed*1.15#decrease the filling by the water velocity
 			self.fill_level=self.damRectangle[3]-self.boardlogic.water_level/100.*self.dam_height
 
 			#ensure that the water level does not go below the chute height

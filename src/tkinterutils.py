@@ -7,6 +7,7 @@ from logicmain import gameLogic
 from level1 import initLevel1
 from level3 import initLevel3
 import ttk
+from PIL import Image, ImageTk
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -519,7 +520,8 @@ class TKBoard:
 		self.tableClearing.tag_configure('oddrow', background='#b8b894')
 
 		#reset the cumulative generation for the clearing table
-		self.boardlogic.cumulGen=0
+		# self.boardlogic.cumulGen=0
+
 
 
 
@@ -649,7 +651,7 @@ class TKBoard:
 
 			#set the board
 			self.setBoard()
-			self.root.after(1,initLevel3,self.boardlogic,self.root)
+			self.root.after(self.updateRate,initLevel3,self.boardlogic,self.root)
 
 	def clearBoard(self):
 		#gameFrame and updateFrame
@@ -670,11 +672,20 @@ class TKBoard:
 			self.infoFrame= tk.Frame(self.master,bg="grey",width=1)
 			self.infoFrame.pack(side="top",fill="x")
 
-			self.infoCanvas = tk.Canvas(self.infoFrame,bg="lightgray",height=150)
+			self.infoCanvasHeight=150
+			self.infoCanvas = tk.Canvas(self.infoFrame,bg="lightgray",height=self.infoCanvasHeight)
 			self.infoCanvas.pack(side="top",fill='x')
 
 
 			self.createInfoTables()
+
+			self.imageFrame= tk.Frame(self.master,bg="grey",width=1)
+			self.imageFrame.place(x=0,y=self.infoCanvasHeight)
+
+			self.imageCanvas = tk.Canvas(self.imageFrame,bg="lightgray")
+			self.imageCanvas.place(x=0,y=self.infoCanvasHeight)
+
+			self.createImage()
 
 
 	def createGensTable(self):
@@ -715,7 +726,7 @@ class TKBoard:
 	def gensClick(self,event):
 		row_id = self.tableGens.selection()[0]
 		row=self.tableGens.item(row_id,'values')
-		self.boardlogic.cumulGen+=int(float(str(row[2])))
+		self.boardlogic.cumulGen+=float(str(row[2]))
 		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
 		self.root.after(self.updateRate,self.updateDisplays,self.root)
@@ -790,4 +801,14 @@ class TKBoard:
 
 		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
 		self.tableClearing.place(x=410,y=20)
+
+	def createImage(self):
+		#resize the canvas, not that everything else has been placed
+		image = Image.open("../images/level3.png")
+		image=image.resize((750,700-self.infoCanvasHeight))
+
+		photo = ImageTk.PhotoImage(image)
+		self.imgLabel = tk.Label(image=photo)
+		self.imgLabel.image = photo # keep a reference!
+		self.imgLabel.place(x=0,y=self.infoCanvasHeight)
 		

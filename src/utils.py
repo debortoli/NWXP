@@ -67,6 +67,8 @@ class Board:
 
 		self.cumulGen=0
 
+		self.events=[["This is a sample\nmessage.\nThis is a sample\nmessage. This is a sample\nmessage.\nThis is a sample\nmessage.",
+					["Sample Option 1","Sample Option 2","Sample Option 3"]]]
 
 	
 	def createCities(self):

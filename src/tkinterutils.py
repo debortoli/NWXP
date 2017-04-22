@@ -522,6 +522,14 @@ class TKBoard:
 		#reset the cumulative generation for the clearing table
 		# self.boardlogic.cumulGen=0
 
+		#update the event stuff if some exist
+		if(len(self.boardlogic.events)>0):
+			self.eventMessage['text']=self.boardlogic.events[0][0]
+			for option in self.boardlogic.events[0][1]:
+				opt=tk.Radiobutton(self.eventMenu,text=option,bg="#80ff80").pack(side='top')
+
+
+
 
 
 
@@ -689,10 +697,11 @@ class TKBoard:
 
 
 	def createGensTable(self):
-		self.levelTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
-		self.levelTitle.pack(side='top',pady=1)
+		#generator table
+		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
+		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=30)#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=23)#height may be in number of items!
 		self.tableGens["columns"]=("type","name","cap","ramp","bid")
 		self.tableGens.column("type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("name", width=150,anchor=tk.CENTER)
@@ -722,6 +731,22 @@ class TKBoard:
 
 		#bind it to a double click so you can add what has been pressed to the clearing table
 		self.tableGens.bind("<Double-1>", self.gensClick)
+
+		#event panel
+		self.eventTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Event Panel",font=("Helvetica", 10))
+		self.eventTitle.pack(side='top',pady=1)
+
+		self.eventMessage = tk.Label(self.generatorCanvas,bg='#ffff99',font=("Helvetica", 10))
+		self.eventMessage.pack(side='left',pady=1,padx=80,fill='y')
+
+
+		self.eventMenu= tk.Canvas(self.generatorCanvas,bg="#80ff80")
+		self.eventMenu.pack(side='left',pady=1,fill='y')
+
+		
+
+
+
 
 	def gensClick(self,event):
 		row_id = self.tableGens.selection()[0]

@@ -56,6 +56,10 @@ class Board:
 		        self.generators.append([row[0],row[1],float(row[2]),
 		        	                    float(row[3]),float(row[4])])
 
+		# self.loadProfile=[["Off Peak AM",12],["Daytime1",20]
+		# 				  ["Peak",25],["Daytime2",23],
+		# 				  ["Off-peak PM",15]]
+
 
 	
 	def createCities(self):

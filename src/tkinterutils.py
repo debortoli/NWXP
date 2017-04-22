@@ -567,8 +567,9 @@ class TKBoard:
 
 
 	def level1End(self,root):
-		self.level1endbutton.place(x=500,y=40)
-		root.after(1,self.spinTurbine,root)
+		if(self.boardlogic.level==1):
+			self.level1endbutton.place(x=500,y=40)
+			root.after(1,self.spinTurbine,root)
 
 	def spill(self):
 		self.boardlogic.spilledSeconds+=self.spillRepeatInterval/1000.
@@ -601,39 +602,96 @@ class TKBoard:
 			self.generatorFrame= tk.Frame(self.master,bg="grey")
 			self.generatorFrame.pack(side="right",fill="y")
 
-			#level canvas
 			self.generatorCanvas = tk.Canvas(self.generatorFrame,bg="lightgray")
-			self.generatorCanvas.pack(fill='x')#grid(row=0,column=0,sticky='N')
+			self.generatorCanvas.pack(fill='x')
 
-			tree = ttk.Treeview(self.generatorCanvas)
-			tree["columns"]=("type","name","cap","ramp","bid")
-			tree.column("type", width=50 ,anchor=tk.CENTER)
-			tree.column("name", width=150,anchor=tk.CENTER)
-			tree.column("cap", width=120 ,anchor=tk.CENTER)
-			tree.column("ramp", width=140,anchor=tk.CENTER)
-			tree.column("bid", width=100 ,anchor=tk.CENTER)
+			self.createGensTable()
 
-			tree.heading("type", text="Type")
-			tree.heading("name", text="Name")
-			tree.heading("cap",  text="Capacity (MW)")
-			tree.heading("ramp", text="Ramp Rate (MW/s)")
-			tree.heading("bid",  text="Bid ($/MWhr)")
+			self.infoFrame= tk.Frame(self.master,bg="grey",width=1)
+			self.infoFrame.pack(side="top",fill="x")
 
+			self.infoCanvas = tk.Canvas(self.infoFrame,bg="lightgray")
+			self.infoCanvas.pack(side="top",fill='x')
+
+			self.createInfoTables()
+
+
+	def createGensTable(self):
+		self.levelTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
+		self.levelTitle.pack(side='top',pady=1)
+
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=23)#height may be in number of items!
+		self.tableGens["columns"]=("type","name","cap","ramp","bid")
+		self.tableGens.column("type", width=50 ,anchor=tk.CENTER)
+		self.tableGens.column("name", width=150,anchor=tk.CENTER)
+		self.tableGens.column("cap", width=120 ,anchor=tk.CENTER)
+		self.tableGens.column("ramp", width=140,anchor=tk.CENTER)
+		self.tableGens.column("bid", width=100 ,anchor=tk.CENTER)
+
+		self.tableGens.heading("type", text="Type")
+		self.tableGens.heading("name", text="Name")
+		self.tableGens.heading("cap",  text="Capacity (MW)")
+		self.tableGens.heading("ramp", text="Ramp Rate (MW/s)")
+		self.tableGens.heading("bid",  text="Bid ($/MWhr)")
+
+		for i in range(5):
 			row_tag='oddrow'#for alternating colors
 			for gen in self.boardlogic.generators:
 				if(row_tag=='oddrow'):
 					row_tag='evenrow'
-					tree.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
 				else:
 					row_tag='oddrow'
-					tree.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
-			tree.tag_configure('oddrow', background='#b8b894')
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+			self.tableGens.tag_configure('oddrow', background='#b8b894')
 
-			tree['show'] = 'headings'#get rid of the empty column on the left
-			tree.pack()
+		self.tableGens['show'] = 'headings'#get rid of the empty column on the left
+		self.tableGens.pack(side='top')
 
-			self.generatorFrame= tk.Frame(self.master,bg="grey")
-			self.generatorFrame.pack(side="right",fill="y")
+	def createInfoTables(self):
+		#Market clearing price
+		self.levelTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Market Clearing Price",font=("Helvetica", 10))
+		self.levelTitle.pack(side='top',pady=3)
+
+		self.tableClearing = ttk.Treeview(self.generatorCanvas)
+		self.tableClearing["columns"]=("gen","cumul","cost")
+		self.tableClearing.column("gen", width=150 ,anchor=tk.CENTER)
+		self.tableClearing.column("cumul", width=70,anchor=tk.CENTER)
+		self.tableClearing.column("cost", width=50 ,anchor=tk.CENTER)
+
+		self.tableClearing.heading("gen", text="Generator")
+		self.tableClearing.heading("cumul", text="Cumulative MW")
+		self.tableClearing.heading("cost",  text="$/MWhr")
+
+		row_tag='oddrow'#for alternating colors
+
+		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
+		self.tableClearing.pack(side='top',fill='x')
+
+
+		#demand forecast
+		# self.tableDemand = ttk.Treeview(self.infoCanvas)
+		# self.tableDemand["columns"]=("segment","length","load")
+		# self.tableDemand.column("segment", width=100 ,anchor=tk.CENTER)
+		# self.tableDemand.column("length" , width=70,anchor=tk.CENTER)
+		# self.tableDemand.column("load"   , width=70 ,anchor=tk.CENTER)
+
+		# self.tableDemand.heading("segment", text="Segment")
+		# self.tableDemand.heading("length" , text="Length")
+		# self.tableDemand.heading("load"   ,  text="Load(MWhr)")
+
+		# row_tag='oddrow'#for alternating colors
+		# for load in self.boardlogic.loadProfile:
+		# 	if(row_tag=='oddrow'):
+		# 		row_tag='evenrow'
+		# 		self.tableGens.insert("",0,values=(load[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+		# 	else:
+		# 		row_tag='oddrow'
+		# 		self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+		# self.tableGens.tag_configure('oddrow', background='#b8b894')
+
+		# self.tableDemand['show'] = 'headings'#get rid of the empty column on the left
+		# self.tableDemand.pack(side="right")
 
 
 

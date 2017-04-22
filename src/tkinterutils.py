@@ -102,7 +102,7 @@ class TKBoard:
 		self.damBottomPolygon=self.gameCanvas.create_polygon(self.damRectangle[2],self.damRectangle[1]+self.tower_height+self.penstock_diameter,
 														self.damRectangle[2],self.damRectangle[3],
 														self.damRectangle[2]+self.dam_width,self.damRectangle[3],
-										 				self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.dam_triangle_h+self.penstock_diameter,
+														self.damRectangle[2]+self.dam_width,self.damRectangle[1]+self.dam_triangle_h+self.penstock_diameter,
 														self.damRectangle[2]+self.dam_width-self.block_width,self.damRectangle[1]+self.dam_triangle_h+self.penstock_diameter,
 														fill="#c0c0c0",width=0)
 
@@ -464,7 +464,66 @@ class TKBoard:
 
 
 	def updateDisplaysLevel3(self,root):
-		p=0
+		#update the generator table
+		#delete the items
+		self.tableGens.delete(*self.tableGens.get_children())
+		#add the updated ones
+		for i in range(5):
+			row_tag='oddrow'#for alternating colors
+			for gen in self.boardlogic.generators:
+				if(row_tag=='oddrow'):
+					row_tag='evenrow'
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				else:
+					row_tag='oddrow'
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+			self.tableGens.tag_configure('oddrow', background='#b8b894')
+
+		#update the dispatch table
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.dispatchProfile:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableDispatch.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableDispatch.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+		self.tableDispatch.tag_configure('oddrow', background='#b8b894')
+
+		#update the ancillary table
+		#delete the items
+		self.tableAncillary.delete(*self.tableAncillary.get_children())
+		#add the updated ones
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.ancillaryProfile:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableAncillary.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableAncillary.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+		self.tableAncillary.tag_configure('oddrow', background='#b8b894')
+
+		#update the market clearing table
+		#delete the items
+		self.tableClearing.delete(*self.tableClearing.get_children())
+		#add the updated ones
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.clearingGens:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableClearing.insert("",0,values=(gen[0],gen[1],gen[2]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableClearing.insert("",0,values=(gen[0],gen[1],gen[2]),tags=row_tag)
+		self.tableClearing.tag_configure('oddrow', background='#b8b894')
+
+		#reset the cumulative generation for the clearing table
+		self.boardlogic.cumulGen=0
+
+
+
+
 
 
 	def updateMessage(self):
@@ -650,6 +709,16 @@ class TKBoard:
 		self.tableGens['show'] = 'headings'#get rid of the empty column on the left
 		self.tableGens.pack(side='top')
 
+		#bind it to a double click so you can add what has been pressed to the clearing table
+		self.tableGens.bind("<Double-1>", self.gensClick)
+
+	def gensClick(self,event):
+		row_id = self.tableGens.selection()[0]
+		row=self.tableGens.item(row_id,'values')
+		self.boardlogic.cumulGen+=int(float(str(row[2])))
+		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+		self.root.after(self.updateRate,self.updateDisplays,self.root)
 
 
 	def createInfoTables(self):	
@@ -678,7 +747,7 @@ class TKBoard:
 		self.tableAncillary['show'] = 'headings'#get rid of the empty column on the left
 		self.tableAncillary.place(x=5,y=20)
 
-		#demand forecast
+		#dispatch
 		self.dispatchTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Dispatch",font=("Helvetica", 10))
 		self.dispatchTitle.place(x=260,y=1)
 
@@ -721,9 +790,4 @@ class TKBoard:
 
 		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
 		self.tableClearing.place(x=410,y=20)
-		
-
-
-
-		
 		

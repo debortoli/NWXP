@@ -63,6 +63,9 @@ class Board:
 		self.ancillaryProfile=[["Off Peak AM",0],["Daytime1",0],
 						  ["Peak",0],["Daytime2",0],
 						  ["Off-peak PM",0]]
+		self.clearingGens=[]
+
+		self.cumulGen=0
 
 
 	

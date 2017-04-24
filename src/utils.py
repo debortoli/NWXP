@@ -25,7 +25,7 @@ class Board:
 
 		# self.draggablesUpdate()
 
-		self.progress=99
+		self.progress=99.4
 		self.totalPoints=0.
 		#level 0=tutorial
 		self.level=1
@@ -61,6 +61,10 @@ class Board:
 						  ["Off-peak PM",0]]
 
 		self.ancillaryProfile=[["Off Peak AM",0],["Daytime1",0],
+						  ["Peak",0],["Daytime2",0],
+						  ["Off-peak PM",0]]
+
+		self.demandProfile=[["Off Peak AM",0],["Daytime1",0],
 						  ["Peak",0],["Daytime2",0],
 						  ["Off-peak PM",0]]
 		self.clearingGens=[]

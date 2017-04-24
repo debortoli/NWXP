@@ -524,17 +524,18 @@ class TKBoard:
 
 		#update the event stuff if some exist
 		if(len(self.boardlogic.events)>0):
+			self.eventTitle.place(x=250,y=520)
+			self.eventMessage.place(x=100,y=570)			
+			self.eventMenu.place(x=400,y=590)
+
 			self.eventMessage['text']=self.boardlogic.events[0][0]
 			for option in self.boardlogic.events[0][1]:
 				opt=tk.Radiobutton(self.eventMenu,text=option,bg="#80ff80").pack(side='top')
 
+		#update the points display
+		self.points["text"]=str(int(self.boardlogic.totalPoints))
 
-
-
-
-
-
-
+		
 
 	def updateMessage(self):
 		self.updateMessageCanvas.pack()
@@ -687,13 +688,20 @@ class TKBoard:
 
 			self.createInfoTables()
 
-			self.imageFrame= tk.Frame(self.master,bg="grey",width=1)
+			self.imageFrame= tk.Frame(self.master,bg="white",width=750,height=550)
 			self.imageFrame.place(x=0,y=self.infoCanvasHeight)
 
-			self.imageCanvas = tk.Canvas(self.imageFrame,bg="lightgray")
-			self.imageCanvas.place(x=0,y=self.infoCanvasHeight)
+			self.imageCanvas = tk.Canvas(self.imageFrame,bg="lightgray",width=750,height=550)
+			self.imageCanvas.place(x=0,y=0)
+		
 
 			self.createImage()
+
+			#event panel
+			self.eventTitle   =   tk.Label(self.master,bg='white',text="An event has occurred!",font=("Helvetica", 15),borderwidth=3)			
+			self.eventMessage = tk.Label(self.master,bg='#ffff99',font=("Helvetica", 10))
+			self.eventMenu    = tk.Canvas(self.master,bg="#80ff80")
+
 
 
 	def createGensTable(self):
@@ -701,7 +709,7 @@ class TKBoard:
 		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
 		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=23)#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=25)#height may be in number of items!
 		self.tableGens["columns"]=("type","name","cap","ramp","bid")
 		self.tableGens.column("type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("name", width=150,anchor=tk.CENTER)
@@ -732,21 +740,28 @@ class TKBoard:
 		#bind it to a double click so you can add what has been pressed to the clearing table
 		self.tableGens.bind("<Double-1>", self.gensClick)
 
-		#event panel
-		self.eventTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Event Panel",font=("Helvetica", 10))
-		self.eventTitle.pack(side='top',pady=1)
+		#Market clearing price
 
-		self.eventMessage = tk.Label(self.generatorCanvas,bg='#ffff99',font=("Helvetica", 10))
-		self.eventMessage.pack(side='left',pady=1,padx=80,fill='y')
+		self.tableClearing = ttk.Treeview(self.generatorCanvas,height=5)
+		self.tableClearing["columns"]=("gen","cumul","cost")
+		self.tableClearing.column("gen", width=150 ,anchor=tk.CENTER)
+		self.tableClearing.column("cumul", width=120,anchor=tk.CENTER)
+		self.tableClearing.column("cost", width=70 ,anchor=tk.CENTER)
+
+		self.tableClearing.heading("gen", text="Generator")
+		self.tableClearing.heading("cumul", text="Cumulative MW")
+		self.tableClearing.heading("cost",  text="$/MWhr")
+
+		row_tag='oddrow'#for alternating colors
+
+		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
+		self.tableClearing.pack(side='bottom',pady=3,fill='x')
 
 
-		self.eventMenu= tk.Canvas(self.generatorCanvas,bg="#80ff80")
-		self.eventMenu.pack(side='left',pady=1,fill='y')
+		self.clearingTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Market Clearing Price",font=("Helvetica", 10))
+		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
 
 		
-
-
-
 
 	def gensClick(self,event):
 		row_id = self.tableGens.selection()[0]
@@ -758,9 +773,17 @@ class TKBoard:
 
 
 	def createInfoTables(self):	
+		#points system
+		self.pointsTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Total Points",font=("Helvetica", 10))
+		self.pointsTitle.place(x=40,y=1)
+
+		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
+		self.points.place(x=60,y=50)
+
+
 		#ancillary services
 		self.ancillaryTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Ancillary Services",font=("Helvetica", 10))
-		self.ancillaryTitle.place(x=50,y=1)
+		self.ancillaryTitle.place(x=200,y=1)
 
 		self.tableAncillary = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableAncillary["columns"]=("segment","generation")
@@ -781,11 +804,11 @@ class TKBoard:
 		self.tableAncillary.tag_configure('oddrow', background='#b8b894')
 
 		self.tableAncillary['show'] = 'headings'#get rid of the empty column on the left
-		self.tableAncillary.place(x=5,y=20)
+		self.tableAncillary.place(x=155,y=20)
 
 		#dispatch
 		self.dispatchTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Dispatch",font=("Helvetica", 10))
-		self.dispatchTitle.place(x=260,y=1)
+		self.dispatchTitle.place(x=420,y=1)
 
 		self.tableDispatch = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableDispatch["columns"]=("segment","generation")
@@ -806,31 +829,39 @@ class TKBoard:
 		self.tableDispatch.tag_configure('oddrow', background='#b8b894')
 
 		self.tableDispatch['show'] = 'headings'#get rid of the empty column on the left
-		self.tableDispatch.place(x=210,y=20)
+		self.tableDispatch.place(x=360,y=20)
 
-		#Market clearing price
-		self.clearingTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Market Clearing Price",font=("Helvetica", 10))
-		self.clearingTitle.place(x=500,y=1)
+		#demand profile
+		self.demandTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Demand Profile",font=("Helvetica", 10))
+		self.demandTitle.place(x=610,y=1)
 
-		self.tableClearing = ttk.Treeview(self.infoCanvas,height=5)
-		self.tableClearing["columns"]=("gen","cumul","cost")
-		self.tableClearing.column("gen", width=150 ,anchor=tk.CENTER)
-		self.tableClearing.column("cumul", width=120,anchor=tk.CENTER)
-		self.tableClearing.column("cost", width=70 ,anchor=tk.CENTER)
+		self.tableDemand = ttk.Treeview(self.infoCanvas,height=5)
+		self.tableDemand["columns"]=("segment","generation")
+		self.tableDemand.column("segment", width=80 ,anchor=tk.CENTER)
+		self.tableDemand.column("generation" , width=100,anchor=tk.CENTER)
 
-		self.tableClearing.heading("gen", text="Generator")
-		self.tableClearing.heading("cumul", text="Cumulative MW")
-		self.tableClearing.heading("cost",  text="$/MWhr")
+		self.tableDemand.heading("segment", text="Segment")
+		self.tableDemand.heading("generation" , text="Gen. (MWh)")
 
 		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.demandProfile:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableDemand.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableDemand.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+		self.tableDemand.tag_configure('oddrow', background='#b8b894')
 
-		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
-		self.tableClearing.place(x=410,y=20)
+		self.tableDemand['show'] = 'headings'#get rid of the empty column on the left
+		self.tableDemand.place(x=565,y=20)
+
+		
 
 	def createImage(self):
 		#resize the canvas, not that everything else has been placed
 		image = Image.open("../images/level3.png")
-		image=image.resize((750,700-self.infoCanvasHeight))
+		image=image.resize((750,700-self.infoCanvasHeight))#750,700-self.infoCanvasHeight
 
 		photo = ImageTk.PhotoImage(image)
 		self.imgLabel = tk.Label(image=photo)

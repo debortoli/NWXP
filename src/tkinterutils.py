@@ -749,7 +749,7 @@ class TKBoard:
 		self.tableClearing.column("cost", width=70 ,anchor=tk.CENTER)
 
 		self.tableClearing.heading("gen", text="Generator")
-		self.tableClearing.heading("cumul", text="Cumulative MW")
+		self.tableClearing.heading("cumul", text="Cumulative MWh")
 		self.tableClearing.heading("cost",  text="$/MWhr")
 
 		row_tag='oddrow'#for alternating colors
@@ -766,7 +766,7 @@ class TKBoard:
 	def gensClick(self,event):
 		row_id = self.tableGens.selection()[0]
 		row=self.tableGens.item(row_id,'values')
-		self.boardlogic.cumulGen+=float(str(row[2]))
+		self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
 		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
 		self.root.after(self.updateRate,self.updateDisplays,self.root)

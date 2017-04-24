@@ -42,6 +42,7 @@ class Board:
 		self.spilledSeconds=0.
 		self.time="09:00 AM"
 
+
 		#for level 2
 		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
 								 1012.,1020.,1021.,1024.,1024.,1020.,
@@ -51,10 +52,10 @@ class Board:
 		#for level 3
 		self.generators=[]
 		with open('generators.csv', 'rb') as csvfile:
-		    generator_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-		    for row in generator_reader:
-		        self.generators.append([row[0],row[1],float(row[2]),
-		        	                    float(row[3]),float(row[4])])
+			generator_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+			for row in generator_reader:
+				self.generators.append([row[0],row[1],float(row[2]),
+										float(row[3]),float(row[4])])
 
 		self.dispatchProfile=[["Off Peak AM",0],["Daytime1",0],
 						  ["Peak",0],["Daytime2",0],
@@ -73,6 +74,12 @@ class Board:
 
 		self.events=[["This is a sample\nmessage.\nThis is a sample\nmessage. This is a sample\nmessage.\nThis is a sample\nmessage.",
 					["Sample Option 1","Sample Option 2","Sample Option 3"]]]
+
+		self.profilePeriods=[["Off Peak AM",5],["Daytime1",5],
+							["Peak",4],["Daytime2",5],
+							["Off-peak PM",5]]
+
+		self.time_period=0
 
 	
 	def createCities(self):

@@ -3,6 +3,7 @@ from pygame.locals import *
 import pdb
 import time
 import csv
+import numpy as np
 
 class Board:
 	def __init__(self):
@@ -50,12 +51,15 @@ class Board:
 								 1055.,1050.,1040.,1030.,1025.,1017.,]
 
 		#for level 3
-		self.generators=[]
+		self.generators=[]#this is a list of all of the generators
 		with open('generators.csv', 'rb') as csvfile:
 			generator_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 			for row in generator_reader:
 				self.generators.append([row[0],row[1],float(row[2]),
 										float(row[3]),float(row[4])])
+		
+
+		self.availableGenerators=[]#these are the generators for the time period
 
 		self.dispatchProfile=[["Off Peak AM",0],["Daytime1",0],
 						  ["Peak",0],["Daytime2",0],
@@ -80,6 +84,7 @@ class Board:
 							["Off-peak PM",5]]
 
 		self.time_period=0
+		self.last_time_period=-1
 
 	
 	def createCities(self):

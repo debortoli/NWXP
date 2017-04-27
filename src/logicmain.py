@@ -8,6 +8,7 @@ from pygame.locals import *
 import pdb
 from level0 import tutorialSequence
 from level1 import damLevel
+from level3 import isoLevel
 
 
 def initGameLogic():
@@ -25,6 +26,8 @@ def gameLogic(disp,board,root):
 		tutorialSequence(board,disp,root)
 	if(board.level==1):
 		damLevel(board,disp,root)
+	if(board.level==3):
+		isoLevel(board,disp,root)
 	
 
 	

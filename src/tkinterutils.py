@@ -8,6 +8,8 @@ from level1 import initLevel1
 from level3 import initLevel3
 import ttk
 from PIL import Image, ImageTk
+import random
+import numpy as np
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -465,20 +467,24 @@ class TKBoard:
 
 
 	def updateDisplaysLevel3(self,root):
-		#update the generator table
+		#check if the time period has changed
+
 		#delete the items
 		self.tableGens.delete(*self.tableGens.get_children())
-		#add the updated ones
-		for i in range(5):
-			row_tag='oddrow'#for alternating colors
-			for gen in self.boardlogic.generators:
-				if(row_tag=='oddrow'):
-					row_tag='evenrow'
-					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
-				else:
-					row_tag='oddrow'
-					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
-			self.tableGens.tag_configure('oddrow', background='#b8b894')
+		#decide on the available generators
+		self.updateAvailableGenerators()
+
+		#add the updated ones		
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.availableGenerators:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+		self.tableGens.tag_configure('oddrow', background='#b8b894')
+
 
 		#update the dispatch table
 		row_tag='oddrow'#for alternating colors
@@ -723,16 +729,18 @@ class TKBoard:
 		self.tableGens.heading("ramp", text="Ramp Rate(MW/s)")
 		self.tableGens.heading("bid",  text="Bid($/MWh)")
 
-		for i in range(5):
-			row_tag='oddrow'#for alternating colors
-			for gen in self.boardlogic.generators:
-				if(row_tag=='oddrow'):
-					row_tag='evenrow'
-					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
-				else:
-					row_tag='oddrow'
-					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
-			self.tableGens.tag_configure('oddrow', background='#b8b894')
+		#decide on the available generators
+		self.updateAvailableGenerators()
+
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.availableGenerators:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+		self.tableGens.tag_configure('oddrow', background='#b8b894')
 
 		self.tableGens['show'] = 'headings'#get rid of the empty column on the left
 		self.tableGens.pack(side='top')
@@ -766,6 +774,16 @@ class TKBoard:
 	def gensClick(self,event):
 		row_id = self.tableGens.selection()[0]
 		row=self.tableGens.item(row_id,'values')
+
+		genList=self.boardlogic.availableGenerators
+		self.boardlogic.availableGenerators=[]
+		for gen in genList:
+			if(gen[1]!=row[1]):
+				self.boardlogic.availableGenerators.append(gen)
+
+		# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
+		
+
 		self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
 		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
@@ -794,7 +812,7 @@ class TKBoard:
 		self.tableAncillary.heading("generation" , text="Gen. (MWh)")
 
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.ancillaryProfile:
+		for gen in reversed(self.boardlogic.ancillaryProfile):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableAncillary.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
@@ -819,7 +837,7 @@ class TKBoard:
 		self.tableDispatch.heading("generation" , text="Gen. (MWh)")
 
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.dispatchProfile:
+		for gen in reversed(self.boardlogic.dispatchProfile):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableDispatch.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
@@ -844,7 +862,7 @@ class TKBoard:
 		self.tableDemand.heading("generation" , text="Gen. (MWh)")
 
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.demandProfile:
+		for gen in reversed(self.boardlogic.demandProfile):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableDemand.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
@@ -867,4 +885,25 @@ class TKBoard:
 		self.imgLabel = tk.Label(image=photo)
 		self.imgLabel.image = photo # keep a reference!
 		self.imgLabel.place(x=0,y=self.infoCanvasHeight)
+
+	def updateAvailableGenerators(self):
+		if(self.boardlogic.time_period!=self.boardlogic.last_time_period):
+			self.boardlogic.availableGenerators=[]
+
+			#choose randomly 20 generators
+			num_to_choose = 20
+			genList=range(len(self.boardlogic.generators))
+			random.shuffle(genList)
+			genList = genList[:num_to_choose]
+			for i in genList:
+				self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
+
+			self.boardlogic.last_time_period=self.boardlogic.time_period
+
+
+		
+
+
+		
+
 		

@@ -1,38 +1,38 @@
-Hydro,Bonneville Dam,1080,2,50
-Hydro,Rocky Brook,1279.3,5,20
-Hydro,Boundary Dam,1039.8,8,20
-Gas,Northeast,61.8,10,20
-Gas,River road,248.1,8,20
-Coal,Transatla Centralia,1781.8,2,75
-Hydro,*Pumped Storage Hydro,1555,5,76
-Hydro,Helms Pumped Storage ,1203,5,77
-Hydro,Shasta ,663,5,78
-Hydro,Edward C Hyatt,644,5,79
-Hydro,*W R Gianelli Pumped Storage,424,5,80
-Hydro,Colgate ,315,5,81
-Hydro,New Melons,300,8,82
-Hydro,Devil Canyon,276.2,5,83
-Hydro,Collervielle ,253,5,84
-Hydro,White rock/Slab Creek,230,5,85
-Hydro,Don Pedro,203,5,86
-Hydro,J S Eastwod ,199.8,5,87
-Hydro,Folsom ,198.6,5,88
-Hydro,Mamath Pool,190,5,89
-Hydro,Spring Creek,180,7,90
-Hydro,Big Creek 3,174.4,7,91
-Hydro,James B Black,168.6,7,92
-Hydro,Pine Flat,165,4,93
-Hydro,Dion R Holm ,165,4,94
-Hydro,Judge F Carr Hydro,154.4,4,95
-Hydro,Jaybird ,154,4,96
-Hydro,Camino ,154,8,97
-Hydro,Poe ,142.8,8,98
-Gas,Beaver ,610.7,9,99
-Gas,Coyote Springs ,266.3,9,100
-Gas,Coyote Springs 2,287,9,101
-Gas,Hermiston Generating Plant,621.2,9,102
-Gas,Hermiston Power Partnership,689.4,9,103
-Gas,Klamath Cogeneration Plant,501.5,9,104
-Gas,Kalamth Expansion ,117.6,10,105
-Gas,SP Newsprint ,102,7,106
-Gas,Univ of Oregon Central Power Station,15,11,107
+Hydro,Bonneville Dam,2160,2,50
+Hydro,Rocky Brook,2558.6,5,20
+Hydro,Boundary Dam,2079.6,8,20
+Gas,Northeast,123.6,10,20
+Gas,River road,496.2,8,20
+Coal,Transatla Centralia,3563.6,2,75
+Hydro,*Pumped Storage Hydro,3110,5,76
+Hydro,Helms Pumped Storage ,2406,5,77
+Hydro,Shasta ,1326,5,78
+Hydro,Edward C Hyatt,1288,5,79
+Hydro,*W R Gianelli Pumped Storage,848,5,80
+Hydro,Colgate ,630,5,81
+Hydro,New Melons,600,8,82
+Hydro,Devil Canyon,552.4,5,83
+Hydro,Collervielle ,506,5,84
+Hydro,White rock/Slab Creek,460,5,85
+Hydro,Don Pedro,406,5,86
+Hydro,J S Eastwod ,399.6,5,87
+Hydro,Folsom ,397.2,5,88
+Hydro,Mamath Pool,380,5,89
+Hydro,Spring Creek,360,7,90
+Hydro,Big Creek 3,348.8,7,91
+Hydro,James B Black,337.2,7,92
+Hydro,Pine Flat,330,4,93
+Hydro,Dion R Holm ,330,4,94
+Hydro,Judge F Carr Hydro,308.8,4,95
+Hydro,Jaybird ,308,4,96
+Hydro,Camino ,308,8,97
+Hydro,Poe ,285.6,8,98
+Gas,Beaver ,1221.4,9,99
+Gas,Coyote Springs ,532.6,9,100
+Gas,Coyote Springs 2,574,9,101
+Gas,Hermiston Generating Plant,1242.4,9,102
+Gas,Hermiston Power Partnership,1378.8,9,103
+Gas,Klamath Cogeneration Plant,1003,9,104
+Gas,Kalamth Expansion ,235.2,10,105
+Gas,SP Newsprint ,204,7,106
+Gas,Univ of Oregon Central Power Station,30,11,107

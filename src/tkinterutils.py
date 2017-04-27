@@ -5,7 +5,7 @@ import time
 import ttk
 from logicmain import gameLogic
 from level1 import initLevel1
-from level3 import initLevel3
+from level3 import initLevel3, isoLevel
 import ttk
 from PIL import Image, ImageTk
 import random
@@ -472,7 +472,10 @@ class TKBoard:
 		#delete the items
 		self.tableGens.delete(*self.tableGens.get_children())
 		#decide on the available generators
+		self.updateDemandProfile()
+		self.updateDispatchProfile()
 		self.updateAvailableGenerators()
+
 
 		#add the updated ones		
 		row_tag='oddrow'#for alternating colors
@@ -488,7 +491,7 @@ class TKBoard:
 
 		#update the dispatch table
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.dispatchProfile:
+		for gen in reversed(self.boardlogic.dispatchProfile):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableDispatch.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
@@ -502,7 +505,7 @@ class TKBoard:
 		self.tableAncillary.delete(*self.tableAncillary.get_children())
 		#add the updated ones
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.ancillaryProfile:
+		for gen in reversed(self.boardlogic.ancillaryProfile):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableAncillary.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
@@ -540,6 +543,10 @@ class TKBoard:
 
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
+
+		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
+
+		# root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
 
 		
 
@@ -708,6 +715,8 @@ class TKBoard:
 			self.eventMessage = tk.Label(self.master,bg='#ffff99',font=("Helvetica", 10))
 			self.eventMenu    = tk.Canvas(self.master,bg="#80ff80")
 
+			self.updateDisplaysLevel3(self.master)
+
 
 
 	def createGensTable(self):
@@ -730,6 +739,7 @@ class TKBoard:
 		self.tableGens.heading("bid",  text="Bid($/MWh)")
 
 		#decide on the available generators
+		self.updateDemandProfile()#first we do the demand profile because it relies on the level being -1. The level is updated in updateAvailableGenerators
 		self.updateAvailableGenerators()
 
 		row_tag='oddrow'#for alternating colors
@@ -787,7 +797,7 @@ class TKBoard:
 		self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
 		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
-		self.root.after(self.updateRate,self.updateDisplays,self.root)
+		self.root.after(1,self.updateDisplays,self.root)
 
 
 	def createInfoTables(self):	
@@ -836,6 +846,7 @@ class TKBoard:
 		self.tableDispatch.heading("segment", text="Segment")
 		self.tableDispatch.heading("generation" , text="Gen. (MWh)")
 
+		self.updateDispatchProfile()
 		row_tag='oddrow'#for alternating colors
 		for gen in reversed(self.boardlogic.dispatchProfile):
 			if(row_tag=='oddrow'):
@@ -860,6 +871,8 @@ class TKBoard:
 
 		self.tableDemand.heading("segment", text="Segment")
 		self.tableDemand.heading("generation" , text="Gen. (MWh)")
+
+		
 
 		row_tag='oddrow'#for alternating colors
 		for gen in reversed(self.boardlogic.demandProfile):
@@ -899,6 +912,32 @@ class TKBoard:
 				self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
 
 			self.boardlogic.last_time_period=self.boardlogic.time_period
+
+	def updateDemandProfile(self):
+		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
+			randomDistributionMeans=[20000,24000,27000,25000,22000]
+			for i in range(5):
+				self.boardlogic.demandProfile[i][1]= int(np.random.normal(randomDistributionMeans[i], 100, 1)[0])
+
+	def updateDispatchProfile(self):
+		#autofill the dispatch
+		if(self.boardlogic.time_period in [0,3,4]):
+			self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
+
+	def clearTimePeriod(self):
+		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.cumulGen
+		self.boardlogic.cumulGen=0
+		self.updateAvailableGenerators()
+
+		#wipe the market clearing board
+		self.tableAncillary.delete(*self.tableAncillary.get_children())
+		self.boardlogic.clearingGens=[]
+
+		#choose new generators
+		self.updateAvailableGenerators()
+
+		self.updateDisplaysLevel3(self.master)
+
 
 
 		

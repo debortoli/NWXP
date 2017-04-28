@@ -13,7 +13,7 @@ def isoLevel(board,disp,root):
 	# root.after(disp.updateRate,disp.updateDisplaysLevel3,root)
 
 def runMarket(board,disp,root):
-	print board.cumulGen,board.demandProfile[board.time_period],board.demandProfile[board.time_period][1] 
+	# print board.cumulGen,board.demandProfile[board.time_period],board.demandProfile[board.time_period][1] 
 	#if we have allocated enough energy, move the time period up 1
 
 	if((board.cumulGen>=board.demandProfile[board.time_period][1]) or (board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):

@@ -718,6 +718,19 @@ class TKBoard:
 			self.updateDisplaysLevel3(self.master)
 
 
+	def treeview_sort_column(self,tv, col, reverse):
+		l = [(tv.set(k, col), k) for k in tv.get_children('')]
+		try:
+			l = sorted(l,key=lambda x: int(float(x[0])),reverse=reverse)
+		except:
+			l = sorted(l,key=lambda x: x[0],reverse=reverse)
+
+		# rearrange items in sorted positions
+		for index, (val, k) in enumerate(l):
+			tv.move(k, '', index)
+
+		# reverse sort next time
+		tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
 
 	def createGensTable(self):
 		#generator table
@@ -725,18 +738,18 @@ class TKBoard:
 		self.genTitle.pack(side='top',pady=1)
 
 		self.tableGens = ttk.Treeview(self.generatorCanvas,height=25)#height may be in number of items!
-		self.tableGens["columns"]=("type","name","cap","ramp","bid")
-		self.tableGens.column("type", width=50 ,anchor=tk.CENTER)
-		self.tableGens.column("name", width=150,anchor=tk.CENTER)
-		self.tableGens.column("cap", width=100 ,anchor=tk.CENTER)
-		self.tableGens.column("ramp", width=140,anchor=tk.CENTER)
-		self.tableGens.column("bid", width=100 ,anchor=tk.CENTER)
+		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
+		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
+		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
+		self.tableGens.column("Capacity(MW)", width=100 ,anchor=tk.CENTER)
+		self.tableGens.column("Ramp Rate(MW/s)", width=140,anchor=tk.CENTER)
+		self.tableGens.column("Bid($/MWh)", width=100 ,anchor=tk.CENTER)
 
-		self.tableGens.heading("type", text="Type")
-		self.tableGens.heading("name", text="Name")
-		self.tableGens.heading("cap",  text="Capacity")
-		self.tableGens.heading("ramp", text="Ramp Rate(MW/s)")
-		self.tableGens.heading("bid",  text="Bid($/MWh)")
+		# self.tableGens.heading("type", text="Type")
+		# self.tableGens.heading("name", text="Name")
+		# self.tableGens.heading("cap",  text="Capacity")
+		# self.tableGens.heading("ramp", text="Ramp Rate(MW/s)")
+		# self.tableGens.heading("Bid($/MWh)",  text="Bid($/MWh)")
 
 		#decide on the available generators
 		self.updateDemandProfile()#first we do the demand profile because it relies on the level being -1. The level is updated in updateAvailableGenerators
@@ -753,6 +766,9 @@ class TKBoard:
 		self.tableGens.tag_configure('oddrow', background='#b8b894')
 
 		self.tableGens['show'] = 'headings'#get rid of the empty column on the left
+
+		for col in self.tableGens['columns']:
+			 self.tableGens.heading(col, text=col, command=lambda _col=col: self.treeview_sort_column(self.tableGens, _col, False))
 		self.tableGens.pack(side='top')
 
 		#bind it to a double click so you can add what has been pressed to the clearing table
@@ -945,4 +961,3 @@ class TKBoard:
 
 		
 
-		

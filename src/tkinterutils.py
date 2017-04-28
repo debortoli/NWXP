@@ -913,6 +913,19 @@ class TKBoard:
 
 			self.boardlogic.last_time_period=self.boardlogic.time_period
 
+	def chooseNewGenerators(self):
+		self.boardlogic.availableGenerators=[]
+
+		#choose randomly 20 generators
+		num_to_choose = 20
+		genList=range(len(self.boardlogic.generators))
+		random.shuffle(genList)
+		genList = genList[:num_to_choose]
+		for i in genList:
+			self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
+
+		self.boardlogic.last_time_period=self.boardlogic.time_period
+
 	def updateDemandProfile(self):
 		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
 			randomDistributionMeans=[20000,24000,27000,25000,22000]
@@ -923,18 +936,21 @@ class TKBoard:
 		#autofill the dispatch
 		if(self.boardlogic.time_period in [0,3,4]):
 			self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
+		
+			# self.master.after(self.updateRate,gameLogic,self,self.boardlogic,self.master)
+
 
 	def clearTimePeriod(self):
 		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.cumulGen
 		self.boardlogic.cumulGen=0
-		self.updateAvailableGenerators()
+		# self.updateDispatchProfile()
 
 		#wipe the market clearing board
 		self.tableAncillary.delete(*self.tableAncillary.get_children())
 		self.boardlogic.clearingGens=[]
 
 		#choose new generators
-		self.updateAvailableGenerators()
+		self.chooseNewGenerators()
 
 		self.updateDisplaysLevel3(self.master)
 

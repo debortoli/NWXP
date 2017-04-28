@@ -76,8 +76,8 @@ class Board:
 
 		self.cumulGen=0
 
-		self.events=[["This is a sample\nmessage.\nThis is a sample\nmessage. This is a sample\nmessage.\nThis is a sample\nmessage.",
-					["Sample Option 1","Sample Option 2","Sample Option 3"]]]
+		self.events=[]#["This is a sample\nmessage.\nThis is a sample\nmessage. This is a sample\nmessage.\nThis is a sample\nmessage.",
+					#["Sample Option 1","Sample Option 2","Sample Option 3"]]]
 
 		self.profilePeriods=[["Off Peak AM",5],["Daytime1",5],
 							["Peak",4],["Daytime2",5],
@@ -173,3 +173,9 @@ class Transmission(pygame.sprite.Sprite):
 		self.name=name
 	def update(self,board):
 		self.age=self.initial_age+board.year
+
+class Generator:
+	def __init__(self,rect,filename):
+		self.rect = pygame.Rect(rect)
+		self.click = False
+		self.image = pygame.image.load(filename)

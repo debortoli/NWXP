@@ -11,6 +11,8 @@ from PIL import Image, ImageTk
 import random
 import numpy as np
 
+from utils import Generator
+
 class TKBoard:
 	def __init__(self, master,boardlogic):
 		self.master = master
@@ -707,8 +709,13 @@ class TKBoard:
 			self.imageCanvas = tk.Canvas(self.imageFrame,bg="lightgray",width=750,height=550)
 			self.imageCanvas.place(x=0,y=0)
 		
-
+			#add the background
 			self.createImage()
+
+			#add the generator and trnasmission imagery
+			self.addGenerators()
+			self.addTransmissionLines()
+
 
 			#event panel
 			self.eventTitle   =   tk.Label(self.master,bg='white',text="An event has occurred!",font=("Helvetica", 15),borderwidth=3)			
@@ -798,6 +805,13 @@ class TKBoard:
 		
 
 	def gensClick(self,event):
+		#remove the border from the other generators
+		for child in self.master.children:
+				try:
+					self.master.children[child].configure(bd=0)
+				except:
+					r=0
+
 		rows = self.tableGens.selection()
 		for row in rows:
 			row_id = row
@@ -814,6 +828,15 @@ class TKBoard:
 
 			self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
 			self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+			#highlight the appropriate generator icons
+			for child in self.master.children:
+				try:
+					if(self.master.children[child]['text']==row[1]):
+						self.master.children[child].configure(bd=3)
+				except:
+					r=0
+
 
 		self.root.after(1,self.updateDisplays,self.root)
 
@@ -972,9 +995,28 @@ class TKBoard:
 
 		self.updateDisplaysLevel3(self.master)
 
+	def addGenerators(self):
+		#make a label with an image for each geenrator. The generator name is in the text, which is not visible,
+		#but can be used to reference it later
+		icon_size=(50,50)
+		background_image_start=(0,self.infoCanvasHeight)
+
+		#the image is the same for all of the generators
+		img=Image.open('../images/city.jpg')
+		img=img.resize(icon_size)
+		img=ImageTk.PhotoImage(img)
+
+		self.genIcons=[]
+		for i,gen in enumerate(self.boardlogic.generators):
+			gen = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffa500")
+			gen.image=img#keep a reference!
+			gen.place(x=background_image_start[0]+i*75,y=background_image_start[1]+10)
+			self.genIcons.append(gen)
 
 
-		
+
+	def addTransmissionLines(self):
+		return 0
 
 
 		

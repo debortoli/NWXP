@@ -737,7 +737,7 @@ class TKBoard:
 		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
 		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=25)#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=25,selectmode='extended')#height may be in number of items!
 		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
 		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
@@ -772,7 +772,7 @@ class TKBoard:
 		self.tableGens.pack(side='top')
 
 		#bind it to a double click so you can add what has been pressed to the clearing table
-		self.tableGens.bind("<Double-1>", self.gensClick)
+		self.tableGens.bind("<Return>", self.gensClick)
 
 		#Market clearing price
 
@@ -798,20 +798,22 @@ class TKBoard:
 		
 
 	def gensClick(self,event):
-		row_id = self.tableGens.selection()[0]
-		row=self.tableGens.item(row_id,'values')
+		rows = self.tableGens.selection()
+		for row in rows:
+			row_id = row
+			row=self.tableGens.item(row_id,'values')
 
-		genList=self.boardlogic.availableGenerators
-		self.boardlogic.availableGenerators=[]
-		for gen in genList:
-			if(gen[1]!=row[1]):
-				self.boardlogic.availableGenerators.append(gen)
+			genList=self.boardlogic.availableGenerators
+			self.boardlogic.availableGenerators=[]
+			for gen in genList:
+				if(gen[1]!=row[1]):
+					self.boardlogic.availableGenerators.append(gen)
 
-		# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
-		
+			# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
+			
 
-		self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
-		self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+			self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
+			self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
 		self.root.after(1,self.updateDisplays,self.root)
 

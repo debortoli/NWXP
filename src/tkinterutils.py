@@ -808,7 +808,7 @@ class TKBoard:
 		#remove the border from the other generators
 		for child in self.master.children:
 				try:
-					self.master.children[child].configure(bd=0)
+					self.master.children[child].configure(bd=0,bg="#ffffff")
 				except:
 					r=0
 
@@ -833,7 +833,7 @@ class TKBoard:
 			for child in self.master.children:
 				try:
 					if(self.master.children[child]['text']==row[1]):
-						self.master.children[child].configure(bd=3)
+						self.master.children[child].configure(bd=3,bg="#ffa500")
 				except:
 					r=0
 
@@ -1001,14 +1001,19 @@ class TKBoard:
 		icon_size=(50,50)
 		background_image_start=(0,self.infoCanvasHeight)
 
-		#the image is the same for all of the generators
-		img=Image.open('../images/city.jpg')
-		img=img.resize(icon_size)
-		img=ImageTk.PhotoImage(img)
-
 		self.genIcons=[]
 		for i,gen in enumerate(self.boardlogic.generators):
-			gen = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffa500")
+			#image determined by type of generator
+			if(gen[0]=='Coal'):
+				img=Image.open('../images/coal.png')
+			elif(gen[0]=='Gas'):
+				img=Image.open('../images/gas.png')
+			elif(gen[0]=='Hydro'):
+				img=Image.open('../images/hydro.png')
+			img=img.resize(icon_size)
+			img=ImageTk.PhotoImage(img)
+
+			gen = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
 			gen.image=img#keep a reference!
 			gen.place(x=background_image_start[0]+i*75,y=background_image_start[1]+10)
 			self.genIcons.append(gen)

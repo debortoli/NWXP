@@ -38,7 +38,7 @@ def box():
 
 def runApp():
 	global list_of_images,counter,top_directory,numRepeated,filename
-	filename='../images/level3.png'	
+	filename='../images/level3_label.png'	
 
 	app.run('0.0.0.0', port=8002)
 

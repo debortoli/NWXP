@@ -1,38 +1,108 @@
-Hydro,Bonneville Dam,2160,2,50
-Hydro,Rocky Brook,2558.6,5,20
-Hydro,Boundary Dam,2079.6,8,20
-Gas,Northeast,123.6,10,20
-Gas,River road,496.2,8,20
-Coal,Transatla Centralia,3563.6,2,75
-Hydro,*Pumped Storage Hydro,3110,5,76
-Hydro,Helms Pumped Storage ,2406,5,77
-Hydro,Shasta ,1326,5,78
-Hydro,Edward C Hyatt,1288,5,79
-Hydro,*W R Gianelli Pumped Storage,848,5,80
-Hydro,Colgate ,630,5,81
-Hydro,New Melons,600,8,82
-Hydro,Devil Canyon,552.4,5,83
-Hydro,Collervielle ,506,5,84
-Hydro,White rock/Slab Creek,460,5,85
-Hydro,Don Pedro,406,5,86
-Hydro,J S Eastwod ,399.6,5,87
-Hydro,Folsom ,397.2,5,88
-Hydro,Mamath Pool,380,5,89
-Hydro,Spring Creek,360,7,90
-Hydro,Big Creek 3,348.8,7,91
-Hydro,James B Black,337.2,7,92
-Hydro,Pine Flat,330,4,93
-Hydro,Dion R Holm ,330,4,94
-Hydro,Judge F Carr Hydro,308.8,4,95
-Hydro,Jaybird ,308,4,96
-Hydro,Camino ,308,8,97
-Hydro,Poe ,285.6,8,98
-Gas,Beaver ,1221.4,9,99
-Gas,Coyote Springs ,532.6,9,100
-Gas,Coyote Springs 2,574,9,101
-Gas,Hermiston Generating Plant,1242.4,9,102
-Gas,Hermiston Power Partnership,1378.8,9,103
-Gas,Klamath Cogeneration Plant,1003,9,104
-Gas,Kalamth Expansion ,235.2,10,105
-Gas,SP Newsprint ,204,7,106
-Gas,Univ of Oregon Central Power Station,30,11,107
+Type ,Name, Capacity MW,Ramp Rate MW/min,Heat rate BTU/kWh,cost $/MWh,#,,,,,,,,,,,
+Coal ,Transalta Centralia,3296,264,8125,24.375,1,,,,,,,,,,Fuel Costs $/MMBTU,
+Coal ,Weyerhaeuser Longview ,110,9,8811,26.433,2,,,,,,,,,,Coal,3
+Gas,Satsop Combusion Turbine,1203,120,5887,23.548,3,,,,,,,,,,Nuclear,2
+Gas,Chehalis Generating Facility,962,96,9343,37.372,4,,,,,,,,,,Natural Gas,4
+Gas,Fredonia ,661,66,10293,41.172,5,,,,,,,,,,,
+Nuclear,Columbia Nuclear Power Plant,2220,111,9265,18.53,6,,,,,,,,,,,
+Hydro,Grand Coulee,12597,1260,,12,7,,,,,,,,,,,
+Hydro,Chief Joseph,4544,454,,12,8,,,,,,,,,,,
+Hydro,Rocky Brook,2367,237,,12,9,,,,,,,,,,,
+Hydro,Boundary Dam,1924,192,,12,10,,,,,,,,,,,
+Hydro,Wanapum ,1920,192,,12,11,,,,,,,,,,,
+Hydro,Priest Rapids,1768,177,,12,12,,,,,,,,,,,
+Hydro,Lttle Goose ,1499,150,,12,13,,,,,,,,,,,
+Hydro,Lower Monumental ,1499,150,,12,14,,,,,,,,,,,
+Hydro,Wells ,1432,143,,12,15,,,,,,,,,,,
+Hydro,John Day,7344,734,,12,16,,,,,,,,,,,
+Hydro,The Dalles ,6187,619,,12,17,,,,,,,,,,,
+Hydro,Bonneville ,3716,372,,12,18,,,,,,,,,,,
+Hydro,McNary ,3368,337,,12,19,,,,,,,,,,,
+Hydro,Hells Canyon,1331,133,,12,20,,,,,,,,,,,
+Hydro,Round Butte,839,84,,12,21,,,,,,,,,,,
+Hydro,Oxbow ,646,65,,12,22,,,,,,,,,,,
+Hydro,Lookout Point ,408,41,,12,23,,,,,,,,,,,
+Hydro,Carmen Smith ,389,39,,12,24,,,,,,,,,,,
+Hydro,Pelton ,373,37,,12,25,,,,,,,,,,,
+Hydro,Detroit ,340,34,,12,26,,,,,,,,,,,
+Coal,Boardman,2043,163,5270,15.81,27,,,,,,,,,,,
+Gas,Beaver ,2076,208,8021,32.084,28,,,,,,,,,,,
+Gas,Coyote Springs ,905,91,5702,22.808,29,,,,,,,,,,,
+Gas,Coyote Springs 2,976,98,6561,26.244,30,,,,,,,,,,,
+Gas,Hermiston Generating Plant,2112,211,5302,21.208,31,,,,,,,,,,,
+Gas,Hermiston Power Partnership,2344,234,5590,22.36,32,,,,,,,,,,,
+Gas,Klamath Cogeneration Plant,1705,171,9345,37.38,33,,,,,,,,,,,
+Gas,Kalamth Expansion ,400,40,8102,32.408,34,,,,,,,,,,,
+Gas,SP Newsprint ,347,35,8812,35.248,35,,,,,,,,,,,
+Hydro,*Pumped Storage Hydro,1711,171,,12,36,,,,,,,,,,,
+Hydro,Helms Pumped Storage ,1323,132,,12,37,,,,,,,,,,,
+Hydro,Shasta ,729,73,,12,38,,,,,,,,,,,
+Hydro,Edward C Hyatt,708,71,,12,39,,,,,,,,,,,
+Hydro,*W R Gianelli Pumped Storage,466,47,,12,40,,,,,,,,,,,
+Hydro,Colgate ,347,35,,12,41,,,,,,,,,,,
+Hydro,New Melons,330,33,,12,42,,,,,,,,,,,
+Hydro,Devil Canyon,304,30,,12,43,,,,,,,,,,,
+Gas,Moss Landing ,3082,308,6720,26.88,44,,,,,,,,,,,
+Gas,Haynes ,2349,235,6451,25.804,45,,,,,,,,,,,
+Gas,Pittsburg Power Plant,2281,228,6512,26.048,46,,,,,,,,,,,
+Gas,AES Alamitos LLC,2228,223,7111,28.444,47,,,,,,,,,,,
+Gas,Ormand Beach,1773,177,9750,39,48,,,,,,,,,,,
+Gas,AES Redondo Beach LLC,1448,145,5276,21.104,49,,,,,,,,,,,
+Gas,Valley Gas,1247,125,9015,36.06,50,,,,,,,,,,,
+Gas,Morro Bay,1162,116,5059,20.236,51,,,,,,,,,,,
+Gas,Etiwanda Generating Sstation ,1155,116,5471,21.884,52,,,,,,,,,,,
+Gas,La Paloma Generating LLC,1124,112,8274,33.096,53,,,,,,,,,,,
+Gas,AES Hunington Beach LLC,1123,112,5152,20.608,54,,,,,,,,,,,
+Gas,El Segundo ,1096,110,6456,25.824,55,,,,,,,,,,,
+Gas,Encina,1079,108,9496,37.984,56,,,,,,,,,,,
+Gas,Delta Energy,1038,104,8140,32.56,57,,,,,,,,,,,
+Gas,High Desert ,937,94,5229,20.916,58,,,,,,,,,,,
+Gas,Scattergood ,906,91,9684,38.736,59,,,,,,,,,,,
+Gas,South Bay Power,802,80,5354,21.416,60,,,,,,,,,,,
+Gas,Coolwater ,800,80,7240,28.96,61,,,,,,,,,,,
+Nuclear,Diablo Canyon,2530,127,6729,13.458,62,,,,,,,,,,,
+Nuclear,San Onofre,2479,124,9577,19.154,63,,,,,,,,,,,
+Gas,182 Combined,9970,997,9278,37.112,64,,,,,,,,,,,
+Coal,Mohave,7854,628,7888,23.664,65,,,,,,,,,,,
+Coal,North Valmy ,2502,200,7727,23.181,66,,,,,,,,,,,
+Coal,Reid Gardner,2938,235,5482,16.446,67,,,,,,,,,,,
+Coal,Newmont TS,1162,93,8276,24.828,68,,,,,,,,,,,
+Gas,Clark ,3792,379,6056,24.224,69,,,,,,,,,,,
+Gas,Bighorn Electing Generating Station,3304,330,9004,36.016,70,,,,,,,,,,,
+Gas,Silverhawk ,3187,319,6739,26.956,71,,,,,,,,,,,
+Gas,Tracey ,3004,300,8224,32.896,72,,,,,,,,,,,
+Gas,Apex Generating Station ,2883,288,5623,22.492,73,,,,,,,,,,,
+Gas,El Dorado Energy,2870,287,9996,39.984,74,,,,,,,,,,,
+Gas,Tri Center Naniwa Energy ,1824,182,8438,33.752,75,,,,,,,,,,,
+Gas,Las Vegas Cogen 2,1428,143,5556,22.224,76,,,,,,,,,,,
+Gas,Sun Peak Project ,1066,107,9418,37.672,77,,,,,,,,,,,
+Gas,Fort Churchill ,1009,101,8878,35.512,78,,,,,,,,,,,
+Gas,Sunrise ,802,80,5487,21.948,79,,,,,,,,,,,
+Gas,Sarguaro Power,611,61,8512,34.048,80,,,,,,,,,,,
+Hydro,Hoover Dam,4989,499,,12,81,,,,,,,,,,,
+Hydro,Flaming Gorge,729,73,,12,82,,,,,,,,,,,
+Hydro,28 more combined ,449,45,,12,83,,,,,,,,,,,
+Hydro,Hoover Dam,3536,354,,12,84,,,,,,,,,,,
+Hydro,Glen Canyon Dam,2244,224,,12,85,,,,,,,,,,,
+Hydro,Mormon Flat,102,10,,12,86,,,,,,,,,,,
+Hydro,Parker Dam,204,20,,12,87,,,,,,,,,,,
+Coal ,Navajo,4096,328,6017,18.051,88,,,,,,,,,,,
+Coal ,Springerville,2713,217,7710,23.13,89,,,,,,,,,,,
+Coal ,Cholla ,1919,154,5895,17.685,90,,,,,,,,,,,
+Coal ,Coronado ,1397,112,7124,21.372,91,,,,,,,,,,,
+Coal ,Apache Station ,1123,90,7449,22.347,92,,,,,,,,,,,
+Coal ,H. Wilson Sundt Generating,949,76,7056,21.168,93,,,,,,,,,,,
+Gas,Gila River Power LP,4209,421,9108,36.432,94,,,,,,,,,,,
+Gas,Harquahala Generating Project ,2288,229,7029,14.058,95,,,,,,,,,,,
+Gas,Santan,2271,227,9369,28.107,96,,,,,,,,,,,
+Gas,West Phoenix,2255,225,5246,15.738,97,,,,,,,,,,,
+Gas,Mesquite Generating Station,2125,213,6935,20.805,98,,,,,,,,,,,
+Gas,Red Hawk CCGT,1931,193,8396,25.188,99,,,,,,,,,,,
+Gas,Arlington Valley Energy Facility ,1212,121,8629,25.887,100,,,,,,,,,,,
+Gas,South Point Energy ,1204,120,5025,15.075,101,,,,,,,,,,,
+Gas,Griffith Energy ,1112,111,7135,21.405,102,,,,,,,,,,,
+Gas,Desert Basin ,1098,110,5611,16.833,103,,,,,,,,,,,
+Gas,Agua Fria,1042,104,6747,20.241,104,,,,,,,,,,,
+Gas,Kyrene ,975,98,6286,18.858,105,,,,,,,,,,,
+Gas,Sundance Energy LLC,765,77,9333,27.999,106,,,,,,,,,,,
+Nuclear ,Palpo Verde,7096,355,6365,19.095,107,,,,,,,,,,,

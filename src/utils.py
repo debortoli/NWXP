@@ -54,9 +54,26 @@ class Board:
 		self.generators=[]#this is a list of all of the generators
 		with open('generators.csv', 'rb') as csvfile:
 			generator_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-			for row in generator_reader:
-				self.generators.append([row[0],row[1],float(row[2]),
-										float(row[3]),float(row[4])])
+			for i,row in enumerate(generator_reader):
+				if(i>0):
+					self.generators.append([row[0],row[1],float(row[2]),
+										float(row[3]),float(row[5]),float(row[6])])
+
+		#add the image locations
+		#make a list of the generator locations where each index is [x,y,#]
+		gen_locs=[]
+		with open('genLocations.csv', 'rb') as csvfile:
+			gen_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+			for row in gen_reader:
+				gen_locs.append([row[1],row[3],row[5]])
+
+		for i,gen in enumerate(self.generators):
+			for loc in gen_locs:
+				try:
+					if(gen[-1]==int(loc[-1])):
+						self.generators[i] = self.generators[i] + [loc[0]]+[loc[1]]
+				except:
+					r=0
 		
 
 		self.availableGenerators=[]#these are the generators for the time period
@@ -174,8 +191,3 @@ class Transmission(pygame.sprite.Sprite):
 	def update(self,board):
 		self.age=self.initial_age+board.year
 
-class Generator:
-	def __init__(self,rect,filename):
-		self.rect = pygame.Rect(rect)
-		self.click = False
-		self.image = pygame.image.load(filename)

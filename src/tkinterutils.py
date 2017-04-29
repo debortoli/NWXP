@@ -10,15 +10,14 @@ import ttk
 from PIL import Image, ImageTk
 import random
 import numpy as np
-
-from utils import Generator
+import csv
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
 		self.master = master
 		master.title("GRID SIMULATOR")
-		master.minsize(width=1300,height=700)
-		master.maxsize(width=1300,height=700)
+		master.minsize(width=1300,height=800)
+		master.maxsize(width=1300,height=800)
 
 
 		self.boardlogic=boardlogic
@@ -703,18 +702,14 @@ class TKBoard:
 
 			self.createInfoTables()
 
-			self.imageFrame= tk.Frame(self.master,bg="white",width=750,height=550)
-			self.imageFrame.place(x=0,y=self.infoCanvasHeight)
+			self.imageCanvas = tk.Canvas(self.master,bg="lightgray",width=750,height=650)
+			self.imageCanvas.place(x=0,y=self.infoCanvasHeight)
 
-			self.imageCanvas = tk.Canvas(self.imageFrame,bg="lightgray",width=750,height=550)
-			self.imageCanvas.place(x=0,y=0)
-		
 			#add the background
 			self.createImage()
-
+		
 			#add the generator and trnasmission imagery
 			self.addGenerators()
-			self.addTransmissionLines()
 
 
 			#event panel
@@ -744,7 +739,7 @@ class TKBoard:
 		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
 		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=25,selectmode='extended')#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=29,selectmode='extended')#height may be in number of items!
 		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
 		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
@@ -783,7 +778,7 @@ class TKBoard:
 
 		#Market clearing price
 
-		self.tableClearing = ttk.Treeview(self.generatorCanvas,height=5)
+		self.tableClearing = ttk.Treeview(self.generatorCanvas,height=6)
 		self.tableClearing["columns"]=("gen","cumul","cost")
 		self.tableClearing.column("gen", width=150 ,anchor=tk.CENTER)
 		self.tableClearing.column("cumul", width=120,anchor=tk.CENTER)
@@ -932,13 +927,16 @@ class TKBoard:
 
 	def createImage(self):
 		#resize the canvas, not that everything else has been placed
-		image = Image.open("../images/level3.png")
-		image=image.resize((750,700-self.infoCanvasHeight))#750,700-self.infoCanvasHeight
+		image = Image.open("../images/level3_old.png")
+		image=image.resize((750,800-self.infoCanvasHeight))#750,700-self.infoCanvasHeight
+		image.save('../images/level3_label.png')
 
 		photo = ImageTk.PhotoImage(image)
-		self.imgLabel = tk.Label(image=photo)
-		self.imgLabel.image = photo # keep a reference!
-		self.imgLabel.place(x=0,y=self.infoCanvasHeight)
+		self.master.photo=photo
+		self.background = self.imageCanvas.create_image((0,0),image=photo,anchor='nw')
+		# self.imgLabel = tk.Label(self.imageCanvas,image=photo)
+		# self.imgLabel.image = photo # keep a reference!
+		# self.imgLabel.place(x=0,y=0)
 
 	def updateAvailableGenerators(self):
 		if(self.boardlogic.time_period!=self.boardlogic.last_time_period):
@@ -996,32 +994,61 @@ class TKBoard:
 		self.updateDisplaysLevel3(self.master)
 
 	def addGenerators(self):
-		#make a label with an image for each geenrator. The generator name is in the text, which is not visible,
+		#make a label with an image for each generator. The generator name is in the text, which is not visible,
 		#but can be used to reference it later
-		icon_size=(50,50)
-		background_image_start=(0,self.infoCanvasHeight)
+		img_height=800-self.infoCanvasHeight
+		img_width= 750
+		icon_size=(25,25)
+		background_image_start=[0,self.infoCanvasHeight]
 
 		self.genIcons=[]
 		for i,gen in enumerate(self.boardlogic.generators):
 			#image determined by type of generator
-			if(gen[0]=='Coal'):
+			if(gen[0]=='Coal' or gen[0]=='Coal '):
 				img=Image.open('../images/coal.png')
-			elif(gen[0]=='Gas'):
+			elif(gen[0]=='Gas' or gen[0]=='Gas '):
 				img=Image.open('../images/gas.png')
-			elif(gen[0]=='Hydro'):
+			elif(gen[0]=='Hydro' or gen[0]=='Hydro '):
 				img=Image.open('../images/hydro.png')
+			elif(gen[0]=='Nuclear' or gen[0]=='Nuclear '):
+				img=Image.open('../images/nuclear.png')
 			img=img.resize(icon_size)
 			img=ImageTk.PhotoImage(img)
 
-			gen = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
-			gen.image=img#keep a reference!
-			gen.place(x=background_image_start[0]+i*75,y=background_image_start[1]+10)
-			self.genIcons.append(gen)
+			genLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
+			genLabel.image=img#keep a reference!
+
+			x_loc=background_image_start[0]+(float(gen[-2])-0.01)*img_width
+			y_loc=background_image_start[1]+(float(gen[-1])-0.01)*img_height
+			genLabel.place(x=x_loc,y=y_loc)
+
+			self.genIcons.append(genLabel)
 
 
 
-	def addTransmissionLines(self):
-		return 0
+	# def addTransmissionLines(self):
+	# 	img_height=800-self.infoCanvasHeight
+	# 	img_width= 750
+
+	# 	for trans_set in os.listdir(top_directory):
+	# 		with open('trans_set.csv', 'rb') as csvfile:
+	# 			line_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+	# 			e=False
+	# 			start=[]
+	# 			for row in line_reader:
+
+	# 				if(e==True):
+	# 					x0=int(float(start[0])*img_width)
+	# 					x1=int(float(row[2])*img_width)
+	# 					y0=int(float(start[1])*img_height)
+	# 					y1=int(float(row[3])*img_height)
+	# 					print x0,y0,x1,y1
+	# 					self.l1=self.imageCanvas.create_line(x0,y0,x1,y1,width=2)
+	# 					start=[row[1],row[3]]
+	# 				else:
+	# 					start=[row[1],row[3]]
+	# 					e=True
+			
 
 
 		

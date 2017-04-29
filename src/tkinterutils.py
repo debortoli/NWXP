@@ -828,7 +828,7 @@ class TKBoard:
 			for child in self.master.children:
 				try:
 					if(self.master.children[child]['text']==row[1]):
-						self.master.children[child].configure(bd=3,bg="#ffa500")
+						self.master.children[child].configure(bd=6,bg="#ffa500")
 				except:
 					r=0
 

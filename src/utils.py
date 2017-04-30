@@ -11,20 +11,6 @@ class Board:
 		pygame.init()
 		self.clock = pygame.time.Clock()
 
-		# # #add the dragNdrop options
-		# self.dnd=[]
-		# d1=DragNDrop((80,100,50,50),'../images/city.jpg')
-		# self.dnd.append(d1)
-		# d2=DragNDrop((180,100,50,50),'../images/city.jpg')
-		# self.dnd.append(d2)
-		# d3=DragNDrop((80,240,50,50),'../images/city.jpg')
-		# self.dnd.append(d3)
-		# d4=DragNDrop((180,240,50,50),'../images/city.jpg')
-		# self.dnd.append(d4)
-		# d5=DragNDrop((80,380,50,50),'../images/city.jpg')
-		# self.dnd.append(d5)
-
-		# self.draggablesUpdate()
 
 		self.progress=99.4
 		self.totalPoints=0.
@@ -93,8 +79,7 @@ class Board:
 
 		self.cumulGen=0
 
-		self.events=[]#["This is a sample\nmessage.\nThis is a sample\nmessage. This is a sample\nmessage.\nThis is a sample\nmessage.",
-					#["Sample Option 1","Sample Option 2","Sample Option 3"]]]
+		self.events=[]
 
 		self.profilePeriods=[["Off Peak AM",5],["Daytime1",5],
 							["Peak",4],["Daytime2",5],

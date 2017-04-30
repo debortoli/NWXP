@@ -708,8 +708,9 @@ class TKBoard:
 			#add the background
 			self.createImage()
 		
-			#add the generator and trnasmission imagery
+			#add the generator and transmission imagery
 			self.addGenerators()
+			self.addLoads()
 
 
 			#event panel
@@ -1024,31 +1025,39 @@ class TKBoard:
 
 			self.genIcons.append(genLabel)
 
+	def addLoads(self):
+		#add the load icons to the map
+		img_height=800-self.infoCanvasHeight
+		img_width= 750
+		icon_size=(30,30)
+		background_image_start=[0,self.infoCanvasHeight]
 
+		gen_locs=[]
+		with open('genLocations.csv', 'rb') as csvfile:
+			load_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+			for row in load_reader:
+				if(row[-1]=='money'):
+					img=Image.open('../images/commercial_load.jpg')
 
-	# def addTransmissionLines(self):
-	# 	img_height=800-self.infoCanvasHeight
-	# 	img_width= 750
+				elif(row[-1]=='house'):
+					img=Image.open('../images/residential_load.jpg')
 
-	# 	for trans_set in os.listdir(top_directory):
-	# 		with open('trans_set.csv', 'rb') as csvfile:
-	# 			line_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-	# 			e=False
-	# 			start=[]
-	# 			for row in line_reader:
+				elif(row[-1]=='industrial'):
+					img=Image.open('../images/industrial_load.png')
 
-	# 				if(e==True):
-	# 					x0=int(float(start[0])*img_width)
-	# 					x1=int(float(row[2])*img_width)
-	# 					y0=int(float(start[1])*img_height)
-	# 					y1=int(float(row[3])*img_height)
-	# 					print x0,y0,x1,y1
-	# 					self.l1=self.imageCanvas.create_line(x0,y0,x1,y1,width=2)
-	# 					start=[row[1],row[3]]
-	# 				else:
-	# 					start=[row[1],row[3]]
-	# 					e=True
-			
+				try:
+					img=img.resize(icon_size)
+					img=ImageTk.PhotoImage(img)
+
+					genLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(row[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
+					genLabel.image=img#keep a reference!
+
+					x_loc=background_image_start[0]+(float(row[-4])-0.01)*img_width
+					y_loc=background_image_start[1]+(float(row[-3])-0.01)*img_height
+					genLabel.place(x=x_loc,y=y_loc)
+				except:
+					r=0
+
 
 
 		

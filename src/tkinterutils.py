@@ -11,6 +11,7 @@ from PIL import Image, ImageTk
 import random
 import numpy as np
 import csv
+from utils import Tooltip
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -1018,12 +1019,22 @@ class TKBoard:
 
 			genLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(gen[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
 			genLabel.image=img#keep a reference!
+			#for tool tips
+			tool_tip = Tooltip(genLabel,  text="Gen type: "+str(gen[0])+"\nName: "+str(gen[1])+"\nCapacity: "+str(gen[2])+"MW")
+			# genLabel.description="This is"+str(gen[1])
+			# genLabel.bind("<Enter>",self.genToolTip)
+
 
 			x_loc=background_image_start[0]+(float(gen[-2])-0.01)*img_width
 			y_loc=background_image_start[1]+(float(gen[-1])-0.01)*img_height
 			genLabel.place(x=x_loc,y=y_loc)
 
 			self.genIcons.append(genLabel)
+
+	def genToolTip(self,event):
+		pdb.set_trace()
+		# description = getattr(event.widget, "description", "")
+        # event.widget.configure(text=description)
 
 	def addLoads(self):
 		#add the load icons to the map

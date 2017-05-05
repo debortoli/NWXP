@@ -4,6 +4,8 @@ import pdb
 import time
 import csv
 import numpy as np
+import Tkinter as tk
+import ttk
 
 class Board:
 	def __init__(self):
@@ -175,4 +177,75 @@ class Transmission(pygame.sprite.Sprite):
 		self.name=name
 	def update(self,board):
 		self.age=self.initial_age+board.year
+
+
+
+class Tooltip:
+
+    def __init__(self, master, text, delay=1200, showTime=10000,
+            background="lightyellow"):
+        self.master = master
+        self.text = text
+        self.delay = delay
+        self.showTime = showTime
+        self.background = background
+        self.timerId = None
+        self.tip = None
+        self.master.bind("<Enter>", self.enter, "+")
+        self.master.bind("<Leave>", self.leave, "+")
+
+    
+    def enter(self, event=None):
+        if self.timerId is None and self.tip is None:
+            self.timerId = self.master.after(self.delay, self.show)
+        
+
+    def leave(self, event=None):
+        if self.timerId is not None:
+            id = self.timerId
+            self.timerId = None
+            self.master.after_cancel(id)
+        self.hide()
+
+
+    def hide(self):
+        if self.tip is not None:
+            tip = self.tip
+            self.tip = None
+            tip.destroy()
+
+
+    def show(self):
+        self.leave()
+        self.tip = tk.Toplevel(self.master)
+        self.tip.withdraw() # Don't show until we have the geometry
+        self.tip.wm_overrideredirect(True) # No window decorations etc.
+       
+        label = ttk.Label(self.tip, text=self.text, padding=1,
+                background=self.background, wraplength=480,
+                relief=tk.GROOVE)
+        label.pack()
+        x, y = self.position()
+        self.tip.wm_geometry("+{}+{}".format(x, y))
+        self.tip.deiconify()
+        if self.master.winfo_viewable():
+            self.tip.transient(self.master)
+        self.tip.update_idletasks()
+        self.timerId = self.master.after(self.showTime, self.hide)
+
+    
+    def position(self):
+        tipx = self.tip.winfo_reqwidth()
+        tipy = self.tip.winfo_reqheight()
+        width = self.tip.winfo_screenwidth()
+        height = self.tip.winfo_screenheight()
+        y = self.master.winfo_rooty() + self.master.winfo_height()
+        if y + tipy > height:
+            y = self.master.winfo_rooty() - tipy
+        x = self.tip.winfo_pointerx()
+        if x < 0:
+            x = 0
+        elif x + tipx > width:
+            x = width - tipx
+        return x, y
 

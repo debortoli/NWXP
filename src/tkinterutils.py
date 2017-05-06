@@ -470,7 +470,43 @@ class TKBoard:
 
 
 	def updateDisplaysLevel3(self,root):
-		#check if the time period has changed
+		#display message if there is any
+		if(len(self.boardlogic.updateQueue)>0):
+			pdb.set_trace()
+			self.nextMessage()
+
+		#display the little attention icon
+		if (self.boardlogic.level==3 and len(self.boardlogic.updateQueue)>0):
+			
+
+			if(self.boardlogic.updateQueue[0][1]==2):#highlight the turbine
+				# print 
+				# self.gameCanvas.itemconfig("circle",fill="orange")
+				self.gameCanvas.create_oval(self.gameCanvas.coords(self.turbine)[0]+2-40,
+											 self.gameCanvas.coords(self.turbine)[1]-5-40,
+											 self.gameCanvas.coords(self.turbine)[0]+2,
+											 self.gameCanvas.coords(self.turbine)[1]-5,fill="#ff6600",width=0,tag="circle")
+				self.waterAnimationSpeed=50./12000.
+				# self.gameCanvas.move("circle",10,20)
+
+			elif(self.boardlogic.updateQueue[0][1]==3):#highlight the water slider
+				if(self.gameCanvas.coords("circle")[0]==self.gameCanvas.coords(self.turbine)[0]+2-40):#if this message has just been chosen
+					self.waterAnimationSpeed=0.
+
+				if(self.gameCanvas.coords("circle")[0]<630):
+					self.gameCanvas.move("circle",10,-20)
+
+			elif(self.boardlogic.updateQueue[0][1]==4):#highlight the load label
+				if(self.gameCanvas.coords("circle")[0]<830):
+					self.gameCanvas.move("circle",30,20)
+
+			elif(self.boardlogic.updateQueue[0][1]==6):#highlight the spill button
+				if(self.gameCanvas.coords("circle")[0]>420):
+					self.gameCanvas.move("circle",-25,-3.5)
+
+			elif(self.boardlogic.updateQueue[0][1]==8):
+				self.gameCanvas.delete("circle")
+
 
 		#delete the items
 		self.tableGens.delete(*self.tableGens.get_children())
@@ -559,7 +595,7 @@ class TKBoard:
 		self.updateMessageLabel.pack(side='top',pady=10)
 
 	def nextMessage(self):
-		
+		# if(level<3):
 		del self.boardlogic.updateQueue[0]
 		if(len(self.boardlogic.updateQueue)==0):
 			#stop providing update messages
@@ -574,6 +610,8 @@ class TKBoard:
 					self.boardlogic.updateQueue = [["Match the load exactly!",4]]+self.boardlogic.updateQueue
 			#display the next message
 			self.updateMessage()
+		# else:
+
 
 	def updateWaterVelocity(self,value):
 		self.boardlogic.water_velocity=float(value)
@@ -676,7 +714,7 @@ class TKBoard:
 
 			#set the board
 			self.setBoard()
-			self.root.after(self.updateRate,initLevel3,self.boardlogic,self.root)
+			self.root.after(self.updateRate,initLevel3,self.boardlogic,self,self.root)
 
 	def clearBoard(self):
 		#gameFrame and updateFrame
@@ -720,7 +758,18 @@ class TKBoard:
 			self.eventMessage = tk.Label(self.master,bg='#ffff99',font=("Helvetica", 10))
 			self.eventMenu    = tk.Canvas(self.master,bg="#80ff80")
 
+			#the message board
+			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
+			self.updateMessageCanvas.pack(side='bottom')
+			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 13))
+			self.updateMessageLabel.pack()
+			self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
+			self.continueButton.pack()
+
 			self.updateDisplaysLevel3(self.master)
+
+
+			# initLevel3()
 
 
 	def treeview_sort_column(self,tv, col, reverse):

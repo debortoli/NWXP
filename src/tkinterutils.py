@@ -778,6 +778,7 @@ class TKBoard:
 
 		#bind it to a double click so you can add what has been pressed to the clearing table
 		self.tableGens.bind("<Return>", self.gensClick)
+		self.tableGens.bind("<ButtonRelease-1>",self.gensHover)
 
 		#Market clearing price
 
@@ -801,6 +802,24 @@ class TKBoard:
 		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
 
 		
+	def gensHover(self,event):
+		#remove the border from the other generators
+		for child in self.master.children:
+				try:
+					self.master.children[child].configure(bd=0,bg="#ffffff")
+				except:
+					r=0
+
+		row_id = self.tableGens.selection()
+		row=self.tableGens.item(row_id,'values')
+		#highlight the appropriate generator icons
+		for child in self.master.children:
+			try:
+				if(self.master.children[child]['text']==row[1]):
+					self.master.children[child].configure(bd=6,bg="#ffa500")
+			except:
+				r=0
+
 
 	def gensClick(self,event):
 		#remove the border from the other generators
@@ -1060,14 +1079,20 @@ class TKBoard:
 		with open('genLocations.csv', 'rb') as csvfile:
 			load_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 			for row in load_reader:
-				if(row[-2]=='money'):
+				if(row[-1]=='money'):
 					img=Image.open('../images/commercial_load.jpg')
+					capacity=random.randint(52325-5000,52325+2000)
+					load_type = "Commercial"
 
-				elif(row[-2]=='house'):
+				elif(row[-1]=='house'):
 					img=Image.open('../images/residential_load.jpg')
+					capacity=random.randint(85995-5000,85995+2000)
+					load_type = "Residential"
 
-				elif(row[-2]=='industrial'):
+				elif(row[-1]=='industrial'):
 					img=Image.open('../images/industrial_load.png')
+					capacity = random.randint(42210-5000,42210+2000)
+					load_type = "Industrial"
 
 				try:
 					img=img.resize(icon_size)
@@ -1075,7 +1100,9 @@ class TKBoard:
 
 					loadLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(row[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
 					loadLabel.image=img#keep a reference!
-					tool_tip = Tooltip(loadLabel,  text="Load type: "+str(row[-2])+"\nName: "+str(gen[1])+"\nCapacity: "+str(gen[2])+"MW")
+
+					
+					tool_tip = Tooltip(loadLabel,  text="Load type: "+str(load_type)+"\nDemand: "+str(capacity)+"MWh")
 
 					x_loc=background_image_start[0]+(float(row[-4])-0.01)*img_width
 					y_loc=background_image_start[1]+(float(row[-3])-0.01)*img_height

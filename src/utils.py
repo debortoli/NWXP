@@ -182,7 +182,7 @@ class Transmission(pygame.sprite.Sprite):
 
 class Tooltip:
 
-    def __init__(self, master, text, delay=1200, showTime=10000,
+    def __init__(self, master, text, delay=400, showTime=10000,
             background="lightyellow"):
         self.master = master
         self.text = text

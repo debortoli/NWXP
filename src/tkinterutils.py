@@ -12,6 +12,7 @@ import random
 import numpy as np
 import csv
 from utils import Tooltip
+from scipy.stats import beta
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -841,15 +842,15 @@ class TKBoard:
 	def createInfoTables(self):	
 		#points system
 		self.pointsTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Total Points",font=("Helvetica", 10))
-		self.pointsTitle.place(x=40,y=1)
+		self.pointsTitle.place(x=20,y=1)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
-		self.points.place(x=60,y=50)
+		self.points.place(x=40,y=50)
 
 
 		#ancillary services
 		self.ancillaryTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Ancillary Services",font=("Helvetica", 10))
-		self.ancillaryTitle.place(x=200,y=1)
+		self.ancillaryTitle.place(x=160,y=1)
 
 		self.tableAncillary = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableAncillary["columns"]=("segment","generation")
@@ -870,11 +871,11 @@ class TKBoard:
 		self.tableAncillary.tag_configure('oddrow', background='#b8b894')
 
 		self.tableAncillary['show'] = 'headings'#get rid of the empty column on the left
-		self.tableAncillary.place(x=155,y=20)
+		self.tableAncillary.place(x=125,y=20)
 
 		#dispatch
 		self.dispatchTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Dispatch",font=("Helvetica", 10))
-		self.dispatchTitle.place(x=420,y=1)
+		self.dispatchTitle.place(x=380,y=1)
 
 		self.tableDispatch = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableDispatch["columns"]=("segment","generation")
@@ -896,34 +897,37 @@ class TKBoard:
 		self.tableDispatch.tag_configure('oddrow', background='#b8b894')
 
 		self.tableDispatch['show'] = 'headings'#get rid of the empty column on the left
-		self.tableDispatch.place(x=360,y=20)
+		self.tableDispatch.place(x=320,y=20)
 
 		#demand profile
 		self.demandTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Demand Profile",font=("Helvetica", 10))
-		self.demandTitle.place(x=610,y=1)
+		self.demandTitle.place(x=580,y=1)
 
 		self.tableDemand = ttk.Treeview(self.infoCanvas,height=5)
-		self.tableDemand["columns"]=("segment","generation")
+		self.tableDemand["columns"]=("segment","generation","duration")
 		self.tableDemand.column("segment", width=80 ,anchor=tk.CENTER)
 		self.tableDemand.column("generation" , width=100,anchor=tk.CENTER)
+		self.tableDemand.column("duration" , width=50,anchor=tk.CENTER)
 
 		self.tableDemand.heading("segment", text="Segment")
 		self.tableDemand.heading("generation" , text="Gen. (MWh)")
+		self.tableDemand.heading("duration" , text="Hrs.")
+
 
 		
 
 		row_tag='oddrow'#for alternating colors
-		for gen in reversed(self.boardlogic.demandProfile):
+		for i,gen in enumerate(reversed(self.boardlogic.demandProfile)):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
-				self.tableDemand.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+				self.tableDemand.insert("",0,values=(gen[0],gen[1],self.boardlogic.profilePeriods[4-i][1]),tags=row_tag)
 			else:
 				row_tag='oddrow'
-				self.tableDemand.insert("",0,values=(gen[0],gen[1]),tags=row_tag)
+				self.tableDemand.insert("",0,values=(gen[0],gen[1],self.boardlogic.profilePeriods[4-i][1]),tags=row_tag)
 		self.tableDemand.tag_configure('oddrow', background='#b8b894')
 
 		self.tableDemand['show'] = 'headings'#get rid of the empty column on the left
-		self.tableDemand.place(x=565,y=20)
+		self.tableDemand.place(x=515,y=20)
 
 		
 
@@ -969,9 +973,23 @@ class TKBoard:
 
 	def updateDemandProfile(self):
 		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
-			randomDistributionMeans=[20000,24000,27000,25000,22000]
+			# alpha=2
+			# beta=5
+			timePeriodMeans=[   [80500	,90500,131790],
+								[124520	,138520,206311],
+								[135720	,145720,217244],
+								[124520	,138520,206311],
+								[80500	,90500,131790]
+							]
+
 			for i in range(5):
-				self.boardlogic.demandProfile[i][1]= int(np.random.normal(randomDistributionMeans[i], 100, 1)[0])
+				k =  int(np.random.normal(timePeriodMeans[i][1], 5000, 1)[0])
+				if (k<timePeriodMeans[i][0]):
+					k+=random.randint(0,2000)
+				elif(k>timePeriodMeans[i][2]):
+					k=timePeriodMeans[i][1]+random.randint(0,5000)
+
+				self.boardlogic.demandProfile[i][1] = k
 
 	def updateDispatchProfile(self):
 		#autofill the dispatch
@@ -1031,11 +1049,6 @@ class TKBoard:
 
 			self.genIcons.append(genLabel)
 
-	def genToolTip(self,event):
-		pdb.set_trace()
-		# description = getattr(event.widget, "description", "")
-        # event.widget.configure(text=description)
-
 	def addLoads(self):
 		#add the load icons to the map
 		img_height=800-self.infoCanvasHeight
@@ -1047,25 +1060,26 @@ class TKBoard:
 		with open('genLocations.csv', 'rb') as csvfile:
 			load_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 			for row in load_reader:
-				if(row[-1]=='money'):
+				if(row[-2]=='money'):
 					img=Image.open('../images/commercial_load.jpg')
 
-				elif(row[-1]=='house'):
+				elif(row[-2]=='house'):
 					img=Image.open('../images/residential_load.jpg')
 
-				elif(row[-1]=='industrial'):
+				elif(row[-2]=='industrial'):
 					img=Image.open('../images/industrial_load.png')
 
 				try:
 					img=img.resize(icon_size)
 					img=ImageTk.PhotoImage(img)
 
-					genLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(row[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
-					genLabel.image=img#keep a reference!
+					loadLabel = tk.Label(self.master,image=img, height=icon_size[0], width=icon_size[1],text=str(row[1]),font=("Helvetica", 1), bd=0,bg="#ffffff")
+					loadLabel.image=img#keep a reference!
+					tool_tip = Tooltip(loadLabel,  text="Load type: "+str(row[-2])+"\nName: "+str(gen[1])+"\nCapacity: "+str(gen[2])+"MW")
 
 					x_loc=background_image_start[0]+(float(row[-4])-0.01)*img_width
 					y_loc=background_image_start[1]+(float(row[-3])-0.01)*img_height
-					genLabel.place(x=x_loc,y=y_loc)
+					loadLabel.place(x=x_loc,y=y_loc)
 				except:
 					r=0
 

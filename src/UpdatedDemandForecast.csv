@@ -1,0 +1,11 @@
+Average Day,,,California (MWh),,,Washington/Oregon  (MWh),,,Nevada (MWh),,
+Segment,Demand MWh,,Residential ,commerical,industrial ,Residential ,commerical,industrial ,Residential ,commerical,industrial 
+OFF PEAK,181000,,6072.5,6940,4337.5,52325,59800,37375,4942.5,5660,3537.5
+MID PEAK,297040,,9754.5,11148,6967.5,85995,98280,61425,8214.5,9388,5867.5
+PEAK,145720,,4746,5424,3390,42210,48240,30150,4046,4624,2890
+,,,,,,,,,,,
+Hottest Day of the Year,,,California (MWh),,,Washington/Oregon (MWh) ,,,Nevada (MWh),,
+Segment ,Demand MWh,,Residential ,commerical,industrial ,Residential ,commerical,industrial ,Residential ,commerical,industrial 
+OFF PEAK,263580,,8987,10271.2,6420,74302,84916,53073,8964,10244,6403
+MID PEAK,432622,,14437,16499,103112,122113,139558,87224,14868,16992,10620
+PEAK,212244,,7024,8028,5017,59938,68501,42813,7323,8369,5230

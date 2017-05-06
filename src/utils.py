@@ -83,9 +83,9 @@ class Board:
 
 		self.events=[]
 
-		self.profilePeriods=[["Off Peak AM",5],["Daytime1",5],
-							["Peak",4],["Daytime2",5],
-							["Off-peak PM",5]]
+		self.profilePeriods=[["Off Peak AM",5.5],["Daytime1",4],
+							["Peak",5],["Daytime2",4],
+							["Off-peak PM",5.5]]
 
 		self.time_period=0
 		self.last_time_period=-1

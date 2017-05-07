@@ -94,8 +94,9 @@ def initLevel3(board,disp,root):
 		# 	""+'\n'+\
 		# 	""+'\n'
 		# board.updateQueue.append([m10,10])
+		disp.updateMessage()
 
-		root.after(1,disp.updateDisplaysLevel3,root)
+		# root.after(1,disp.updateDisplaysLevel3,root)
 
 def isoLevel(board,disp,root):
 	runMarket(board,disp,root)

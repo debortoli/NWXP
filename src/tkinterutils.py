@@ -1132,9 +1132,6 @@ class TKBoard:
 
 	def level3MessageHandler(self,root):
 		#display message if there is any
-		# pdb.set_trace()
-		if(self.updateMessageLabel['text']=='Loading....' and len(self.boardlogic.updateQueue)>0):
-			self.nextMessage()
 
 		# 2-hydro dam
 		# 4-residential load
@@ -1150,7 +1147,7 @@ class TKBoard:
 			if(self.boardlogic.updateQueue[0][1]==1):
 				self.imageCanvas.create_oval(500,500,540,540,fill="#ff6600",width=0,tag="circle")
 
-			if(self.boardlogic.updateQueue[0][1]==3):#highlight the turbine
+			if(self.boardlogic.updateQueue[0][1]==2):#highlight the turbine
 				if(self.imageCanvas.coords("circle")[0]>70):
 					self.imageCanvas.move("circle",-20,-20)
 

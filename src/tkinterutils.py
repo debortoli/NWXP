@@ -730,7 +730,7 @@ class TKBoard:
 
 			#the message board
 			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
-			self.updateMessageCanvas.pack(side='top')
+			self.updateMessageCanvas.pack(side='right')
 			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 13))
 			self.updateMessageLabel.pack()
 			self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
@@ -1147,26 +1147,36 @@ class TKBoard:
 			if(self.boardlogic.updateQueue[0][1]==1):
 				self.imageCanvas.create_oval(500,500,540,540,fill="#ff6600",width=0,tag="circle")
 
-			if(self.boardlogic.updateQueue[0][1]==2):#highlight the turbine
+			if(self.boardlogic.updateQueue[0][1]==2):#hydro dam
 				if(self.imageCanvas.coords("circle")[0]>70):
 					self.imageCanvas.move("circle",-20,-20)
 
-		# 	elif(self.boardlogic.updateQueue[0][1]==3):#highlight the water slider
-		# 		if(self.gameCanvas.coords("circle")[0]==self.gameCanvas.coords(self.turbine)[0]+2-40):#if this message has just been chosen
-		# 			self.waterAnimationSpeed=0.
+			elif(self.boardlogic.updateQueue[0][1]==4):#residential load
+				if(self.imageCanvas.coords("circle")[0]<500):
+					self.imageCanvas.move("circle",20,1)
 
-		# 		if(self.gameCanvas.coords("circle")[0]<630):
-		# 			self.gameCanvas.move("circle",10,-20)
+			elif(self.boardlogic.updateQueue[0][1]==5):#generator fleet
+				if(self.imageCanvas.coords("circle")[0]<700):
+					self.imageCanvas.move("circle",10,0)
 
-		# 	elif(self.boardlogic.updateQueue[0][1]==4):#highlight the load label
-		# 		if(self.gameCanvas.coords("circle")[0]<830):
-		# 			self.gameCanvas.move("circle",30,20)
+			elif(self.boardlogic.updateQueue[0][1]==6):#market clearing table
+				if(self.imageCanvas.coords("circle")[1]<500):
+					self.imageCanvas.move("circle",0,20)
 
-		# 	elif(self.boardlogic.updateQueue[0][1]==6):#highlight the spill button
-		# 		if(self.gameCanvas.coords("circle")[0]>420):
-		# 			self.gameCanvas.move("circle",-25,-3.5)
+			elif(self.boardlogic.updateQueue[0][1]==7):#dispatch
+				if(self.imageCanvas.coords("circle")[0]>420):
+					self.imageCanvas.move("circle",-12,-21)
 
-		# 	elif(self.boardlogic.updateQueue[0][1]==8):
-		# 		self.gameCanvas.delete("circle")
+			elif(self.boardlogic.updateQueue[0][1]==8):#demand profile
+				if(self.imageCanvas.coords("circle")[0]<600):
+					self.imageCanvas.move("circle",10,0)
+
+			elif(self.boardlogic.updateQueue[0][1]==10):#ancillary services
+				if(self.imageCanvas.coords("circle")[0]>200):
+					self.imageCanvas.move("circle",-20,0)
+
+			if(self.boardlogic.updateQueue[0][1]==11):#highlight the turbine
+				if(self.imageCanvas.coords("circle")[0]>70):
+					self.imageCanvas.delete("circle")
 		
 

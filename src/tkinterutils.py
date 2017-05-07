@@ -765,10 +765,10 @@ class TKBoard:
 
 	def createGensTable(self):
 		#generator table
-		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
+		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 15))
 		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=30,selectmode='extended')#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=26,selectmode='extended')#height may be in number of items!
 		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
 		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
@@ -820,13 +820,64 @@ class TKBoard:
 
 		row_tag='oddrow'#for alternating colors
 
+		self.dispatchButton=   tk.Button(self.generatorCanvas,bg='#00ff00',text="Dispatch Gens!",command=self.dispatchGens)
+		self.dispatchButton.pack(side='bottom',pady=2,fill='x')
+
 		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
 		self.tableClearing.pack(side='bottom',pady=3,fill='x')
 
+		self.timeTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Time Period: Off-peak AM \t\t Clearing Price: $0.00",font=("Helvetica", 12))
+		self.timeTitle.pack(side='bottom',pady=1,fill='x')
 
-		self.clearingTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Market Clearing Price",font=("Helvetica", 10))
+		self.clearingTitle=   tk.Label(self.generatorCanvas,bg='gray60',text="Market Clearing Table",font=("Helvetica", 15),bd=1)
 		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
 
+	
+	def dispatchGens(self):
+		board=self.boardlogic
+		if(len(board.updateQueue)>0):
+			self.nextMessage()
+
+		#check that they are grabbing the lowest priced generators
+
+		if((board.cumulGen>=board.demandProfile[board.time_period][1] and 
+			board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
+			(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
+			if(board.time_period<4):
+				self.clearTimePeriod()
+				board.time_period+=1
+				board.last_time_period=board.time_period
+
+		elif(board.cumulGen<board.demandProfile[board.time_period][1]):
+			m13="Not enough generation has been secured!"+'\n'
+			board.updateQueue.append([m13,13])
+			self.updateMessage()
+
+		elif(board.cumulGen>board.demandProfile[board.time_period][1]):
+			#determine the last generator added
+			last_gen_name=self.boardlogic.clearingGens[-1][0]
+			#find the capacity of this generator
+			for gen in self.boardlogic.generators:
+				if(gen[1]==last_gen_name):
+					last_gen_mwh=float(str(gen[2]))*self.boardlogic.profilePeriods[board.time_period][1]
+
+			#if the last generator was not necessary, then complain
+			if(self.boardlogic.cumulGen-last_gen_mwh>board.demandProfile[board.time_period][1]):
+				m13="Too much generation has been secured!"+'\n'
+				board.updateQueue.append([m13,13])
+				self.updateMessage()
+			
+		#if we're in an autofill period
+		if(board.time_period==3):
+			self.updateDispatchProfile()
+			root.after(disp.updateRate,disp.updateDisplaysLevel3,root)
+		if(board.time_period==4):
+			self.updateDispatchProfile()
+			self.clearTimePeriod()
+			board.time_period+=1
+			root.after(self.updateRate,self.updateDisplaysLevel3,root)
+			
+		self.master.after(self.updateRate,isoLevel,board,self,self.master)
 		
 	def gensHover(self,event):
 		#remove the border from the other generators
@@ -889,10 +940,10 @@ class TKBoard:
 			if(float(gen[-1][1:])<lowest_price):
 				lowest_price=float(gen[-1][1:])
 
-		if(self.clearingTitle['text'][-5:]=='Price'):
-			self.clearingTitle['text']=self.clearingTitle['text']+": "+locale.currency(lowest_price)
-		else:
-			self.clearingTitle['text']=self.clearingTitle['text'][:-8]+": "+locale.currency(lowest_price)
+		#update the time period and the clearing price
+		price = locale.currency(lowest_price)
+		time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
+		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
 
 
 		self.root.after(1,self.updateDisplays,self.root)
@@ -900,16 +951,16 @@ class TKBoard:
 
 	def createInfoTables(self):	
 		#points system
-		self.pointsTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Total Points",font=("Helvetica", 10))
-		self.pointsTitle.place(x=20,y=1)
+		self.pointsTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Total Points",font=("Helvetica", 12))
+		self.pointsTitle.place(x=20,y=0)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
 		self.points.place(x=40,y=50)
 
 
 		#ancillary services
-		self.ancillaryTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Ancillary Services",font=("Helvetica", 10))
-		self.ancillaryTitle.place(x=160,y=1)
+		self.ancillaryTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Ancillary Services",font=("Helvetica", 12))
+		self.ancillaryTitle.place(x=160,y=0)
 
 		self.tableAncillary = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableAncillary["columns"]=("segment","generation")
@@ -933,8 +984,8 @@ class TKBoard:
 		self.tableAncillary.place(x=125,y=20)
 
 		#dispatch
-		self.dispatchTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Dispatch",font=("Helvetica", 10))
-		self.dispatchTitle.place(x=380,y=1)
+		self.dispatchTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Dispatch",font=("Helvetica", 12))
+		self.dispatchTitle.place(x=380,y=0)
 
 		self.tableDispatch = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableDispatch["columns"]=("segment","generation")
@@ -959,8 +1010,8 @@ class TKBoard:
 		self.tableDispatch.place(x=320,y=20)
 
 		#demand profile
-		self.demandTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Demand Profile",font=("Helvetica", 10))
-		self.demandTitle.place(x=580,y=1)
+		self.demandTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Demand Profile",font=("Helvetica", 12))
+		self.demandTitle.place(x=580,y=0)
 
 		self.tableDemand = ttk.Treeview(self.infoCanvas,height=5)
 		self.tableDemand["columns"]=("segment","generation","duration")
@@ -1008,7 +1059,7 @@ class TKBoard:
 			self.boardlogic.availableGenerators=[]
 
 			#choose randomly 20 generators
-			num_to_choose = 30
+			num_to_choose = 35
 			genList=range(len(self.boardlogic.generators))
 			random.shuffle(genList)
 			genList = genList[:num_to_choose]
@@ -1021,7 +1072,7 @@ class TKBoard:
 		self.boardlogic.availableGenerators=[]
 
 		#choose randomly 20 generators
-		num_to_choose = 30
+		num_to_choose = 35
 		genList=range(len(self.boardlogic.generators))
 		random.shuffle(genList)
 		genList = genList[:num_to_choose]

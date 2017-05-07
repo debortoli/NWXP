@@ -551,6 +551,20 @@ class TKBoard:
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
 
+		#update the market clearing price in the title
+		#find the highest clearing price
+		lowest_price=500000
+		for gen in self.boardlogic.clearingGens:
+			if(float(gen[-1][1:])<lowest_price):
+				lowest_price=float(gen[-1][1:])
+		if(lowest_price==500000):
+			lowest_price=0.0
+
+		#update the time period and the clearing price
+		price = locale.currency(lowest_price)
+		time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
+		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
+
 		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
 
 		# root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
@@ -580,6 +594,8 @@ class TKBoard:
 				self.updateMessage()
 
 		else:#we're in level 3 or 4
+			if(self.boardlogic.updateQueue[0][1]==12):
+				initLevel3()#start here
 			del self.boardlogic.updateQueue[0]
 			if(len(self.boardlogic.updateQueue)==0):
 				#stop providing update messages
@@ -844,6 +860,7 @@ class TKBoard:
 			board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
 			(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
 			if(board.time_period<4):
+				self.updateDispatchProfile()
 				self.clearTimePeriod()
 				board.time_period+=1
 				board.last_time_period=board.time_period
@@ -899,9 +916,8 @@ class TKBoard:
 
 
 	def gensClick(self,event):
-		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
-			self.tableClearing['height']+=1
-			self.tableGens['height']-=1
+		
+
 		#remove the border from the other generators
 		for child in self.master.children:
 				try:
@@ -933,17 +949,12 @@ class TKBoard:
 						self.master.children[child].configure(bd=6,bg="#ffa500")
 				except:
 					r=0
-		#update the market clearing price in the title
-		#find the highest clearing price
-		lowest_price=500000
-		for gen in self.boardlogic.clearingGens:
-			if(float(gen[-1][1:])<lowest_price):
-				lowest_price=float(gen[-1][1:])
+		
 
-		#update the time period and the clearing price
-		price = locale.currency(lowest_price)
-		time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
-		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
+		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
+			diff=len(self.boardlogic.clearingGens)-(self.tableClearing['height']-1)
+			self.tableClearing['height']+=diff
+			self.tableGens['height']-=diff
 
 
 		self.root.after(1,self.updateDisplays,self.root)
@@ -1103,8 +1114,8 @@ class TKBoard:
 
 	def updateDispatchProfile(self):
 		#autofill the dispatch
-		if(self.boardlogic.time_period in [0,3,4]):
-			self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
+		# if(self.boardlogic.time_period in [0,3,4]):
+		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
 		
 			# self.master.after(self.updateRate,gameLogic,self,self.boardlogic,self.master)
 

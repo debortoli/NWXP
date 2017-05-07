@@ -13,6 +13,7 @@ import numpy as np
 import csv
 from utils import Tooltip
 from scipy.stats import beta
+import locale
 
 class TKBoard:
 	def __init__(self, master,boardlogic):
@@ -363,6 +364,9 @@ class TKBoard:
 		self.timeIndicator=tk.Label(self.gameCanvas,bg='white',text="time",font=("Helvetica", 15),fg="#bb0000")
 		self.timeIndicator.place(x=15,y=15)
 
+		#for printing currency
+		locale.setlocale(locale.LC_ALL,'')
+
 
 
 	def updateDisplays(self,root):
@@ -485,10 +489,10 @@ class TKBoard:
 		for gen in self.boardlogic.availableGenerators:
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
 			else:
 				row_tag='oddrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
 		self.tableGens.tag_configure('oddrow', background='#b8b894')
 
 
@@ -522,7 +526,7 @@ class TKBoard:
 		self.tableClearing.delete(*self.tableClearing.get_children())
 		#add the updated ones
 		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.clearingGens:
+		for gen in reversed(self.boardlogic.clearingGens):
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
 				self.tableClearing.insert("",0,values=(gen[0],gen[1],gen[2]),tags=row_tag)
@@ -590,23 +594,26 @@ class TKBoard:
 
 	def spinTurbine(self,root):
 		#get position of blade
-		[x0,y0,x1,y1]=self.gameCanvas.coords(self.blade)
-		# print self.original_blade_x-x0
-		if((x0-self.original_blade_x0)>25):
-			x0=self.original_blade_x0
-			x1=self.original_blade_x1
-			y0=self.original_blade_y0
-			y1=self.original_blade_y1
+		try:
+			[x0,y0,x1,y1]=self.gameCanvas.coords(self.blade)
+			# print self.original_blade_x-x0
+			if((x0-self.original_blade_x0)>25):
+				x0=self.original_blade_x0
+				x1=self.original_blade_x1
+				y0=self.original_blade_y0
+				y1=self.original_blade_y1
 
-		#delete the old blade
-		self.gameCanvas.delete(self.blade)
+			#delete the old blade
+			self.gameCanvas.delete(self.blade)
 
-		#add a new blade
-		self.blade=self.gameCanvas.create_rectangle(x0+self.waterAnimationSpeed*70.,y0,
-													x1+self.waterAnimationSpeed*70.,y1,
-													fill="#000000")
+			#add a new blade
+			self.blade=self.gameCanvas.create_rectangle(x0+self.waterAnimationSpeed*70.,y0,
+														x1+self.waterAnimationSpeed*70.,y1,
+														fill="#000000")
 
-		self.moveWaves()
+			self.moveWaves()
+		except:
+			r=0
 		root.after(1,self.updateDisplays,root)
 
 	def moveWaves(self):
@@ -730,7 +737,7 @@ class TKBoard:
 
 			#the message board
 			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
-			self.updateMessageCanvas.pack(side='right')
+			self.updateMessageCanvas.pack(side='bottom')
 			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 13))
 			self.updateMessageLabel.pack()
 			self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
@@ -761,7 +768,7 @@ class TKBoard:
 		self.genTitle=   tk.Label(self.generatorCanvas,bg='lightgray',text="Generator Fleet",font=("Helvetica", 10))
 		self.genTitle.pack(side='top',pady=1)
 
-		self.tableGens = ttk.Treeview(self.generatorCanvas,height=29,selectmode='extended')#height may be in number of items!
+		self.tableGens = ttk.Treeview(self.generatorCanvas,height=30,selectmode='extended')#height may be in number of items!
 		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
 		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
 		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
@@ -783,10 +790,10 @@ class TKBoard:
 		for gen in self.boardlogic.availableGenerators:
 			if(row_tag=='oddrow'):
 				row_tag='evenrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
 			else:
 				row_tag='oddrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],gen[4]),tags=row_tag)
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
 		self.tableGens.tag_configure('oddrow', background='#b8b894')
 
 		self.tableGens['show'] = 'headings'#get rid of the empty column on the left
@@ -801,7 +808,7 @@ class TKBoard:
 
 		#Market clearing price
 
-		self.tableClearing = ttk.Treeview(self.generatorCanvas,height=6)
+		self.tableClearing = ttk.Treeview(self.generatorCanvas,height=5)
 		self.tableClearing["columns"]=("gen","cumul","cost")
 		self.tableClearing.column("gen", width=150 ,anchor=tk.CENTER)
 		self.tableClearing.column("cumul", width=120,anchor=tk.CENTER)
@@ -841,6 +848,9 @@ class TKBoard:
 
 
 	def gensClick(self,event):
+		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
+			self.tableClearing['height']+=1
+			self.tableGens['height']-=1
 		#remove the border from the other generators
 		for child in self.master.children:
 				try:
@@ -872,6 +882,17 @@ class TKBoard:
 						self.master.children[child].configure(bd=6,bg="#ffa500")
 				except:
 					r=0
+		#update the market clearing price in the title
+		#find the highest clearing price
+		lowest_price=500000
+		for gen in self.boardlogic.clearingGens:
+			if(float(gen[-1][1:])<lowest_price):
+				lowest_price=float(gen[-1][1:])
+
+		if(self.clearingTitle['text'][-5:]=='Price'):
+			self.clearingTitle['text']=self.clearingTitle['text']+": "+locale.currency(lowest_price)
+		else:
+			self.clearingTitle['text']=self.clearingTitle['text'][:-8]+": "+locale.currency(lowest_price)
 
 
 		self.root.after(1,self.updateDisplays,self.root)
@@ -987,7 +1008,7 @@ class TKBoard:
 			self.boardlogic.availableGenerators=[]
 
 			#choose randomly 20 generators
-			num_to_choose = 20
+			num_to_choose = 30
 			genList=range(len(self.boardlogic.generators))
 			random.shuffle(genList)
 			genList = genList[:num_to_choose]
@@ -1000,7 +1021,7 @@ class TKBoard:
 		self.boardlogic.availableGenerators=[]
 
 		#choose randomly 20 generators
-		num_to_choose = 20
+		num_to_choose = 30
 		genList=range(len(self.boardlogic.generators))
 		random.shuffle(genList)
 		genList = genList[:num_to_choose]

@@ -564,15 +564,17 @@ class TKBoard:
 			time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
 		else:
 			time_period="Ancillary Services"
-			
+
 			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5):
 				if(len(self.boardlogic.updateQueue)>0):
 					if(self.boardlogic.updateQueue[-1][1]!=99):#avoid adding the error message multiple times
 						self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
-						self.updateMessage()
+
 				else:
 					self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
-					self.updateMessage()
+				
+				self.updateMessage()
+				self.chooseNewGenerators()
 
 		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
 
@@ -876,12 +878,25 @@ class TKBoard:
 			if(gen[1]==last_gen[0]):
 				self.boardlogic.availableGenerators.append(gen)
 
+		#remove it from the selected generators
+		del self.boardlogic.gensSelected[-1]
+
+
+
 		#delete it from the market clearing table and decrement the cumulative mw
 		genList=self.boardlogic.clearingGens
 		self.boardlogic.clearingGens=[]
 		for gen in genList:
 			if(gen[0]!=last_gen[0]):
 				self.boardlogic.clearingGens.append(gen)
+
+		#uncolor the generator
+		for child in self.master.children:
+				try:
+					if(self.master.children[child]['text']==last_gen[0]):
+						self.master.children[child].configure(bd=0,bg="#ffffff")
+				except:
+					r=0
 
 		self.boardlogic.cumulGen=new_cumul_mw
 
@@ -988,6 +1003,8 @@ class TKBoard:
 				for gen in genList:
 					if(gen[1]!=row[1]):
 						self.boardlogic.availableGenerators.append(gen)
+					else:
+						self.boardlogic.gensSelected.append(gen)
 
 				# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
 				
@@ -1014,8 +1031,9 @@ class TKBoard:
 
 		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
 			diff=len(self.boardlogic.clearingGens)-(self.tableClearing['height']-1)
-			self.tableClearing['height']+=diff
-			self.tableGens['height']-=diff
+			if(self.tableGens['height']-diff>5):
+				self.tableClearing['height']+=diff
+				self.tableGens['height']-=diff
 
 
 		self.root.after(1,self.updateDisplays,self.root)
@@ -1127,6 +1145,7 @@ class TKBoard:
 		# self.imgLabel.place(x=0,y=0)
 
 	def updateAvailableGenerators(self):
+
 		if(self.boardlogic.time_period!=self.boardlogic.last_time_period):
 			self.boardlogic.availableGenerators=[]
 
@@ -1147,9 +1166,19 @@ class TKBoard:
 		num_to_choose = 35
 		genList=range(len(self.boardlogic.generators))
 		random.shuffle(genList)
+		gensNotChosen=genList[num_to_choose:]
 		genList = genList[:num_to_choose]
+
 		for i in genList:
-			self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
+			if(self.boardlogic.time_period==5):#if we're in ancillary services, don't serve up a generator that has already been selected
+				if(self.boardlogic.generators[i] in self.boardlogic.gensSelected):
+					#choose a new generator
+					for k in gensNotChosen:
+						if(self.boardlogic.generators[k] not in self.boardlogic.gensSelected) and (self.boardlogic.generators[k] not in self.boardlogic.availableGenerators):
+							self.boardlogic.availableGenerators.append(self.boardlogic.generators[k])
+							break
+			else:
+				self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
 
 		self.boardlogic.last_time_period=self.boardlogic.time_period
 

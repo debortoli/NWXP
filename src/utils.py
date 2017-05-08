@@ -90,6 +90,8 @@ class Board:
 		self.time_period=0
 		self.last_time_period=-1
 
+		self.gensSelected=[]
+
 	
 	def createCities(self):
 		self.cities=[]

@@ -570,6 +570,15 @@ class TKBoard:
 				self.skipAncillaryButton.configure(bg='#dd0000')
 				self.enterAncillaryButton.configure(bg='#00dd00')
 
+				#disable the table
+				self.tableGens.configure(selectmode="none")
+
+				#discolor the options
+				row_tag='oddrow'#for alternating colors
+				for gen in self.boardlogic.availableGenerators:
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
+				self.tableGens.tag_configure('oddrow', background='gray')
+
 				#fill in the gensSelected periods that were autofilled
 				self.boardlogic.gensSelected[0]=self.boardlogic.gensSelected[1]
 				self.boardlogic.gensSelected[3]=self.boardlogic.gensSelected[2]
@@ -901,38 +910,84 @@ class TKBoard:
 
 	def enterAncillary(self):
 		self.boardlogic.enteredAncillaryMarket=True
-		# self.boardlogic.time_period=6
+
+		#enable the table
+		self.tableGens.configure(selectmode="extended")
+
+		#recolor the options in tableGens
+		row_tag='oddrow'#for alternating colors
+		for gen in self.boardlogic.availableGenerators:
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
+		self.tableGens.tag_configure('oddrow', background='#b8b894')
 
 	def deleteLastGen(self):	
-		last_gen=self.boardlogic.clearingGens[-1]
-		new_cumul_mw=self.boardlogic.clearingGens[-2][1]
+		if(self.boardlogic.time_period<5):#we're not in the ancillary market
+			last_gen=self.boardlogic.clearingGens[-1]
+			new_cumul_mw=self.boardlogic.clearingGens[-2][1]
 
-		#add it to the gensTables
-		for gen in self.boardlogic.generators:
-			if(gen[1]==last_gen[0]):
-				self.boardlogic.availableGenerators.append(gen)
+			#add it to the gensTables
+			for gen in self.boardlogic.generators:
+				if(gen[1]==last_gen[0]):
+					self.boardlogic.availableGenerators.append(gen)
 
-		#remove it from the selected generators
-		del self.boardlogic.gensSelected[self.boardlogic.time_period][-1]
+			#remove it from the selected generators
+			del self.boardlogic.gensSelected[self.boardlogic.time_period][-1]
 
 
 
-		#delete it from the market clearing table and decrement the cumulative mw
-		genList=self.boardlogic.clearingGens
-		self.boardlogic.clearingGens=[]
-		for gen in genList:
-			if(gen[0]!=last_gen[0]):
-				self.boardlogic.clearingGens.append(gen)
+			#delete it from the market clearing table and decrement the cumulative mw
+			genList=self.boardlogic.clearingGens
+			self.boardlogic.clearingGens=[]
+			for gen in genList:
+				if(gen[0]!=last_gen[0]):
+					self.boardlogic.clearingGens.append(gen)
 
-		#uncolor the generator
-		for child in self.master.children:
-				try:
-					if(self.master.children[child]['text']==last_gen[0]):
-						self.master.children[child].configure(bd=0,bg="#ffffff")
-				except:
-					r=0
+			#uncolor the generator
+			for child in self.master.children:
+					try:
+						if(self.master.children[child]['text']==last_gen[0]):
+							self.master.children[child].configure(bd=0,bg="#ffffff")
+					except:
+						r=0
 
-		self.boardlogic.cumulGen=new_cumul_mw
+			self.boardlogic.cumulGen=new_cumul_mw
+
+		else:
+			last_gen=self.boardlogic.clearingGens[-1]
+			new_cumul_mw=self.boardlogic.clearingGens[-2][1]
+
+			#add it to the gensTables
+			for gen in self.boardlogic.generators:
+				if(gen[1]==last_gen[0]):
+					self.boardlogic.availableGenerators.append(gen)
+
+			#remove it from the selected generators
+			del self.boardlogic.gensSelected[self.boardlogic.ancillary_period][-1]
+
+
+
+			#delete it from the market clearing table and decrement the cumulative mw
+			genList=self.boardlogic.clearingGens
+			self.boardlogic.clearingGens=[]
+			for gen in genList:
+				if(gen[0]!=last_gen[0]):
+					self.boardlogic.clearingGens.append(gen)
+
+			#uncolor the generator
+			for child in self.master.children:
+					try:
+						if(self.master.children[child]['text']==last_gen[0]):
+							self.master.children[child].configure(bd=0,bg="#ffffff")
+					except:
+						r=0
+
+			self.boardlogic.cumulGen=new_cumul_mw
+
 
 		self.updateDisplaysLevel3(self.master)
 
@@ -1010,6 +1065,8 @@ class TKBoard:
 				board.last_time_period=board.time_period
 				self.updateDisplaysLevel3(self.master)
 				
+			self.boardlogic.ancillary_period+=1
+				
 			
 			
 		self.master.after(self.updateRate,isoLevel,board,self,self.master)
@@ -1059,8 +1116,6 @@ class TKBoard:
 				ramp_list.append(float(str(gen[3])))
 
 			median_ramp_rate = np.median(np.array(ramp_list))
-			if(self.boardlogic.time_period==5):
-				pdb.set_trace()
 
 			if(self.boardlogic.time_period<5):#we're not in ancillary services
 				min_bid_rate=float(str(locale.currency(min_bid_rate)[1:]))
@@ -1286,44 +1341,63 @@ class TKBoard:
 		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
 			# alpha=2
 			# beta=5
-			timePeriodMeans=[   [80500	,90500,124520],
-								[124520	,138520,142206],
+			timePeriodMeans=[   [80500	,90500,124320],
+								[124520	,138520,142006],
 								[142206	,145720,217244],
-								[124520	,138520,142206],
+								[124520	,138520,142006],
 								[80500	,90500,124520]
 							]
 
 			for i in range(5):
 				k =  int(np.random.normal(timePeriodMeans[i][1], 5000, 1)[0])
 				if (k<timePeriodMeans[i][0]):
-					k+=random.randint(0,2000)
+					k=timePeriodMeans[i][1]+random.randint(0,200)
 				elif(k>timePeriodMeans[i][2]):
-					k=timePeriodMeans[i][1]+random.randint(0,5000)
+					k=timePeriodMeans[i][1]+random.randint(0,200)
 
 				self.boardlogic.demandProfile[i][1] = k
 
 	def updateDispatchProfile(self):
 		#autofill the dispatch
 		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
-		
-			# self.master.after(self.updateRate,gameLogic,self,self.boardlogic,self.master)
+
+	def updateAncillaryProfile(self):
+		#autofill the dispatch
+		self.boardlogic.ancillaryProfile[self.boardlogic.ancillary_period][1] = int(self.boardlogic.cumulGen)#self.boardlogic.demandProfile[self.boardlogic.ancillary_period][1]
 
 
 	def clearTimePeriod(self):
-		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.demandProfile[self.boardlogic.time_period][1]#self.boardlogic.cumulGen
-		self.boardlogic.cumulGen=0
-		# self.updateDispatchProfile()
+		if(self.boardlogic.time_period<5):#we're not in the ancillary market
+			self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.demandProfile[self.boardlogic.time_period][1]#self.boardlogic.cumulGen
+			self.boardlogic.cumulGen=0
+			# self.updateDispatchProfile()
 
-		#wipe the market clearing board
-		self.tableAncillary.delete(*self.tableAncillary.get_children())
-		self.boardlogic.clearingGens=[]
+			#wipe the market clearing board
+			# self.tableAncillary.delete(*self.tableAncillary.get_children())
+			self.boardlogic.clearingGens=[]
 
-		#choose new generators
-		self.chooseNewGenerators()
+			#choose new generators
+			self.chooseNewGenerators()
 
-		#adjust height of tables
-		self.tableGens['height']=26
-		self.tableClearing['height']=5
+			#adjust height of tables
+			self.tableGens['height']=26
+			self.tableClearing['height']=5
+
+		else:#we're in the ancillary market
+			self.boardlogic.ancillaryProfile[self.boardlogic.ancillary_period][1]=int(self.boardlogic.cumulGen)#self.boardlogic.demandProfile[self.boardlogic.ancillary_period][1]#self.boardlogic.cumulGen
+			self.boardlogic.cumulGen=0
+			# self.updateDispatchProfile()
+
+			#wipe the market clearing board
+			# self.tableAncillary.delete(*self.tableAncillary.get_children())
+			self.boardlogic.clearingGens=[]
+
+			#choose new generators
+			self.chooseNewGenerators()
+
+			#adjust height of tables
+			self.tableGens['height']=26
+			self.tableClearing['height']=5
 
 		self.updateDisplaysLevel3(self.master)
 

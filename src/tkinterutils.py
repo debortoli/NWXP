@@ -564,9 +564,16 @@ class TKBoard:
 			time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
 		else:
 			time_period="Ancillary Services"
+			
 			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5):
-				self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
-				self.updateMessage()
+				if(len(self.boardlogic.updateQueue)>0):
+					if(self.boardlogic.updateQueue[-1][1]!=99):#avoid adding the error message multiple times
+						self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
+						self.updateMessage()
+				else:
+					self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
+					self.updateMessage()
+
 		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
 
 		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
@@ -973,6 +980,8 @@ class TKBoard:
 					if(float(str(gen[4]))<min_bid_rate):
 						min_bid_rate=float(str(gen[4]))
 
+			min_bid_rate=float(str(locale.currency(min_bid_rate)[1:]))
+
 			if(float(str(row[-1][1:]))==min_bid_rate):
 				genList=self.boardlogic.availableGenerators
 				self.boardlogic.availableGenerators=[]
@@ -994,8 +1003,13 @@ class TKBoard:
 					except:
 						r=0
 			else:
-				self.boardlogic.updateQueue.append(["The lowest bid rate generator was not selected",98])
-				self.updateMessage()
+				if(len(self.boardlogic.updateQueue)>0):
+					if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
+						self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
+						self.updateMessage()
+				else:
+					self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
+					self.updateMessage()
 		
 
 		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):

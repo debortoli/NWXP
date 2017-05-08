@@ -480,7 +480,7 @@ class TKBoard:
 		self.tableGens.delete(*self.tableGens.get_children())
 		#decide on the available generators
 		self.updateDemandProfile()
-		self.updateDispatchProfile()
+		# self.updateDispatchProfile()
 		self.updateAvailableGenerators()
 
 
@@ -553,16 +553,20 @@ class TKBoard:
 
 		#update the market clearing price in the title
 		#find the highest clearing price
-		lowest_price=500000
+		highest_price=0
 		for gen in self.boardlogic.clearingGens:
-			if(float(gen[-1][1:])<lowest_price):
-				lowest_price=float(gen[-1][1:])
-		if(lowest_price==500000):
-			lowest_price=0.0
+			if(float(gen[-1][1:])>highest_price):
+				highest_price=float(gen[-1][1:])
 
 		#update the time period and the clearing price
-		price = locale.currency(lowest_price)
-		time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
+		price = locale.currency(highest_price)
+		if(self.boardlogic.time_period<4):
+			time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
+		else:
+			time_period="Ancillary Services"
+			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5):
+				self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
+				self.updateMessage()
 		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
 
 		root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
@@ -595,7 +599,10 @@ class TKBoard:
 
 		else:#we're in level 3 or 4
 			if(self.boardlogic.updateQueue[0][1]==12):
-				initLevel3()#start here
+				# pdb.set_trace()
+				self.boardlogic.time_period=1
+				self.updateDisplaysLevel3(self.master)
+				# initLevel3()
 			del self.boardlogic.updateQueue[0]
 			if(len(self.boardlogic.updateQueue)==0):
 				#stop providing update messages
@@ -833,11 +840,16 @@ class TKBoard:
 		self.tableClearing.heading("gen", text="Generator")
 		self.tableClearing.heading("cumul", text="Cumulative MWh")
 		self.tableClearing.heading("cost",  text="$/MWhr")
-
 		row_tag='oddrow'#for alternating colors
 
-		self.dispatchButton=   tk.Button(self.generatorCanvas,bg='#00ff00',text="Dispatch Gens!",command=self.dispatchGens)
-		self.dispatchButton.pack(side='bottom',pady=2,fill='x')
+		self.buttonCanvas = tk.Canvas(self.generatorCanvas,bg="lightgray")
+		self.buttonCanvas.pack(side='bottom',fill='x')
+
+		self.dispatchButton=   tk.Button(self.buttonCanvas,bg='#00dd00',text="Dispatch Gens!",command=self.dispatchGens)
+		self.dispatchButton.pack(side='left',padx=10)
+
+		self.deleteLastGen=   tk.Button(self.buttonCanvas,bg='#dd0000',text="Delete Last Generator",command=self.deleteLastGen)
+		self.deleteLastGen.pack(side='right',padx=10)
 
 		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
 		self.tableClearing.pack(side='bottom',pady=3,fill='x')
@@ -848,6 +860,27 @@ class TKBoard:
 		self.clearingTitle=   tk.Label(self.generatorCanvas,bg='gray60',text="Market Clearing Table",font=("Helvetica", 15),bd=1)
 		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
 
+	def deleteLastGen(self):	
+		last_gen=self.boardlogic.clearingGens[-1]
+		new_cumul_mw=self.boardlogic.clearingGens[-2][1]
+
+		#add it to the gensTables
+		for gen in self.boardlogic.generators:
+			if(gen[1]==last_gen[0]):
+				self.boardlogic.availableGenerators.append(gen)
+
+		#delete it from the market clearing table and decrement the cumulative mw
+		genList=self.boardlogic.clearingGens
+		self.boardlogic.clearingGens=[]
+		for gen in genList:
+			if(gen[0]!=last_gen[0]):
+				self.boardlogic.clearingGens.append(gen)
+
+		self.boardlogic.cumulGen=new_cumul_mw
+
+		self.updateDisplaysLevel3(self.master)
+
+
 	
 	def dispatchGens(self):
 		board=self.boardlogic
@@ -856,21 +889,17 @@ class TKBoard:
 
 		#check that they are grabbing the lowest priced generators
 
-		if((board.cumulGen>=board.demandProfile[board.time_period][1] and 
-			board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
-			(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
-			if(board.time_period<4):
-				self.updateDispatchProfile()
-				self.clearTimePeriod()
-				board.time_period+=1
-				board.last_time_period=board.time_period
+		# if((board.cumulGen=board.demandProfile[board.time_period][1] and 
+		# 	board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
+		# 	(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
+			
 
-		elif(board.cumulGen<board.demandProfile[board.time_period][1]):
+		if(board.cumulGen<board.demandProfile[board.time_period][1]):
 			m13="Not enough generation has been secured!"+'\n'
 			board.updateQueue.append([m13,13])
 			self.updateMessage()
 
-		elif(board.cumulGen>board.demandProfile[board.time_period][1]):
+		if(board.cumulGen>board.demandProfile[board.time_period][1]):
 			#determine the last generator added
 			last_gen_name=self.boardlogic.clearingGens[-1][0]
 			#find the capacity of this generator
@@ -883,16 +912,24 @@ class TKBoard:
 				m13="Too much generation has been secured!"+'\n'
 				board.updateQueue.append([m13,13])
 				self.updateMessage()
+
+			elif(board.time_period<4):#its in the right range
+					# self.updateDispatchProfile()
+					self.clearTimePeriod()
+					board.time_period+=1
+					board.last_time_period=board.time_period
+					self.updateDisplaysLevel3(self.master)
 			
 		#if we're in an autofill period
 		if(board.time_period==3):
 			self.updateDispatchProfile()
-			root.after(disp.updateRate,disp.updateDisplaysLevel3,root)
-		if(board.time_period==4):
-			self.updateDispatchProfile()
+			self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+			board.time_period+=1
+			# self.updateDispatchProfile()
+			self.updateDisplaysLevel3(self.master)
 			self.clearTimePeriod()
 			board.time_period+=1
-			root.after(self.updateRate,self.updateDisplaysLevel3,root)
+			self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
 			
 		self.master.after(self.updateRate,isoLevel,board,self,self.master)
 		
@@ -904,21 +941,22 @@ class TKBoard:
 				except:
 					r=0
 
-		row_id = self.tableGens.selection()
-		row=self.tableGens.item(row_id,'values')
-		#highlight the appropriate generator icons
-		for child in self.master.children:
-			try:
-				if(self.master.children[child]['text']==row[1]):
-					self.master.children[child].configure(bd=6,bg="#ffa500")
-			except:
-				r=0
+		rows = self.tableGens.selection()
+		for row_id in rows:
+			row=self.tableGens.item(row_id,'values')
+			#highlight the appropriate generator icons
+			for child in self.master.children:
+				try:
+					if(self.master.children[child]['text']==row[1]):
+						self.master.children[child].configure(bd=6,bg="#ffa500")
+				except:
+					r=0
 
 
 	def gensClick(self,event):
 		
 
-		#remove the border from the other generators
+		#remove the border from the other generator icons
 		for child in self.master.children:
 				try:
 					self.master.children[child].configure(bd=0,bg="#ffffff")
@@ -930,25 +968,34 @@ class TKBoard:
 			row_id = row
 			row=self.tableGens.item(row_id,'values')
 
-			genList=self.boardlogic.availableGenerators
-			self.boardlogic.availableGenerators=[]
-			for gen in genList:
-				if(gen[1]!=row[1]):
-					self.boardlogic.availableGenerators.append(gen)
+			min_bid_rate=50000
+			for gen in self.boardlogic.availableGenerators:
+					if(float(str(gen[4]))<min_bid_rate):
+						min_bid_rate=float(str(gen[4]))
 
-			# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
-			
+			if(float(str(row[-1][1:]))==min_bid_rate):
+				genList=self.boardlogic.availableGenerators
+				self.boardlogic.availableGenerators=[]
+				for gen in genList:
+					if(gen[1]!=row[1]):
+						self.boardlogic.availableGenerators.append(gen)
 
-			self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
-			self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+				# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
+				
 
-			#highlight the appropriate generator icons
-			for child in self.master.children:
-				try:
-					if(self.master.children[child]['text']==row[1]):
-						self.master.children[child].configure(bd=6,bg="#ffa500")
-				except:
-					r=0
+				self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
+				self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+				#highlight the appropriate generator icons
+				for child in self.master.children:
+					try:
+						if(self.master.children[child]['text']==row[1]):
+							self.master.children[child].configure(bd=6,bg="#ffa500")
+					except:
+						r=0
+			else:
+				self.boardlogic.updateQueue.append(["The lowest bid rate generator was not selected",98])
+				self.updateMessage()
 		
 
 		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
@@ -963,7 +1010,7 @@ class TKBoard:
 	def createInfoTables(self):	
 		#points system
 		self.pointsTitle=   tk.Label(self.infoCanvas,bg='lightgray',text="Total Points",font=("Helvetica", 12))
-		self.pointsTitle.place(x=20,y=0)
+		self.pointsTitle.place(x=10,y=0)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
 		self.points.place(x=40,y=50)
@@ -1096,11 +1143,11 @@ class TKBoard:
 		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
 			# alpha=2
 			# beta=5
-			timePeriodMeans=[   [80500	,90500,131790],
-								[124520	,138520,206311],
-								[135720	,145720,217244],
-								[124520	,138520,206311],
-								[80500	,90500,131790]
+			timePeriodMeans=[   [80500	,90500,124520],
+								[124520	,138520,142206],
+								[142206	,145720,217244],
+								[124520	,138520,142206],
+								[80500	,90500,124520]
 							]
 
 			for i in range(5):
@@ -1114,14 +1161,13 @@ class TKBoard:
 
 	def updateDispatchProfile(self):
 		#autofill the dispatch
-		# if(self.boardlogic.time_period in [0,3,4]):
 		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1] = self.boardlogic.demandProfile[self.boardlogic.time_period][1]
 		
 			# self.master.after(self.updateRate,gameLogic,self,self.boardlogic,self.master)
 
 
 	def clearTimePeriod(self):
-		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.cumulGen
+		self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.demandProfile[self.boardlogic.time_period][1]#self.boardlogic.cumulGen
 		self.boardlogic.cumulGen=0
 		# self.updateDispatchProfile()
 
@@ -1131,6 +1177,10 @@ class TKBoard:
 
 		#choose new generators
 		self.chooseNewGenerators()
+
+		#adjust height of tables
+		self.tableGens['height']=26
+		self.tableClearing['height']=5
 
 		self.updateDisplaysLevel3(self.master)
 

@@ -45,7 +45,7 @@ class Board:
 			for i,row in enumerate(generator_reader):
 				if(i>0):
 					self.generators.append([row[0],row[1],float(row[2]),
-										float(row[3]),float(row[5]),float(row[6])])
+										float(row[3]),float(row[4]),float(row[5])])
 
 		#add the image locations
 		#make a list of the generator locations where each index is [x,y,#]
@@ -90,7 +90,9 @@ class Board:
 		self.time_period=0
 		self.last_time_period=-1
 
-		self.gensSelected=[]
+		self.gensSelected=[[],[],[],[],[]]
+		self.enteredAncillaryMarket=False
+		self.ancillary_period=0
 
 	
 	def createCities(self):

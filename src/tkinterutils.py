@@ -565,13 +565,31 @@ class TKBoard:
 		else:
 			time_period="Ancillary Services"
 
-			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5):
+			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5 and self.boardlogic.enteredAncillaryMarket==False):
+				#enable the buttons
+				self.skipAncillaryButton.configure(bg='#dd0000')
+				self.enterAncillaryButton.configure(bg='#00dd00')
+
+				#fill in the gensSelected periods that were autofilled
+				self.boardlogic.gensSelected[0]=self.boardlogic.gensSelected[1]
+				self.boardlogic.gensSelected[3]=self.boardlogic.gensSelected[2]
+				self.boardlogic.gensSelected[4]=self.boardlogic.gensSelected[2]
+
+
 				if(len(self.boardlogic.updateQueue)>0):
-					if(self.boardlogic.updateQueue[-1][1]!=99):#avoid adding the error message multiple times
-						self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
+					if(self.boardlogic.updateQueue[-1][1]!=99):#avoid adding the message multiple times
+						self.boardlogic.updateQueue.append(["You can now choose generators to designate for Ancillary Services!\n "+\
+															"It is suggested that you secure generators for at least 5000MWh\n "+\
+															"for each time period. You must select generators that have a ramp rate\n "+\
+															"greater than the median of the available generators. \n"+\
+															"Press the 'Secure Ancillary' Button to begin!",99])
 
 				else:
-					self.boardlogic.updateQueue.append(["You can now choose generators to designate\n for Ancillary Services!",99])
+					self.boardlogic.updateQueue.append(["You can now choose generators to designate for Ancillary Services!\n "+\
+														"It is suggested that you secure generators for at least 5000MWh\n "+\
+														"for each time period. You must select generators that have a ramp rate\n "+\
+														"greater than the median of the available generators.  \n"+\
+														"Press the 'Secure Ancillary' Button to begin!",99])
 				
 				self.updateMessage()
 				self.chooseNewGenerators()
@@ -854,11 +872,19 @@ class TKBoard:
 		self.buttonCanvas = tk.Canvas(self.generatorCanvas,bg="lightgray")
 		self.buttonCanvas.pack(side='bottom',fill='x')
 
-		self.dispatchButton=   tk.Button(self.buttonCanvas,bg='#00dd00',text="Dispatch Gens!",command=self.dispatchGens)
-		self.dispatchButton.pack(side='left',padx=10)
+		self.dispatchButton=   tk.Button(self.buttonCanvas,bg='#00dd00',text="Dispatch Gens!\n",command=self.dispatchGens)
+		self.dispatchButton.pack(side='left',padx=2)
 
-		self.deleteLastGen=   tk.Button(self.buttonCanvas,bg='#dd0000',text="Delete Last Generator",command=self.deleteLastGen)
-		self.deleteLastGen.pack(side='right',padx=10)
+		self.deleteLastGen=   tk.Button(self.buttonCanvas,bg='#dd0000',text="Delete Last \nGenerator",command=self.deleteLastGen)
+		self.deleteLastGen.pack(side='left',padx=2)
+
+		self.skipAncillaryButton=   tk.Button(self.buttonCanvas,bg='gray',text="Skip Ancillary\n",command=self.skipAncillary)
+		self.skipAncillaryButton.pack(side='right',padx=2)
+
+		self.enterAncillaryButton=   tk.Button(self.buttonCanvas,bg='gray',text="Secure Ancillary \nGens",command=self.enterAncillary)
+		self.enterAncillaryButton.pack(side='right',padx=2)
+
+		
 
 		self.tableClearing['show'] = 'headings'#get rid of the empty column on the left
 		self.tableClearing.pack(side='bottom',pady=3,fill='x')
@@ -868,6 +894,14 @@ class TKBoard:
 
 		self.clearingTitle=   tk.Label(self.generatorCanvas,bg='gray60',text="Market Clearing Table",font=("Helvetica", 15),bd=1)
 		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
+
+	def skipAncillary(self):
+		self.boardlogic.enteredAncillaryMarket=False
+		self.boardlogic.time_period=6
+
+	def enterAncillary(self):
+		self.boardlogic.enteredAncillaryMarket=True
+		# self.boardlogic.time_period=6
 
 	def deleteLastGen(self):	
 		last_gen=self.boardlogic.clearingGens[-1]
@@ -879,7 +913,7 @@ class TKBoard:
 				self.boardlogic.availableGenerators.append(gen)
 
 		#remove it from the selected generators
-		del self.boardlogic.gensSelected[-1]
+		del self.boardlogic.gensSelected[self.boardlogic.time_period][-1]
 
 
 
@@ -905,53 +939,78 @@ class TKBoard:
 
 	
 	def dispatchGens(self):
-		board=self.boardlogic
-		if(len(board.updateQueue)>0):
-			self.nextMessage()
+		if(self.boardlogic.time_period<5):#we're not in ancillary services
+			board=self.boardlogic
+			if(len(board.updateQueue)>0):
+				self.nextMessage()
 
-		#check that they are grabbing the lowest priced generators
+			#check that they are grabbing the lowest priced generators
 
-		# if((board.cumulGen=board.demandProfile[board.time_period][1] and 
-		# 	board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
-		# 	(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
-			
+			# if((board.cumulGen=board.demandProfile[board.time_period][1] and 
+			# 	board.cumulGen<board.demandProfile[board.time_period][1]+board.demandProfile[board.time_period][1]*0.1) or #if its within a threshold of the amount needed
+			# 	(board.dispatchProfile[board.time_period][1]==board.demandProfile[board.time_period][1])):
+				
 
-		if(board.cumulGen<board.demandProfile[board.time_period][1]):
-			m13="Not enough generation has been secured!"+'\n'
-			board.updateQueue.append([m13,13])
-			self.updateMessage()
-
-		if(board.cumulGen>board.demandProfile[board.time_period][1]):
-			#determine the last generator added
-			last_gen_name=self.boardlogic.clearingGens[-1][0]
-			#find the capacity of this generator
-			for gen in self.boardlogic.generators:
-				if(gen[1]==last_gen_name):
-					last_gen_mwh=float(str(gen[2]))*self.boardlogic.profilePeriods[board.time_period][1]
-
-			#if the last generator was not necessary, then complain
-			if(self.boardlogic.cumulGen-last_gen_mwh>board.demandProfile[board.time_period][1]):
-				m13="Too much generation has been secured!"+'\n'
+			if(board.cumulGen<board.demandProfile[board.time_period][1]):
+				m13="Not enough generation has been secured!"+'\n'
 				board.updateQueue.append([m13,13])
 				self.updateMessage()
 
-			elif(board.time_period<4):#its in the right range
-					# self.updateDispatchProfile()
-					self.clearTimePeriod()
-					board.time_period+=1
-					board.last_time_period=board.time_period
-					self.updateDisplaysLevel3(self.master)
+			if(board.cumulGen>board.demandProfile[board.time_period][1]):
+				#determine the last generator added
+				last_gen_name=self.boardlogic.clearingGens[-1][0]
+				#find the capacity of this generator
+				for gen in self.boardlogic.generators:
+					if(gen[1]==last_gen_name):
+						last_gen_mwh=float(str(gen[2]))*self.boardlogic.profilePeriods[board.time_period][1]
+
+				#if the last generator was not necessary, then complain
+				if(self.boardlogic.cumulGen-last_gen_mwh>board.demandProfile[board.time_period][1]):
+					m13="Too much generation has been secured!"+'\n'
+					board.updateQueue.append([m13,13])
+					self.updateMessage()
+
+				elif(board.time_period<4):#its in the right range
+						# self.updateDispatchProfile()
+						self.clearTimePeriod()
+						board.time_period+=1
+						board.last_time_period=board.time_period
+						self.updateDisplaysLevel3(self.master)
+				
+			#if we're in an autofill period
+			if(board.time_period==3):
+				self.updateDispatchProfile()
+				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+				board.time_period+=1
+				# self.updateDispatchProfile()
+				self.updateDisplaysLevel3(self.master)
+				self.clearTimePeriod()
+				board.time_period+=1
+				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+
+		elif(self.boardlogic.enteredAncillaryMarket==True):#we're in ancillary services
+			board=self.boardlogic
+			if(len(board.updateQueue)>0):
+				self.nextMessage()
 			
-		#if we're in an autofill period
-		if(board.time_period==3):
-			self.updateDispatchProfile()
-			self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
-			board.time_period+=1
-			# self.updateDispatchProfile()
-			self.updateDisplaysLevel3(self.master)
-			self.clearTimePeriod()
-			board.time_period+=1
-			self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+			#if we're in an autofill period
+			if(board.time_period in [0,3,4]):
+				self.updateDispatchProfile()
+				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+				board.time_period+=1
+				# self.updateDispatchProfile()
+				self.updateDisplaysLevel3(self.master)
+				self.clearTimePeriod()
+				board.time_period+=1
+				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+			else:
+
+				self.clearTimePeriod()
+				board.time_period+=1
+				board.last_time_period=board.time_period
+				self.updateDisplaysLevel3(self.master)
+				
+			
 			
 		self.master.after(self.updateRate,isoLevel,board,self,self.master)
 		
@@ -995,39 +1054,76 @@ class TKBoard:
 					if(float(str(gen[4]))<min_bid_rate):
 						min_bid_rate=float(str(gen[4]))
 
-			min_bid_rate=float(str(locale.currency(min_bid_rate)[1:]))
+			ramp_list=[]
+			for gen in self.boardlogic.availableGenerators:
+				ramp_list.append(float(str(gen[3])))
 
-			if(float(str(row[-1][1:]))==min_bid_rate):
-				genList=self.boardlogic.availableGenerators
-				self.boardlogic.availableGenerators=[]
-				for gen in genList:
-					if(gen[1]!=row[1]):
-						self.boardlogic.availableGenerators.append(gen)
+			median_ramp_rate = np.median(np.array(ramp_list))
+			if(self.boardlogic.time_period==5):
+				pdb.set_trace()
+
+			if(self.boardlogic.time_period<5):#we're not in ancillary services
+				min_bid_rate=float(str(locale.currency(min_bid_rate)[1:]))
+
+				if(float(str(row[-1][1:]))==min_bid_rate):
+					genList=self.boardlogic.availableGenerators
+					self.boardlogic.availableGenerators=[]
+					for gen in genList:
+						if(gen[1]!=row[1]):
+							self.boardlogic.availableGenerators.append(gen)
+						else:
+							self.boardlogic.gensSelected[self.boardlogic.time_period].append(gen)
+
+					# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
+					
+
+					self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
+					self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+					#highlight the appropriate generator icons
+					for child in self.master.children:
+						try:
+							if(self.master.children[child]['text']==row[1]):
+								self.master.children[child].configure(bd=6,bg="#ffa500")
+						except:
+							r=0
+				else:
+					if(len(self.boardlogic.updateQueue)>0):
+						if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
+							self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
+							self.updateMessage()
 					else:
-						self.boardlogic.gensSelected.append(gen)
-
-				# self.boardlogic.availableGenerators = np.delete(self.boardlogic.availableGenerators,np.where(self.boardlogic.availableGenerators[:,1] == row[1])[0][0])
-				
-
-				self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.time_period][1]#to account for the amount of time this will be online
-				self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
-
-				#highlight the appropriate generator icons
-				for child in self.master.children:
-					try:
-						if(self.master.children[child]['text']==row[1]):
-							self.master.children[child].configure(bd=6,bg="#ffa500")
-					except:
-						r=0
-			else:
-				if(len(self.boardlogic.updateQueue)>0):
-					if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
 						self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
 						self.updateMessage()
+
+			else:#we're in ancillary services
+				
+				#check if the ramp rate is correct
+				if(float(str(row[3]))>=median_ramp_rate):
+					genList=self.boardlogic.availableGenerators
+					self.boardlogic.availableGenerators=[]
+					for gen in genList:
+						if(gen[1]!=row[1]):
+							self.boardlogic.availableGenerators.append(gen)
+
+					self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.ancillary_period][1]#to account for the amount of time this will be online
+					self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+					#highlight the appropriate generator icons
+					for child in self.master.children:
+						try:
+							if(self.master.children[child]['text']==row[1]):
+								self.master.children[child].configure(bd=6,bg="#ffa500")
+						except:
+							r=0
 				else:
-					self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
-					self.updateMessage()
-		
+					if(len(self.boardlogic.updateQueue)>0):
+						if(self.boardlogic.updateQueue[-1][1]!=198):#avoid adding the error message multiple times
+							self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum ramp rate of "+str(median_ramp_rate),198])
+							self.updateMessage()
+					else:
+						self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum ramp rate of "+str(median_ramp_rate),198])
+						self.updateMessage()
 
 		if(len(self.boardlogic.clearingGens)>self.tableClearing['height']-1):
 			diff=len(self.boardlogic.clearingGens)-(self.tableClearing['height']-1)
@@ -1171,12 +1267,16 @@ class TKBoard:
 
 		for i in genList:
 			if(self.boardlogic.time_period==5):#if we're in ancillary services, don't serve up a generator that has already been selected
-				if(self.boardlogic.generators[i] in self.boardlogic.gensSelected):
+				if(self.boardlogic.generators[i] in self.boardlogic.gensSelected[self.boardlogic.ancillary_period]):
 					#choose a new generator
-					for k in gensNotChosen:
-						if(self.boardlogic.generators[k] not in self.boardlogic.gensSelected) and (self.boardlogic.generators[k] not in self.boardlogic.availableGenerators):
+					while True:
+						k=random.choice(range(len(self.boardlogic.generators)))
+						if(self.boardlogic.generators[k] not in self.boardlogic.gensSelected[self.boardlogic.ancillary_period]) and \
+														(self.boardlogic.generators[k] not in self.boardlogic.availableGenerators):
 							self.boardlogic.availableGenerators.append(self.boardlogic.generators[k])
 							break
+				else:
+					self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
 			else:
 				self.boardlogic.availableGenerators.append(self.boardlogic.generators[i])
 

@@ -15,7 +15,7 @@ class Board:
 
 
 		self.progress=99.4
-		self.totalPoints=0.
+		self.totalPoints=20.
 		#level 0=tutorial
 		self.level=1
 		self.year=0
@@ -93,6 +93,14 @@ class Board:
 		self.gensSelected=[[],[],[],[],[]]
 		self.enteredAncillaryMarket=False
 		self.ancillary_period=0
+
+		#build events
+		self.possibleEvents=[]
+		with open('events.csv', 'rb') as csvfile:
+			event_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+			for i,row in enumerate(event_reader):
+				if(i!=0):
+					self.possibleEvents.append(row)
 
 	
 	def createCities(self):

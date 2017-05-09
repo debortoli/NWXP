@@ -540,13 +540,55 @@ class TKBoard:
 
 		#update the event stuff if some exist
 		if(len(self.boardlogic.events)>0):
-			self.eventTitle.place(x=250,y=520)
-			self.eventMessage.place(x=100,y=570)			
-			self.eventMenu.place(x=400,y=590)
+			# self.eventCanvas.place(x=10,y=400)
+			self.eventTitle.pack(side='top',fill='x')
+			self.eventMessage.pack(side='left',fill='y')	
+			self.eventMenu.pack(side='right',fill='y')	
 
-			self.eventMessage['text']=self.boardlogic.events[0][0]
-			for option in self.boardlogic.events[0][1]:
-				opt=tk.Radiobutton(self.eventMenu,text=option,bg="#80ff80").pack(side='top')
+			#reformat the message to look nice
+			eventMessage=""
+			num_words=0
+			for char in self.boardlogic.events[0][0]:
+				if (char == ' '):
+					num_words+=1
+					if(num_words>4):
+						eventMessage+='\n '
+						num_words=0
+					else:
+						eventMessage+=' '
+				else:
+					eventMessage+=char
+
+			self.eventMessage['text']=eventMessage
+			self.eventMessage.configure(bg='lightgray')
+			self.eventTitle.configure(bg='lightgray')
+
+			for i,option in enumerate(self.boardlogic.events[0]):
+				if(i in [1,2,3]):
+					#format the option
+					option_formatted=""
+					num_words=0
+					for char in option:
+						if (char == ' '):
+							num_words+=1
+							if(num_words>5):
+								option_formatted+='\n '
+								num_words=0
+							else:
+								option_formatted+=' '
+						else:
+							option_formatted+=char
+
+					self.opt=tk.Radiobutton(self.eventMenu,text=option_formatted, font=("Helvetica", 12), value=i,indicatoron=0).pack(side='top')
+					# self.opt.
+			
+
+			#compute the window width
+			window_width = self.eventMessage.winfo_width()+self.eventMenu.winfo_width()
+			pdb.set_trace()
+
+			#make the x of the window 750/2.-width/2.
+			self.eventCanvas.place(x=(750/2.-(self.eventMessage.winfo_width()+self.eventMenu.winfo_width())/2.),y=400)
 
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
@@ -563,9 +605,13 @@ class TKBoard:
 		if(self.boardlogic.time_period<4):
 			time_period=self.boardlogic.demandProfile[self.boardlogic.time_period][0]
 		else:
+			
 			time_period="Ancillary Services"
-
 			if(self.boardlogic.time_period==5 and self.boardlogic.last_time_period==5 and self.boardlogic.enteredAncillaryMarket==False):
+				
+				#give them 50 points for successfully dispatching gens
+				self.boardlogic.totalPoints+=50
+
 				#enable the buttons
 				self.skipAncillaryButton.configure(bg='#dd0000')
 				self.enterAncillaryButton.configure(bg='#00dd00')
@@ -602,6 +648,12 @@ class TKBoard:
 				
 				self.updateMessage()
 				self.chooseNewGenerators()
+
+			# elif(self.boardlogic.time_period==6 and self.boardlogic.last_time_period==6):
+				#randomly grab an event, wait some random amount of time, and start
+				# self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
+
+
 
 		self.timeTitle['text']="Time Period: "+time_period+ "\t\t Clearing Price: "+price
 
@@ -760,6 +812,9 @@ class TKBoard:
 
 	def setBoard(self):
 		if(self.boardlogic.level==3):
+			#intialize the points
+			self.boardlogic.totalPoints = self.boardlogic.totalPoints*100
+
 			self.generatorFrame= tk.Frame(self.master,bg="grey")
 			self.generatorFrame.pack(side="right",fill="y")
 
@@ -790,9 +845,15 @@ class TKBoard:
 
 
 			#event panel
-			self.eventTitle   =   tk.Label(self.master,bg='white',text="An event has occurred!",font=("Helvetica", 15),borderwidth=3)			
-			self.eventMessage = tk.Label(self.master,bg='#ffff99',font=("Helvetica", 10))
-			self.eventMenu    = tk.Canvas(self.master,bg="#80ff80")
+			#make this a canvas
+			self.eventCanvas = tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
+
+			self.eventCanvas.place(x=10000,y=50000)
+			# self.eventCanvas.pack_forget()
+
+			self.eventTitle   =   tk.Label(self.eventCanvas,bg='lightgray',text="An event has occurred!",font=("Helvetica", 18))			
+			self.eventMessage = tk.Label(self.eventCanvas,bg='lightgray',font=("Helvetica", 13))
+			self.eventMenu    = tk.Canvas(self.eventCanvas,bg="lightgray")
 
 			#the message board
 			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
@@ -908,7 +969,14 @@ class TKBoard:
 		self.boardlogic.enteredAncillaryMarket=False
 		self.boardlogic.time_period=6
 
+		#add an event
+		self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
+		self.updateDisplaysLevel3(self.master)
+
 	def enterAncillary(self):
+		#decrement 10 points
+		self.boardlogic.totalPoints-=20
+
 		self.boardlogic.enteredAncillaryMarket=True
 
 		#enable the table
@@ -1064,7 +1132,7 @@ class TKBoard:
 				board.time_period+=1
 				board.last_time_period=board.time_period
 				self.updateDisplaysLevel3(self.master)
-				
+
 			self.boardlogic.ancillary_period+=1
 				
 			
@@ -1196,7 +1264,7 @@ class TKBoard:
 		self.pointsTitle.place(x=10,y=0)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
-		self.points.place(x=40,y=50)
+		self.points.place(x=25,y=50)
 
 
 		#ancillary services

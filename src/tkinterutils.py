@@ -542,17 +542,17 @@ class TKBoard:
 		if(len(self.boardlogic.events)>0):
 			# self.eventCanvas.place(x=10,y=400)
 			self.eventTitle.pack(side='top',fill='x')
-			self.eventMessage.pack(side='left',fill='y')	
-			self.eventMenu.pack(side='right',fill='y')	
+			self.eventMessage.pack(side='left',fill='both')	
+			self.eventMenu.pack(side='right',fill='both')	
 
 			#reformat the message to look nice
-			eventMessage=""
+			eventMessage="    "
 			num_words=0
 			for char in self.boardlogic.events[0][0]:
 				if (char == ' '):
 					num_words+=1
 					if(num_words>4):
-						eventMessage+='\n '
+						eventMessage+='    \n    '
 						num_words=0
 					else:
 						eventMessage+=' '
@@ -578,17 +578,20 @@ class TKBoard:
 								option_formatted+=' '
 						else:
 							option_formatted+=char
-
-					self.opt=tk.Radiobutton(self.eventMenu,text=option_formatted, font=("Helvetica", 12), value=i,indicatoron=0).pack(side='top')
+					if(i==1):
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(1),bd=2).pack(side='top',fill='x')
+					elif(i==2):
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(2),bd=2).pack(side='top',fill='x')
+					elif(i==3):
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(3),bd=2).pack(side='top',fill='x')
 					# self.opt.
 			
 
 			#compute the window width
 			window_width = self.eventMessage.winfo_width()+self.eventMenu.winfo_width()
-			pdb.set_trace()
 
 			#make the x of the window 750/2.-width/2.
-			self.eventCanvas.place(x=(750/2.-(self.eventMessage.winfo_width()+self.eventMenu.winfo_width())/2.),y=400)
+			self.eventCanvas.place(x=(750/2.-(self.eventMessage.winfo_width()+self.eventMenu.winfo_width())/2.),y=300)
 
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
@@ -596,7 +599,7 @@ class TKBoard:
 		#update the market clearing price in the title
 		#find the highest clearing price
 		highest_price=0
-		for gen in self.boardlogic.clearingGens:
+		for gen in self.boardlogic.clearingGens:        
 			if(float(gen[-1][1:])>highest_price):
 				highest_price=float(gen[-1][1:])
 
@@ -662,6 +665,124 @@ class TKBoard:
 		# root.after(self.updateRate,gameLogic,self,self.boardlogic,root)
 
 		
+	def choseEventOption(self,option):
+		if(option==1):
+			messageIndex=4
+			pointIndex=5
+		elif(option==2):
+			messageIndex=7
+			pointIndex=8
+		elif(option==3):
+			messageIndex=10
+			pointIndex=11
+
+
+		#place the menu 40 miles away
+		self.eventCanvas.place(x=10000,y=10000)
+
+
+		#updates the message panel with the message
+		eventMessage=""
+		num_words=0
+
+		for char in self.boardlogic.events[0][messageIndex]:
+			if (char == ' '):
+				num_words+=1
+				if(num_words>8):
+					eventMessage+='\n '
+					num_words=0
+				else:
+					eventMessage+=' '
+			else:
+				eventMessage+=char
+
+
+		#decrement the points
+		self.boardlogic.totalPoints+=int(float(str(self.boardlogic.events[0][pointIndex])))
+
+
+		
+		#reset a bunch of the tables
+
+		self.boardlogic.availableGenerators=[]#these are the generators for the time period
+
+		self.boardlogic.dispatchProfile=[["Off Peak AM","--"],["Daytime1","--"],
+						  ["Peak","--"],["Daytime2","--"],
+						  ["Off-peak PM","--"]]
+
+		self.boardlogic.ancillaryProfile=[["Off Peak AM",0],["Daytime1",0],
+						  ["Peak",0],["Daytime2",0],
+						  ["Off-peak PM",0]]
+
+		self.boardlogic.demandProfile=[["Off Peak AM",0],["Daytime1",0],
+						  ["Peak",0],["Daytime2",0],
+						  ["Off-peak PM",0]]
+		self.boardlogic.clearingGens=[]
+
+		self.boardlogic.cumulGen=0
+
+		self.boardlogic.events=[]
+
+		self.boardlogic.profilePeriods=[["Off Peak AM",5.5],["Daytime1",4],
+							["Peak",5],["Daytime2",4],
+							["Off-peak PM",5.5]]
+
+		self.boardlogic.time_period=0
+		self.boardlogic.ancillary_period=0
+		self.boardlogic.last_time_period=-1
+
+		self.updateDemandProfile()
+		self.updateDispatchProfile()
+
+		self.dispatchButton['text']="Dispatch Gens!\n"
+
+		#uncolor the generators
+		for gen in self.boardlogic.generators:
+			for child in self.master.children:
+				try:
+					if(self.master.children[child]['text']==gen[1]):
+						self.master.children[child].configure(bd=0,bg="#ffffff")
+				except:
+					r=0
+		
+		row_tag='oddrow'#for alternating colors
+		for i,gen in enumerate(reversed(self.boardlogic.demandProfile)):
+			if(row_tag=='oddrow'):
+				row_tag='evenrow'
+				self.tableDemand.insert("",0,values=(gen[0],gen[1],self.boardlogic.profilePeriods[4-i][1]),tags=row_tag)
+			else:
+				row_tag='oddrow'
+				self.tableDemand.insert("",0,values=(gen[0],gen[1],self.boardlogic.profilePeriods[4-i][1]),tags=row_tag)
+		self.tableDemand.tag_configure('oddrow', background='#b8b894')
+
+		self.tableDemand['show'] = 'headings'#get rid of the empty column on the left
+		self.tableDemand.place(x=515,y=20)
+
+		
+
+
+		
+
+		self.boardlogic.gensSelected=[[],[],[],[],[]]
+		self.boardlogic.enteredAncillaryMarket=False
+		
+
+		#remove the event from the event queue
+		self.boardlogic.events=[]
+
+		#make the table selectable again
+		self.tableGens.configure(selectmode="extended")
+
+		self.enterAncillaryButton.configure(bg="gray")
+		self.skipAncillaryButton.configure(bg="gray")
+
+		self.boardlogic.updateQueue.append([eventMessage,120])
+		self.boardlogic.updateQueue.append(["The next Day-Ahead Market has begun! \nSelect generators to meet the demand!",12])
+		self.updateMessage()
+
+
+
+
 
 	def updateMessage(self):
 		self.updateMessageCanvas.pack()
@@ -966,32 +1087,42 @@ class TKBoard:
 		self.clearingTitle.pack(side='bottom',pady=3,fill='x')
 
 	def skipAncillary(self):
-		self.boardlogic.enteredAncillaryMarket=False
-		self.boardlogic.time_period=6
+		if(self.boardlogic.time_period>4):
+			self.boardlogic.enteredAncillaryMarket=False
+			self.boardlogic.time_period=6
 
-		#add an event
-		self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
-		self.updateDisplaysLevel3(self.master)
+			#add an event
+			self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
+			self.updateDisplaysLevel3(self.master)
 
 	def enterAncillary(self):
-		#decrement 10 points
-		self.boardlogic.totalPoints-=20
+		if(self.boardlogic.time_period>4):
+			#decrement 10 points
+			self.boardlogic.totalPoints-=20
 
-		self.boardlogic.enteredAncillaryMarket=True
+			self.boardlogic.enteredAncillaryMarket=True
 
-		#enable the table
-		self.tableGens.configure(selectmode="extended")
+			self.boardlogic.updateQueue.append(["Please choose your ancillary generators \nfrom the Gen Fleet Table!",312])
+			self.updateMessage()
 
-		#recolor the options in tableGens
-		row_tag='oddrow'#for alternating colors
-		for gen in self.boardlogic.availableGenerators:
-			if(row_tag=='oddrow'):
-				row_tag='evenrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
-			else:
-				row_tag='oddrow'
-				self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
-		self.tableGens.tag_configure('oddrow', background='#b8b894')
+			#enable the table
+			self.tableGens.configure(selectmode="extended")
+
+			#change the label text
+			self.dispatchButton['text']="Secure Ancillary \nGenerator!"
+
+			#recolor the options in tableGens
+			row_tag='oddrow'#for alternating colors
+			for gen in self.boardlogic.availableGenerators:
+				if(row_tag=='oddrow'):
+					row_tag='evenrow'
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
+				else:
+					row_tag='oddrow'
+					self.tableGens.insert("",0,values=(gen[0],gen[1],gen[2],gen[3],locale.currency(gen[4])),tags=row_tag)
+			self.tableGens.tag_configure('oddrow', background='#b8b894')
+
+			
 
 	def deleteLastGen(self):	
 		if(self.boardlogic.time_period<5):#we're not in the ancillary market
@@ -1096,11 +1227,22 @@ class TKBoard:
 				elif(board.time_period<4):#its in the right range
 						# self.updateDispatchProfile()
 						self.clearTimePeriod()
+
+						#uncolor the generators
+						for gen in self.boardlogic.generators:
+							for child in self.master.children:
+								try:
+									if(self.master.children[child]['text']==gen[1]):
+										self.master.children[child].configure(bd=0,bg="#ffffff")
+								except:
+									r=0
+
 						board.time_period+=1
 						board.last_time_period=board.time_period
 						self.updateDisplaysLevel3(self.master)
 				
 			#if we're in an autofill period
+
 			if(board.time_period==3):
 				self.updateDispatchProfile()
 				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
@@ -1137,7 +1279,7 @@ class TKBoard:
 				
 			
 			
-		self.master.after(self.updateRate,isoLevel,board,self,self.master)
+		self.master.after(self.updateRate,isoLevel, self.boardlogic,self,self.master)
 		
 	def gensHover(self,event):
 		#remove the border from the other generators
@@ -1223,22 +1365,40 @@ class TKBoard:
 				
 				#check if the ramp rate is correct
 				if(float(str(row[3]))>=median_ramp_rate):
-					genList=self.boardlogic.availableGenerators
-					self.boardlogic.availableGenerators=[]
-					for gen in genList:
-						if(gen[1]!=row[1]):
-							self.boardlogic.availableGenerators.append(gen)
 
-					self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.ancillary_period][1]#to account for the amount of time this will be online
-					self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+					#check the the price is minimal
+					min_bid_rate=50000
+					for gen in self.boardlogic.availableGenerators:
+							if(float(str(gen[4]))<min_bid_rate):
+								min_bid_rate=float(str(gen[4]))
 
-					#highlight the appropriate generator icons
-					for child in self.master.children:
-						try:
-							if(self.master.children[child]['text']==row[1]):
-								self.master.children[child].configure(bd=6,bg="#ffa500")
-						except:
-							r=0
+					if(float(str(row[-1][1:]))==min_bid_rate):
+						genList=self.boardlogic.availableGenerators
+						self.boardlogic.availableGenerators=[]
+						for gen in genList:
+							if(gen[1]!=row[1]):
+								self.boardlogic.availableGenerators.append(gen)
+
+						self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.ancillary_period][1]#to account for the amount of time this will be online
+						self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+
+						#highlight the appropriate generator icons
+						for child in self.master.children:
+							try:
+								if(self.master.children[child]['text']==row[1]):
+									self.master.children[child].configure(bd=6,bg="#ffa500")
+							except:
+								r=0
+
+					else:
+						if(len(self.boardlogic.updateQueue)>0):
+							if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
+								self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
+								self.updateMessage()
+						else:
+							self.boardlogic.updateQueue.append(["A generator could not be added as it did\nnot have the minimum bid rate",98])
+							self.updateMessage()
+
 				else:
 					if(len(self.boardlogic.updateQueue)>0):
 						if(self.boardlogic.updateQueue[-1][1]!=198):#avoid adding the error message multiple times

@@ -11,7 +11,7 @@ def initLevel1(board):
 	board.time="09:00 AM"
 	board.damLoad=board.possibleLoadLevels[int(board.time[:2])-1]
 	board.spilledSeconds=0
-	board.water_level=87
+	board.water_level=89.
 
 def damLevel(board,disp,root):
 
@@ -19,13 +19,16 @@ def damLevel(board,disp,root):
 	if(board.progress<99.5):
 		if(board.water_level>99):
 			board.progress-=20.
-		if(board.water_level>95):
-			board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
-			root.after(1,disp.updateMessage)
+		if(board.water_level>90):
+			if(len(board.updateQueue)==0):
+				board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
+				root.after(1,disp.updateMessage)
 		else:
 			#remove the message
-			if(len(board.updateQueue)>0 and board.updateQueue[0][1]==8):
-				del board.updateQueue[0]
+			if(len(board.updateQueue)>0 and int(board.updateQueue[0][1])==8):
+				print "here"
+				board.updateQueue=[]
+				board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
 				root.after(1,disp.nextMessage)
 
 		#update the power produced

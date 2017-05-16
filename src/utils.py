@@ -14,8 +14,8 @@ class Board:
 		self.clock = pygame.time.Clock()
 
 
-		self.progress=10.
-		self.totalPoints=11.
+		self.progress=0.
+		self.totalPoints=0.
 		#level 0=tutorial
 		self.level=0
 		self.year=0
@@ -23,7 +23,7 @@ class Board:
 		self.updateQueue=[]
 		self.UpdateMessageSurface_x=100
 		self.UpdateMessageSurface_y=450
-		self.water_level=87
+		self.water_level=89.
 		self.powerProducedDam=0.
 		self.damLoad=1020.
 		self.water_velocity=10.
@@ -34,8 +34,8 @@ class Board:
 
 		#for level 2
 		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
-								 1012.,1020.,1021.,1024.,1024.,1020.,
-								 1025.,1030.,1032.,1033.,1039.,1047.,
+								 1012.,1020.,1021.,1024.,1024.,1027.,
+								 1029.,1030.,1032.,1033.,1039.,1047.,
 								 1055.,1050.,1040.,1030.,1025.,1017.,]
 
 		#for level 3

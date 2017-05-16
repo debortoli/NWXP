@@ -19,8 +19,8 @@ class TKBoard:
 	def __init__(self, master,boardlogic):
 		self.master = master
 		master.title("GRID SIMULATOR")
-		master.minsize(width=1300,height=800)
-		master.maxsize(width=1300,height=800)
+		master.minsize(width=1300,height=700)
+		master.maxsize(width=1300,height=700)
 
 
 		self.boardlogic=boardlogic
@@ -339,9 +339,9 @@ class TKBoard:
 		#updateCanvas
 		self.updateMessageCanvas=tk.Canvas(self.gameFrame,bg="lightgray",highlightthickness=0)
 		self.updateMessageCanvas.pack(fill='y',side='bottom')
-		self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 15))
+		self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 21))
 		self.updateMessageLabel.pack(fill='y',pady=10)
-		self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
+		self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',font=("Helvetica", 20),bg='#00ff00',command=self.nextMessage)
 		self.continueButton.pack()
 
 		#for resizing
@@ -824,7 +824,7 @@ class TKBoard:
 			self.boardlogic.water_velocity=0
 		else:
 			self.boardlogic.water_velocity=float(value)+100
-		self.waterAnimationSpeed=float(value)/12000
+		self.waterAnimationSpeed=float(value)/2000
 
 
 	def spinTurbine(self,root):
@@ -976,13 +976,13 @@ class TKBoard:
 			# self.eventCanvas.pack_forget()
 
 			self.eventTitle   =   tk.Label(self.eventCanvas,bg='lightgray',text="An event has occurred!",font=("Helvetica", 18))			
-			self.eventMessage = tk.Label(self.eventCanvas,bg='lightgray',font=("Helvetica", 13))
+			self.eventMessage = tk.Label(self.eventCanvas,bg='lightgray',font=("Helvetica", 17))
 			self.eventMenu    = tk.Canvas(self.eventCanvas,bg="lightgray")
 
 			#the message board
 			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
 			self.updateMessageCanvas.pack(side='bottom')
-			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 13))
+			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....")
 			self.updateMessageLabel.pack()
 			self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
 			self.continueButton.pack()

@@ -36,7 +36,7 @@ class TKBoard:
 		self.levelCanvas = tk.Canvas(self.updateFrame,bg="lightgray",highlightthickness=2,highlightbackground="Black",height=250)
 		self.levelCanvas.pack(fill='x')#grid(row=0,column=0,sticky='N')
 
-		self.levelTitle=   tk.Label(self.levelCanvas,bg='lightgray',text="LEVEL PROGRESS",font=("Helvetica", 16))
+		self.levelTitle=   tk.Label(self.levelCanvas,bg='lightgray',text="LEVEL PROGRESS",font=("Helvetica", 23))
 		self.levelTitle.pack(side='top',pady=15)
 		
 		self.progress = ttk.Progressbar(self.levelCanvas,style="green.Horizontal.TProgressbar", orient="horizontal", length=300, mode="determinate", maximum=100, value=1)
@@ -49,7 +49,7 @@ class TKBoard:
 		self.pointsCanvas = tk.Canvas(self.updateFrame,bg="lightgray",highlightthickness=2,highlightbackground="Black",height=100)
 		self.pointsCanvas.pack(fill='x')#grid(row=1,column=0,sticky='N')
 
-		self.pointsTitle=   tk.Label(self.pointsCanvas,bg='lightgray',text="TOTAL POINTS",font=("Helvetica", 16))
+		self.pointsTitle=   tk.Label(self.pointsCanvas,bg='lightgray',text="TOTAL POINTS",font=("Helvetica", 23))
 		self.pointsTitle.pack(side='top',pady=10)
 
 		self.points = tk.Label(self.pointsCanvas,bg='lightgray',text=str(boardlogic.totalPoints),font=("Helvetica", 25),fg="#309933")
@@ -261,7 +261,7 @@ class TKBoard:
 
 		#add the label for the load
 		self.LoadLabel=tk.Label(self.gameCanvas,text="Load",bg='white',font=("Helvetica", 17))
-		self.LoadLabel.place(x=self.Load_x+15,y=self.Load_y-35)
+		self.LoadLabel.place(x=self.Load_x+2,y=self.Load_y-35)
 
 		
 		#add shaft
@@ -325,8 +325,8 @@ class TKBoard:
 
 
 		#put in slider for user to set water velocity
-		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate (m^3/s)",font=("Helvetica",15))
-		self.water_slider_label.place(x=670,y=10)
+		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate (m^3/s)",font=("Helvetica",17))
+		self.water_slider_label.place(x=650,y=10)
 
 		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity,showvalue=0)
 		self.water_slider.place(x=700,y=40)
@@ -357,11 +357,11 @@ class TKBoard:
 
 		#spill button
 		self.spillRepeatInterval=100
-		self.spillbutton=tk.Button(self.gameCanvas,bg='#c0c0c0',text="Spill Water!",command=self.spill,repeatdelay=10,repeatinterval=self.spillRepeatInterval,relief='groove')
+		self.spillbutton=tk.Button(self.gameCanvas,bg='#c0c0c0',text="  Spill!  ",font=("Helvetica", 17),command=self.spill,repeatdelay=10,repeatinterval=self.spillRepeatInterval,relief='groove')
 		self.spillbutton.place(x=self.gameCanvas.coords(self.damTopPolygon)[0],y=self.gameCanvas.coords(self.damTopPolygon)[1]-27)
 
 		#time indicator
-		self.timeIndicator=tk.Label(self.gameCanvas,bg='white',text="time",font=("Helvetica", 15),fg="#bb0000")
+		self.timeIndicator=tk.Label(self.gameCanvas,bg='white',text="time",font=("Helvetica", 20),fg="#bb0000")
 		self.timeIndicator.place(x=15,y=15)
 
 		#for printing currency

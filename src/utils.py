@@ -14,10 +14,10 @@ class Board:
 		self.clock = pygame.time.Clock()
 
 
-		self.progress=99.4
-		self.totalPoints=20.
+		self.progress=10.
+		self.totalPoints=11.
 		#level 0=tutorial
-		self.level=1
+		self.level=0
 		self.year=0
 
 		self.updateQueue=[]
@@ -25,7 +25,7 @@ class Board:
 		self.UpdateMessageSurface_y=450
 		self.water_level=87
 		self.powerProducedDam=0.
-		self.damLoad=0.
+		self.damLoad=1020.
 		self.water_velocity=10.
 		self.loadChangeTime=pygame.time.get_ticks()
 		self.spilledSeconds=0.

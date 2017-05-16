@@ -222,8 +222,8 @@ class TKBoard:
 										fill="#c0c0c0",width=0)
 
 		#add the label for the powerIndicator
-		self.pILabel=tk.Label(self.gameCanvas,text="Power Produced",bg='white',font=("Helvetica", 10))
-		self.pILabel.place(x=self.powerIndicator_x-20,y=self.powerIndicator_y-25)
+		self.pILabel=tk.Label(self.gameCanvas,text="Power \nProduced",bg='white',font=("Helvetica", 17))
+		self.pILabel.place(x=self.powerIndicator_x-20,y=self.powerIndicator_y-65)
 
 		#add the power lines from the power indicator to the load
 		self.power_line_lengthc=40
@@ -260,8 +260,8 @@ class TKBoard:
 										fill="#c0c0c0",width=0)
 
 		#add the label for the load
-		self.LoadLabel=tk.Label(self.gameCanvas,text="Load",bg='white',font=("Helvetica", 10))
-		self.LoadLabel.place(x=self.Load_x+15,y=self.Load_y-25)
+		self.LoadLabel=tk.Label(self.gameCanvas,text="Load",bg='white',font=("Helvetica", 17))
+		self.LoadLabel.place(x=self.Load_x+15,y=self.Load_y-35)
 
 		
 		#add shaft
@@ -1489,7 +1489,7 @@ class TKBoard:
 		self.tableDemand.column("duration" , width=50,anchor=tk.CENTER)
 
 		self.tableDemand.heading("segment", text="Segment")
-		self.tableDemand.heading("generation" , text="Gen. (MWh)")
+		self.tableDemand.heading("generation" , text="Load (MWh)")
 		self.tableDemand.heading("duration" , text="Hrs.")
 
 

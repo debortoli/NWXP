@@ -94,7 +94,8 @@ def initLevel3(board,disp,root):
 
 
 		m12="Finally, during this level and the next, events will pop up based on the conditions of "+\
-			"the grid. You will make decisions that affect the reliability of our grid "+\
+			"the grid. After you complete a certain number of events you will be able to move onto the next "+\
+			"level. You will make decisions that affect the reliability of our grid "+\
 			"and the millions of consumers in the Pacific Northwest. "+\
 			"Good luck!"
 		board.updateQueue.append([m12,12])
@@ -110,8 +111,9 @@ def initLevel3(board,disp,root):
 		# root.after(1,disp.updateDisplaysLevel3,root)
 
 def isoLevel(board,disp,root):
+	# print board.numEvents
 	
-	if(board.numEvents==3):
+	if(board.numEvents==6):
 		root.after(disp.updateRate,disp.level1End,root)
 	runMarket(board,disp,root)
 	root.after(disp.updateRate,disp.level3MessageHandler,root)

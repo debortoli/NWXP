@@ -39,7 +39,7 @@ class Board:
 		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
 								 1012.,1020.,1022.,1024.,1024.,1025.,
 								 1027.,1030.,1032.,1033.,1039.,1047.,
-								 1055.,1050.,1040.,1030.,1025.,1017.,]
+								 1050.,1050.,1040.,1030.,1025.,1017.,]
 
 		#for level 3
 		self.generators=[]#this is a list of all of the generators
@@ -102,7 +102,7 @@ class Board:
 		with open('events.csv', 'rb') as csvfile:
 			event_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 			for i,row in enumerate(event_reader):
-				if(i==1):
+				if(i!=0):
 					self.possibleEvents.append(row)
 
 	

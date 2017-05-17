@@ -9,7 +9,7 @@ import pdb
 from level0 import tutorialSequence
 from level1 import damLevel
 from level3 import isoLevel
-# from level4 import 
+from level4 import renewLevel
 
 
 def initGameLogic():
@@ -29,6 +29,8 @@ def gameLogic(disp,board,root):
 		damLevel(board,disp,root)
 	if(board.level==3):
 		isoLevel(board,disp,root)
+	if(board.level==4):
+		renewLevel(board,disp,root)
 	# if(board.level==4):
 	# 	isoLevel(board,disp,root)
 	# print board.level

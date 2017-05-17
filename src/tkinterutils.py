@@ -6,6 +6,7 @@ import ttk
 from logicmain import gameLogic
 from level1 import initLevel1
 from level3 import initLevel3, isoLevel
+from level4 import initLevel4, renewLevel
 import ttk
 from PIL import Image, ImageTk
 import random
@@ -563,6 +564,9 @@ class TKBoard:
 			self.eventMessage.configure(bg='lightgray')
 			self.eventTitle.configure(bg='lightgray')
 
+			for child in self.eventMenu.winfo_children():
+				child.destroy()
+
 			for i,option in enumerate(self.boardlogic.events[0]):
 				if(i in [1,2,3]):
 					#format the option
@@ -591,7 +595,7 @@ class TKBoard:
 			window_width = self.eventMessage.winfo_width()+self.eventMenu.winfo_width()
 
 			#make the x of the window 750/2.-width/2.
-			self.eventCanvas.place(x=(750/2.-(self.eventMessage.winfo_width()+self.eventMenu.winfo_width())/2.),y=300)
+			self.eventCanvas.place(x=300,y=300)
 
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
@@ -924,8 +928,12 @@ class TKBoard:
 			self.level1endbutton.place(x=500,y=40)
 			root.after(self.updateRate,self.spinTurbine,root)
 
-		elif(self.boardlogic.level==3):
-			self.level1endbutton.place(x=500,y=40)
+		elif(self.boardlogic.level==3 and self.boardlogic.numEvents>0):
+			try:
+				self.level1endbutton.place(x=570,y=40)
+			except:
+				self.level1endbutton=tk.Button(self.imageCanvas,bg='#00ff00',text="     Move     \n     on!     \n",command=self.nextLevel)
+				self.level1endbutton.place(x=570,y=40)
 
 	def spill(self):
 		self.boardlogic.spilledSeconds+=self.spillRepeatInterval/1000.
@@ -946,6 +954,12 @@ class TKBoard:
 			#set the board
 			self.setBoard()
 			self.root.after(self.updateRate,initLevel3,self.boardlogic,self,self.root)
+
+		elif(self.boardlogic.level==3):
+			self.boardlogic.numEvents=0
+			self.boardlogic.level=4
+			initLevel4(self.boardlogic,self,root)
+
 
 	def clearBoard(self):
 		#gameFrame and updateFrame
@@ -1313,8 +1327,10 @@ class TKBoard:
 														str(int(self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]*0.1)),98])
 					self.updateMessage()
 
-			
-		self.master.after(self.updateRate,isoLevel, self.boardlogic,self,self.master)
+		if(self.boardlogic.level==3):	
+			self.master.after(self.updateRate,isoLevel, self.boardlogic,self,self.master)
+		elif(self.boardlogic.level==4):	
+			self.master.after(self.updateRate,renewLevel, self.boardlogic,self,self.master)
 		
 	def gensHover(self,event):
 		#remove the border from the other generators
@@ -1473,7 +1489,7 @@ class TKBoard:
 		self.pointsTitle.place(x=10,y=0)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
-		self.points.place(x=43,y=50)
+		self.points.place(x=20,y=50)
 
 
 		#ancillary services

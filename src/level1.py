@@ -15,7 +15,7 @@ def initLevel1(board):
 
 def damLevel(board,disp,root):
 
-	board.water_level+=0.018
+	board.water_level+=0.025
 	if(board.progress<99.5):
 		if(board.water_level>99):
 			board.progress-=20.
@@ -140,7 +140,7 @@ def powerProduced(board):
 
 def addPoints(board,disp):
 	if abs(board.powerProducedDam-board.damLoad)<5:
-		board.progress+=(disp.updateRate/2)/1000./3*1.4 #/1.2  amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
+		board.progress+=(disp.updateRate/2)/1000./3*2.#/1.2  amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
 		board.totalPoints+=0.01
 	if abs(board.powerProducedDam-board.damLoad)<1:
 		board.totalPoints+=0.01

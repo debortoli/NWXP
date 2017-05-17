@@ -12,7 +12,6 @@ import random
 import numpy as np
 import csv
 from utils import Tooltip
-from scipy.stats import beta
 import locale
 
 class TKBoard:

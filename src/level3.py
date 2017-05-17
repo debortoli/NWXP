@@ -118,7 +118,7 @@ def initLevel3(board,disp,root):
 def isoLevel(board,disp,root):
 	# print board.numEvents
 	
-	if(board.numEvents==1):
+	if(board.numEvents==4):
 		root.after(disp.updateRate,disp.level1End,root)
 	runMarket(board,disp,root)
 	root.after(disp.updateRate,disp.level3MessageHandler,root)

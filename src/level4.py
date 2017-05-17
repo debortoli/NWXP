@@ -27,7 +27,7 @@ def initLevel4(board,disp,root):
 def renewLevel(board,disp,root):
 	# print board.numEvents
 	# print board.numEvents
-	if(board.numEvents==6):
+	if(board.numEvents==3):
 		root.after(disp.updateRate,disp.level1End,root)
 	runMarket(board,disp,root)
 	root.after(disp.updateRate,disp.level3MessageHandler,root)

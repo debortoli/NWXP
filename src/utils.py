@@ -14,9 +14,9 @@ class Board:
 		self.clock = pygame.time.Clock()
 
 		#change for push to master!
-		self.progress=0.
+		self.progress=99.9
 		self.totalPoints=0.
-		self.level=0.
+		self.level=1.
 
 
 		self.year=0

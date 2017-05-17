@@ -790,9 +790,15 @@ class TKBoard:
 
 
 	def updateMessage(self):
-		self.updateMessageCanvas.pack()
-		self.updateMessageLabel['text']=self.boardlogic.updateQueue[0][0]
-		self.updateMessageLabel.pack(side='top',pady=10)
+		
+		if(self.boardlogic.level<4):
+			self.updateMessageCanvas.pack()
+			self.updateMessageLabel['text']=self.boardlogic.updateQueue[0][0]
+			self.updateMessageLabel.pack(side='top',pady=10)
+		elif(self.boardlogic.level==4):
+			self.updateMessageCanvas.pack(side='bottom')
+			self.updateMessageLabel['text']=self.boardlogic.updateQueue[0][0]
+			self.updateMessageLabel.pack(side='top',pady=10)
 
 	def nextMessage(self):
 		if(self.boardlogic.level<3):
@@ -958,7 +964,7 @@ class TKBoard:
 		elif(self.boardlogic.level==3):
 			self.boardlogic.numEvents=0
 			self.boardlogic.level=4
-			initLevel4(self.boardlogic,self,root)
+			initLevel4(self.boardlogic,self,self.master)
 
 
 	def clearBoard(self):

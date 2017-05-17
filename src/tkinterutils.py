@@ -996,9 +996,16 @@ class TKBoard:
 			self.boardlogic.level=4
 			self.level1endbutton.destroy()
 
+			with open('level4events.csv', 'rb') as csvfile:
+				event_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+				for i,row in enumerate(event_reader):
+					if(i!=0):
+						self.boardlogic.possibleEvents.append(row)
+
 			initLevel4(self.boardlogic,self,self.master)
 
 		elif(self.boardlogic.level==4):
+			
 			self.gameEnd()
 
 	def gameEnd(self):

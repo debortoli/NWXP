@@ -54,8 +54,13 @@ def initLevel3(board,disp,root):
 		"(in hours) to compute the total amount of power (in MWh) secured for the time period. "
 		board.updateQueue.append([m6,6])
 
+		m62="On the top right of this table you will also notice a 'Market Clearing Price'. "+\
+			"Even though generators bid a certain amount, what they get paid is the maximum amount "+\
+			"of an accepted generator's bid. This is the Market Clearing Price. "
+		board.updateQueue.append([m62,6.2])
+
 		m65="Your goal will be to to select enough generators (as indicated by the 'Cumulative MWh column)"+\
-		"to meet the load for that time period. You must select at least enough generators, but also not more"+\
+		"to meet the load for that time period. You must select at least enough generators, but also not more "+\
 		"than you need. You can delete selected generators by clicking the red button. "
 		board.updateQueue.append([m65,6.5])
 
@@ -75,16 +80,16 @@ def initLevel3(board,disp,root):
 			"the energy needs are the greatest. "
 		board.updateQueue.append([m9,9])
 
-		m10="What has just been described is a market that real engineers run the day before (thus it is called the 'Day-Ahead' Market.)"+\
+		m10="What has just been described is a market that real engineers run the day before (thus it is called the 'Day-Ahead' Market.). "+\
 			"On the day of, the estimate for the demand may have been "+\
 			"too low. In order to make up the difference, generators can be designated for "+\
-			"'Ancillary Services'. These generators will not run unless they are needed, but must be ready"+\
+			"'Ancillary Services'. These generators will not run unless they are needed, but must be ready "+\
 			"in the event that additional generation is needed. "
 		board.updateQueue.append([m10,10])
 
 		m11="As a power administrator, you must pay these generators to be ready to turn on "+\
-			"quickly (in the game you will lose a small number of points). However securing these services"+\
-			"prevents events like black outs from occuring. During the game not having Ancillary Services"+\
+			"quickly (in the game you will lose a small number of points). However securing these services "+\
+			"prevents events like black outs from occuring. During the game not having Ancillary Services "+\
 			"leaves open the possibility to lose a lot of points."
 		board.updateQueue.append([m11,11])
 
@@ -113,7 +118,7 @@ def initLevel3(board,disp,root):
 def isoLevel(board,disp,root):
 	# print board.numEvents
 	
-	if(board.numEvents==1):
+	if(board.numEvents==6):
 		root.after(disp.updateRate,disp.level1End,root)
 	runMarket(board,disp,root)
 	root.after(disp.updateRate,disp.level3MessageHandler,root)

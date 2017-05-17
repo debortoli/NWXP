@@ -675,11 +675,11 @@ class TKBoard:
 			messageIndex=4
 			pointIndex=5
 		elif(option==2):
-			messageIndex=7
-			pointIndex=8
+			messageIndex=6
+			pointIndex=7
 		elif(option==3):
-			messageIndex=10
-			pointIndex=11
+			messageIndex=8
+			pointIndex=9
 
 
 		#place the menu 40 miles away
@@ -995,6 +995,7 @@ class TKBoard:
 			self.boardlogic.numEvents=0
 			self.boardlogic.level=4
 			self.level1endbutton.destroy()
+
 			initLevel4(self.boardlogic,self,self.master)
 
 		elif(self.boardlogic.level==4):
@@ -1002,8 +1003,15 @@ class TKBoard:
 
 	def gameEnd(self):
 		self.clearBoard()
-		self.doneCanvas = tk.Canvas(self.master,bg="#0dad27",height=600, width=600, text="'YOU\'VE \nWON!'",font=("Helvetica", 50))
+		self.doneCanvas = tk.Canvas(self.master,bg="#0dad27",height=600, width=600)
 		self.doneCanvas.pack(fill='both')
+
+		self.eventTitle   =   tk.Label(self.doneCanvas,bg='#0dad27',text="'YOU\'VE \nWON!'",font=("Helvetica", 50))
+		self.eventTitle.pack(fill='both')
+
+
+
+		
 
 
 	def clearBoard(self):
@@ -1187,7 +1195,7 @@ class TKBoard:
 	def enterAncillary(self):
 		if(self.boardlogic.time_period>4):
 			#decrement 10 points
-			self.boardlogic.totalPoints-=20
+			self.boardlogic.totalPoints-=5
 
 			self.boardlogic.enteredAncillaryMarket=True
 
@@ -1631,7 +1639,7 @@ class TKBoard:
 		#resize the canvas, not that everything else has been placed
 		image = Image.open("../images/level3_old.png")
 		image=image.resize((750,800-self.infoCanvasHeight))#750,700-self.infoCanvasHeight
-		image.save('../images/level3_label.png')
+		# image.save('../images/level3_label.png')
 
 		photo = ImageTk.PhotoImage(image)
 		self.master.photo=photo

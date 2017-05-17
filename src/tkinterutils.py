@@ -595,7 +595,7 @@ class TKBoard:
 			window_width = self.eventMessage.winfo_width()+self.eventMenu.winfo_width()
 
 			#make the x of the window 750/2.-width/2.
-			self.eventCanvas.place(x=300,y=300)
+			self.eventCanvas.place(x=300,y=200)
 
 		#update the points display
 		self.points["text"]=str(int(self.boardlogic.totalPoints))
@@ -817,8 +817,38 @@ class TKBoard:
 				#display the next message
 				self.updateMessage()
 
-		else:#we're in level 3 or 4
+		elif(self.boardlogic.level==3):#we're in level 3 or 4
 			if(self.boardlogic.updateQueue[0][1]==12):
+				self.boardlogic.time_period=1
+				self.boardlogic.clearingGens=[]
+				self.updateDisplaysLevel3(self.master)
+
+			del self.boardlogic.updateQueue[0]
+			if(len(self.boardlogic.updateQueue)==0):
+				#stop providing update messages
+				self.updateMessageCanvas.pack_forget()
+			else:
+				#reformat the message to look nice
+				eventMessage="    "
+				num_words=0
+				for char in self.boardlogic.updateQueue[0][0]:
+					if (char == ' '):
+						num_words+=1
+						if(num_words>7):
+							eventMessage+='    \n    '
+							num_words=0
+						else:
+							eventMessage+=' '
+					else:
+						eventMessage+=char
+
+				self.boardlogic.updateQueue[0][0]=eventMessage
+				self.updateMessage()
+
+		elif(self.boardlogic.level==4):
+			if(self.boardlogic.updateQueue[0][1]==0):
+				self.updateMessageCanvas.pack(side='top')
+			if(self.boardlogic.updateQueue[0][1]==1):
 				self.boardlogic.time_period=1
 				self.boardlogic.clearingGens=[]
 				self.updateDisplaysLevel3(self.master)
@@ -934,7 +964,7 @@ class TKBoard:
 			self.level1endbutton.place(x=500,y=40)
 			root.after(self.updateRate,self.spinTurbine,root)
 
-		elif(self.boardlogic.level==3 and self.boardlogic.numEvents>0):
+		elif((self.boardlogic.level==3 or self.boardlogic.level==4) and self.boardlogic.numEvents>0):
 			try:
 				self.level1endbutton.place(x=570,y=40)
 			except:
@@ -964,7 +994,16 @@ class TKBoard:
 		elif(self.boardlogic.level==3):
 			self.boardlogic.numEvents=0
 			self.boardlogic.level=4
+			self.level1endbutton.destroy()
 			initLevel4(self.boardlogic,self,self.master)
+
+		elif(self.boardlogic.level==4):
+			self.gameEnd()
+
+	def gameEnd(self):
+		self.clearBoard()
+		self.doneCanvas = tk.Canvas(self.master,bg="#0dad27",height=600, width=600, text="'YOU\'VE \nWON!'",font=("Helvetica", 50))
+		self.doneCanvas.pack(fill='both')
 
 
 	def clearBoard(self):
@@ -972,6 +1011,13 @@ class TKBoard:
 		if(self.boardlogic.level==1):
 			self.gameFrame.destroy()
 			self.updateFrame.destroy()
+		elif(self.boardlogic.level==4):
+			for child in self.infoCanvas.winfo_children():
+				child.destroy()
+			for child in self.generatorCanvas.winfo_children():
+				child.destroy()
+			for child in self.imageCanvas.winfo_children():
+				child.destroy()
 
 	def setBoard(self):
 		if(self.boardlogic.level==3):

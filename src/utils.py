@@ -8,16 +8,20 @@ import Tkinter as tk
 import ttk
 
 class Board:
-	def __init__(self):
+	def __init__(self,skip1=0):
 		# initialize game engine
 		pygame.init()
 		self.clock = pygame.time.Clock()
 
 		#change for push to master!
-		self.progress=99.9
-		self.totalPoints=0.
-		self.level=1.
 
+		self.progress=0.
+		self.totalPoints=0.
+		self.level=0.
+		if(skip1):
+			self.progress=99.9
+			self.totalPoints=0.
+			self.level=1.
 
 		self.year=0
 

@@ -11,12 +11,17 @@ from tkinterutils import TKBoard
 import Tkinter as tk
 from ttk import *
 from logicmain import initGameLogic, gameLogic
+import sys
 
 
 
 if __name__ == '__main__':
     
-    boardlogic=initGameLogic()
+    try:
+        skip1=float(sys.argv[1])
+    except:
+        skip1=0
+    boardlogic=initGameLogic(skip1)
 
     root = tk.Tk()
     my_gui = TKBoard(root,boardlogic)

@@ -12,8 +12,8 @@ from level3 import isoLevel
 from level4 import renewLevel
 
 
-def initGameLogic():
-	board=Board()
+def initGameLogic(skip1):
+	board=Board(skip1)
 	board.clock.tick()
 	return board
 

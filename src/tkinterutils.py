@@ -56,7 +56,7 @@ class TKBoard:
 		self.points.pack(side='top',pady=10)
 
 		#draggables canvas
-		self.draggablesCanvas = tk.Canvas(self.updateFrame,bg="lightgray",highlightthickness=2,highlightbackground="Black",height=500)
+		self.draggablesCanvas = tk.Canvas(self.updateFrame,bg="lightgray",highlightthickness=2,highlightbackground="Black",height=700)
 		self.draggablesCanvas.pack()#grid(row=2,column=0,sticky='NS')
 
 		#the game canvas
@@ -326,10 +326,10 @@ class TKBoard:
 
 		#put in slider for user to set water velocity
 		self.water_slider_label=tk.Label(self.gameCanvas,bg='white',text="Water Flow Rate (m^3/s)",font=("Helvetica",15))
-		self.water_slider_label.place(x=670,y=10)
+		self.water_slider_label.place(x=655,y=10)
 
-		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=350,orient='horizontal',command=self.updateWaterVelocity,showvalue=0)
-		self.water_slider.place(x=700,y=40)
+		self.water_slider=tk.Scale(self.gameCanvas,from_=0, to=50,length=270,orient='horizontal',command=self.updateWaterVelocity,showvalue=0)
+		self.water_slider.place(x=630,y=40)
 
 		#put in the level end button
 		self.level1endbutton=tk.Button(self.gameFrame,bg='#00ff00',text="     Move     \n     on!     \n",command=self.nextLevel)
@@ -443,7 +443,7 @@ class TKBoard:
 				if(self.gameCanvas.coords("circle")[0]==self.gameCanvas.coords(self.turbine)[0]+2-40):#if this message has just been chosen
 					self.waterAnimationSpeed=0.
 
-				if(self.gameCanvas.coords("circle")[0]<630):
+				if(self.gameCanvas.coords("circle")[0]<610):
 					self.gameCanvas.move("circle",10,-20)
 
 			elif(self.boardlogic.updateQueue[0][1]==4):#highlight the load label
@@ -541,6 +541,7 @@ class TKBoard:
 		#update the event stuff if some exist
 		if(len(self.boardlogic.events)>0):
 			# self.eventCanvas.place(x=10,y=400)
+			self.boardlogic.numEvents+=1
 			self.eventTitle.pack(side='top',fill='x')
 			self.eventMessage.pack(side='left',fill='both')	
 			self.eventMenu.pack(side='right',fill='both')	
@@ -579,11 +580,11 @@ class TKBoard:
 						else:
 							option_formatted+=char
 					if(i==1):
-						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(1),bd=2).pack(side='top',fill='x')
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 14), command=lambda: self.choseEventOption(1),bd=2).pack(side='top',fill='x')
 					elif(i==2):
-						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(2),bd=2).pack(side='top',fill='x')
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 14), command=lambda: self.choseEventOption(2),bd=2).pack(side='top',fill='x')
 					elif(i==3):
-						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 12), command=lambda: self.choseEventOption(3),bd=2).pack(side='top',fill='x')
+						self.opt=tk.Button(self.eventMenu,text=option_formatted, font=("Helvetica", 14), command=lambda: self.choseEventOption(3),bd=2).pack(side='top',fill='x')
 					# self.opt.
 			
 
@@ -637,17 +638,18 @@ class TKBoard:
 				if(len(self.boardlogic.updateQueue)>0):
 					if(self.boardlogic.updateQueue[-1][1]!=99):#avoid adding the message multiple times
 						self.boardlogic.updateQueue.append(["You can now choose generators to designate for Ancillary Services!\n "+\
-															"It is suggested that you secure generators for at least 5000MWh\n "+\
+															"It is suggested that you secure at least 10% of the dispatch power\n "+\
 															"for each time period. You must select generators that have a ramp rate\n "+\
 															"greater than the median of the available generators. \n"+\
-															"Press the 'Secure Ancillary' Button to begin!",99])
+															"Press the 'Secure Ancillary' Button to begin, or the 'Skip Ancillary' Button",99])
 
 				else:
 					self.boardlogic.updateQueue.append(["You can now choose generators to designate for Ancillary Services!\n "+\
-														"It is suggested that you secure generators for at least 5000MWh\n "+\
+														"It is suggested that you secure at least 10% of the dispatch power\n "+\
 														"for each time period. You must select generators that have a ramp rate\n "+\
-														"greater than the median of the available generators.  \n"+\
-														"Press the 'Secure Ancillary' Button to begin!",99])
+														"greater than the median of the available generators. \n"+\
+														"Press the 'Secure Ancillary' Button to begin, or the 'Skip Ancillary' Button",99])
+
 				
 				self.updateMessage()
 				self.chooseNewGenerators()
@@ -760,7 +762,7 @@ class TKBoard:
 
 		
 
-
+		#somewhere in here put level 3 end stuff
 		
 
 		self.boardlogic.gensSelected=[[],[],[],[],[]]
@@ -808,20 +810,38 @@ class TKBoard:
 
 		else:#we're in level 3 or 4
 			if(self.boardlogic.updateQueue[0][1]==12):
-				# pdb.set_trace()
 				self.boardlogic.time_period=1
+				self.boardlogic.clearingGens=[]
 				self.updateDisplaysLevel3(self.master)
-				# initLevel3()
+
 			del self.boardlogic.updateQueue[0]
 			if(len(self.boardlogic.updateQueue)==0):
 				#stop providing update messages
 				self.updateMessageCanvas.pack_forget()
 			else:
+				#reformat the message to look nice
+				eventMessage="    "
+				num_words=0
+				for char in self.boardlogic.updateQueue[0][0]:
+					if (char == ' '):
+						num_words+=1
+						if(num_words>7):
+							eventMessage+='    \n    '
+							num_words=0
+						else:
+							eventMessage+=' '
+					else:
+						eventMessage+=char
+
+				self.boardlogic.updateQueue[0][0]=eventMessage
 				self.updateMessage()
 
 	def updateWaterVelocity(self,value):
-		self.boardlogic.water_velocity=float(value)
-		self.waterAnimationSpeed=float(value)/12000
+		if(float(value)!=0):
+			self.boardlogic.water_velocity=float(value)+100
+		else:
+			self.boardlogic.water_velocity=0
+		self.waterAnimationSpeed=float(value)/1800
 
 
 	def spinTurbine(self,root):
@@ -905,6 +925,9 @@ class TKBoard:
 			self.level1endbutton.place(x=500,y=40)
 			root.after(self.updateRate,self.spinTurbine,root)
 
+		elif(self.boardlogic.level==3):
+			self.level1endbutton.place(x=500,y=40)
+
 	def spill(self):
 		self.boardlogic.spilledSeconds+=self.spillRepeatInterval/1000.
 		if(self.boardlogic.spilledSeconds>10.):
@@ -972,14 +995,14 @@ class TKBoard:
 			self.eventCanvas.place(x=10000,y=50000)
 			# self.eventCanvas.pack_forget()
 
-			self.eventTitle   =   tk.Label(self.eventCanvas,bg='lightgray',text="An event has occurred!",font=("Helvetica", 18))			
-			self.eventMessage = tk.Label(self.eventCanvas,bg='lightgray',font=("Helvetica", 13))
+			self.eventTitle   =   tk.Label(self.eventCanvas,bg='lightgray',text="An event has occurred!",font=("Helvetica", 28))			
+			self.eventMessage = tk.Label(self.eventCanvas,bg='lightgray',font=("Helvetica", 19))
 			self.eventMenu    = tk.Canvas(self.eventCanvas,bg="lightgray")
 
 			#the message board
 			self.updateMessageCanvas=tk.Canvas(self.master,bg="lightgray",highlightthickness=0)
 			self.updateMessageCanvas.pack(side='bottom')
-			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 13))
+			self.updateMessageLabel =  tk.Label(self.updateMessageCanvas,bg='#ddf4c2',text="Loading....",font=("Helvetica", 15))
 			self.updateMessageLabel.pack()
 			self.continueButton=tk.Button(self.updateMessageCanvas,text='Continue',bg='#00ff00',command=self.nextMessage)
 			self.continueButton.pack()
@@ -1010,11 +1033,11 @@ class TKBoard:
 		self.genTitle.pack(side='top',pady=1)
 
 		self.tableGens = ttk.Treeview(self.generatorCanvas,height=26,selectmode='extended')#height may be in number of items!
-		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/s)","Bid($/MWh)")
+		self.tableGens["columns"]=("Type","Name","Capacity(MW)","Ramp Rate(MW/min)","Bid($/MWh)")
 		self.tableGens.column("Type", width=50 ,anchor=tk.CENTER)
-		self.tableGens.column("Name", width=150,anchor=tk.CENTER)
+		self.tableGens.column("Name", width=155,anchor=tk.CENTER)
 		self.tableGens.column("Capacity(MW)", width=100 ,anchor=tk.CENTER)
-		self.tableGens.column("Ramp Rate(MW/s)", width=140,anchor=tk.CENTER)
+		self.tableGens.column("Ramp Rate(MW/min)", width=140,anchor=tk.CENTER)
 		self.tableGens.column("Bid($/MWh)", width=100 ,anchor=tk.CENTER)
 
 		# self.tableGens.heading("type", text="Type")
@@ -1092,8 +1115,9 @@ class TKBoard:
 			self.boardlogic.time_period=6
 
 			#add an event
-			self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
-			self.updateDisplaysLevel3(self.master)
+			if(len(self.boardlogic.events)<1):
+				self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
+				self.updateDisplaysLevel3(self.master)
 
 	def enterAncillary(self):
 		if(self.boardlogic.time_period>4):
@@ -1110,6 +1134,8 @@ class TKBoard:
 
 			#change the label text
 			self.dispatchButton['text']="Secure Ancillary \nGenerator!"
+
+			self.boardlogic.time_period = 0
 
 			#recolor the options in tableGens
 			row_tag='oddrow'#for alternating colors
@@ -1193,7 +1219,7 @@ class TKBoard:
 
 	
 	def dispatchGens(self):
-		if(self.boardlogic.time_period<5):#we're not in ancillary services
+		if(self.boardlogic.time_period<5 and self.boardlogic.enteredAncillaryMarket==False):#we're not in ancillary services
 			board=self.boardlogic
 			if(len(board.updateQueue)>0):
 				self.nextMessage()
@@ -1254,30 +1280,40 @@ class TKBoard:
 				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
 
 		elif(self.boardlogic.enteredAncillaryMarket==True):#we're in ancillary services
+			# if(board.time_period)
+
 			board=self.boardlogic
 			if(len(board.updateQueue)>0):
 				self.nextMessage()
-			
-			#if we're in an autofill period
-			if(board.time_period in [0,3,4]):
-				self.updateDispatchProfile()
-				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
-				board.time_period+=1
-				# self.updateDispatchProfile()
-				self.updateDisplaysLevel3(self.master)
+			if(self.boardlogic.cumulGen>=int(self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]*0.1)):
+				#if we're in an autofill period
+				self.updateAncillaryProfile()
 				self.clearTimePeriod()
 				board.time_period+=1
+				board.last_time_period+=1
 				self.master.after(self.updateRate,self.updateDisplaysLevel3,self.master)
+
+				self.boardlogic.ancillary_period+=1
+
+				if(board.time_period==5):
+					self.boardlogic.enteredAncillaryMarket=False
+					self.boardlogic.time_period=6
+
+				#add an event
+				if(self.boardlogic.events)<1:
+					self.boardlogic.events.append(random.choice(self.boardlogic.possibleEvents))
+					self.updateDisplaysLevel3(self.master)
 			else:
+				if(len(self.boardlogic.updateQueue)>0):
+					if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
+						self.boardlogic.updateQueue.append(["Please add more generators to reach a cumulative\n generation of: "+\
+														str(int(self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]*0.1)),98])
+						self.updateMessage()
+				else:
+					self.boardlogic.updateQueue.append(["Please add more generators to reach a cumulative\n generation of: "+\
+														str(int(self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]*0.1)),98])
+					self.updateMessage()
 
-				self.clearTimePeriod()
-				board.time_period+=1
-				board.last_time_period=board.time_period
-				self.updateDisplaysLevel3(self.master)
-
-			self.boardlogic.ancillary_period+=1
-				
-			
 			
 		self.master.after(self.updateRate,isoLevel, self.boardlogic,self,self.master)
 		
@@ -1327,7 +1363,7 @@ class TKBoard:
 
 			median_ramp_rate = np.median(np.array(ramp_list))
 
-			if(self.boardlogic.time_period<5):#we're not in ancillary services
+			if(self.boardlogic.time_period<5 and self.boardlogic.enteredAncillaryMarket==False):#we're not in ancillary services
 				min_bid_rate=float(str(locale.currency(min_bid_rate)[1:]))
 
 				if(float(str(row[-1][1:]))==min_bid_rate):
@@ -1366,6 +1402,7 @@ class TKBoard:
 				#check if the ramp rate is correct
 				if(float(str(row[3]))>=median_ramp_rate):
 
+
 					#check the the price is minimal
 					min_bid_rate=50000
 					for gen in self.boardlogic.availableGenerators:
@@ -1373,22 +1410,33 @@ class TKBoard:
 								min_bid_rate=float(str(gen[4]))
 
 					if(float(str(row[-1][1:]))==min_bid_rate):
-						genList=self.boardlogic.availableGenerators
-						self.boardlogic.availableGenerators=[]
-						for gen in genList:
-							if(gen[1]!=row[1]):
-								self.boardlogic.availableGenerators.append(gen)
+						
+							genList=self.boardlogic.availableGenerators
+							self.boardlogic.availableGenerators=[]
+							for gen in genList:
+								if(gen[1]!=row[1]):
+									self.boardlogic.availableGenerators.append(gen)
 
-						self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.ancillary_period][1]#to account for the amount of time this will be online
-						self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
+							self.boardlogic.cumulGen+=float(str(row[2]))*self.boardlogic.profilePeriods[self.boardlogic.ancillary_period][1]#to account for the amount of time this will be online
+							self.boardlogic.clearingGens.append([row[1],self.boardlogic.cumulGen,row[4]])
 
-						#highlight the appropriate generator icons
-						for child in self.master.children:
-							try:
-								if(self.master.children[child]['text']==row[1]):
-									self.master.children[child].configure(bd=6,bg="#ffa500")
-							except:
-								r=0
+							#highlight the appropriate generator icons
+							for child in self.master.children:
+								try:
+									if(self.master.children[child]['text']==row[1]):
+										self.master.children[child].configure(bd=6,bg="#ffa500")
+								except:
+									r=0
+						# else:
+						# 	if(len(self.boardlogic.updateQueue)>0):
+						# 		if(self.boardlogic.updateQueue[-1][1]!=98):#avoid adding the error message multiple times
+						# 			self.boardlogic.updateQueue.append(["Please add more generators to reach a cumulative\n generation of: "+\
+						# 											str(int(self.boardlogic.demandProfile[self.boardlogic.time_period][1]*0.1)),98])
+						# 			self.updateMessage()
+						# 	else:
+						# 		self.boardlogic.updateQueue.append(["Please add more generators to reach a cumulative\n generation of: "+\
+						# 											str(int(self.boardlogic.demandProfile[self.boardlogic.time_period][1]*0.1)),98])
+						# 		self.updateMessage()
 
 					else:
 						if(len(self.boardlogic.updateQueue)>0):
@@ -1415,7 +1463,9 @@ class TKBoard:
 				self.tableGens['height']-=diff
 
 
-		self.root.after(1,self.updateDisplays,self.root)
+
+
+		self.root.after(1,self.updateDisplaysLevel3,self.root)
 
 
 	def createInfoTables(self):	
@@ -1424,7 +1474,7 @@ class TKBoard:
 		self.pointsTitle.place(x=10,y=0)
 
 		self.points = tk.Label(self.infoCanvas,bg='lightgray',text=str(int(self.boardlogic.totalPoints)),font=("Helvetica", 20),fg="#309933")
-		self.points.place(x=25,y=50)
+		self.points.place(x=43,y=50)
 
 
 		#ancillary services
@@ -1566,7 +1616,8 @@ class TKBoard:
 		self.boardlogic.last_time_period=self.boardlogic.time_period
 
 	def updateDemandProfile(self):
-		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period)):
+		if((self.boardlogic.time_period==0 or self.boardlogic.time_period==4) and (self.boardlogic.time_period!=self.boardlogic.last_time_period) and\
+																											self.boardlogic.enteredAncillaryMarket==False):
 			# alpha=2
 			# beta=5
 			timePeriodMeans=[   [80500	,90500,124320],
@@ -1591,12 +1642,13 @@ class TKBoard:
 
 	def updateAncillaryProfile(self):
 		#autofill the dispatch
-		self.boardlogic.ancillaryProfile[self.boardlogic.ancillary_period][1] = int(self.boardlogic.cumulGen)#self.boardlogic.demandProfile[self.boardlogic.ancillary_period][1]
+		self.boardlogic.ancillaryProfile[self.boardlogic.ancillary_period][1] = int(self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]*0.1)#self.boardlogic.demandProfile[self.boardlogic.ancillary_period][1]
 
 
 	def clearTimePeriod(self):
 		if(self.boardlogic.time_period<5):#we're not in the ancillary market
-			self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.demandProfile[self.boardlogic.time_period][1]#self.boardlogic.cumulGen
+			if(self.boardlogic.enteredAncillaryMarket==False):
+				self.boardlogic.dispatchProfile[self.boardlogic.time_period][1]=self.boardlogic.demandProfile[self.boardlogic.time_period][1]#self.boardlogic.cumulGen
 			self.boardlogic.cumulGen=0
 			# self.updateDispatchProfile()
 
@@ -1726,8 +1778,8 @@ class TKBoard:
 				self.imageCanvas.create_oval(500,500,540,540,fill="#ff6600",width=0,tag="circle")
 
 			if(self.boardlogic.updateQueue[0][1]==2):#hydro dam
-				if(self.imageCanvas.coords("circle")[0]>70):
-					self.imageCanvas.move("circle",-20,-20)
+				if(self.imageCanvas.coords("circle")[0]>75):
+					self.imageCanvas.move("circle",-21,-20)
 
 			elif(self.boardlogic.updateQueue[0][1]==4):#residential load
 				if(self.imageCanvas.coords("circle")[0]<500):
@@ -1753,8 +1805,11 @@ class TKBoard:
 				if(self.imageCanvas.coords("circle")[0]>200):
 					self.imageCanvas.move("circle",-20,0)
 
-			if(self.boardlogic.updateQueue[0][1]==11):#highlight the turbine
-				if(self.imageCanvas.coords("circle")[0]>70):
-					self.imageCanvas.delete("circle")
+			elif(self.boardlogic.updateQueue[0][1]==11):#highlight the turbine
+				try:
+					if(self.imageCanvas.coords("circle")[0]>70):
+						self.imageCanvas.delete("circle")
+				except:
+					r=0
 		
 

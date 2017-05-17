@@ -11,7 +11,7 @@ def initLevel1(board):
 	board.time="09:00 AM"
 	board.damLoad=board.possibleLoadLevels[int(board.time[:2])-1]
 	board.spilledSeconds=0
-	board.water_level=87
+	board.water_level=89.
 
 def damLevel(board,disp,root):
 
@@ -19,13 +19,14 @@ def damLevel(board,disp,root):
 	if(board.progress<99.5):
 		if(board.water_level>99):
 			board.progress-=20.
-		if(board.water_level>95):
-			board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
+		if(board.water_level>90):
+			if(len(board.updateQueue)==0):
+				board.updateQueue.append(["The water level is getting high. \n Consider spilling!",8])
 			root.after(1,disp.updateMessage)
 		else:
 			#remove the message
-			if(len(board.updateQueue)>0 and board.updateQueue[0][1]==8):
-				del board.updateQueue[0]
+			if(len(board.updateQueue)>0 and int(board.updateQueue[0][1])==8):
+				board.updateQueue = [["Ended",1000]]
 				root.after(1,disp.nextMessage)
 
 		#update the power produced
@@ -139,7 +140,7 @@ def powerProduced(board):
 
 def addPoints(board,disp):
 	if abs(board.powerProducedDam-board.damLoad)<5:
-		board.progress+=(disp.updateRate/2)/1000./3 #/1.2  amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
+		board.progress+=(disp.updateRate/2)/1000./3*1.4 #/1.2  amounts to 1/1.2 percent a second * 120 seconds gives 100 percent
 		board.totalPoints+=0.01
 	if abs(board.powerProducedDam-board.damLoad)<1:
 		board.totalPoints+=0.01

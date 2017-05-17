@@ -13,11 +13,12 @@ class Board:
 		pygame.init()
 		self.clock = pygame.time.Clock()
 
+		#change for push to master!
+		self.progress=0.
+		self.totalPoints=0.
+		self.level=0.
 
-		self.progress=99.4
-		self.totalPoints=20.
-		#level 0=tutorial
-		self.level=1
+
 		self.year=0
 
 		self.updateQueue=[]
@@ -25,17 +26,19 @@ class Board:
 		self.UpdateMessageSurface_y=450
 		self.water_level=87
 		self.powerProducedDam=0.
-		self.damLoad=0.
+		self.damLoad=1020.
 		self.water_velocity=10.
 		self.loadChangeTime=pygame.time.get_ticks()
 		self.spilledSeconds=0.
 		self.time="09:00 AM"
 
+		self.numEvents=0
+
 
 		#for level 2
 		self.possibleLoadLevels=[1010.,1020.,1015.,1011.,1010.,1010.,
-								 1012.,1020.,1021.,1024.,1024.,1020.,
-								 1025.,1030.,1032.,1033.,1039.,1047.,
+								 1012.,1020.,1022.,1024.,1024.,1025.,
+								 1027.,1030.,1032.,1033.,1039.,1047.,
 								 1055.,1050.,1040.,1030.,1025.,1017.,]
 
 		#for level 3
@@ -45,7 +48,7 @@ class Board:
 			for i,row in enumerate(generator_reader):
 				if(i>0):
 					self.generators.append([row[0],row[1],float(row[2]),
-										float(row[3]),float(row[4]),float(row[5])])
+										float(row[3]),float(row[5]),float(row[4]),float(row[6])])
 
 		#add the image locations
 		#make a list of the generator locations where each index is [x,y,#]
@@ -99,7 +102,7 @@ class Board:
 		with open('events.csv', 'rb') as csvfile:
 			event_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
 			for i,row in enumerate(event_reader):
-				if(i!=0):
+				if(i==1):
 					self.possibleEvents.append(row)
 
 	

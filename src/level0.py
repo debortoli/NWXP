@@ -62,8 +62,9 @@ def tutorialSequence(board,disp,root):
 		   "2: Don't flow water so fast that you exceed the generation needed by the load."
 		board.updateQueue.append([m9,9])
 
-		m10="You can beat this level of the game by successfully running the dam"+"\n"+\
-		   "until the progress bar fills up. When you are ready press the 'Continue' Button!"
+		m10="You can beat this level of the game by successfully "+ "\n"+\
+			"running the dam until the progress bar fills up."+"\n"+\
+		    "When you are ready press the 'Continue' Button!"
 		board.updateQueue.append([m10,10])
 
 	
